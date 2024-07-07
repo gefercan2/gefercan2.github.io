@@ -177,6 +177,8 @@ border:none;
 
 
 #next{
+	position:fixed;
+	font-size:2em;
 	
 }
 
