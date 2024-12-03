@@ -8,5 +8,4 @@
 
 //---------------------------------------------------------------
 
-gsap.to("#logo1", { x: 200 })
-tl.from("logo1", {x:-500, y:190,opacity: "0.3",duration: 0.5, delay:0})
+gsap.fromTo( "#logo1",{ x: -140, fill: 'blue', }, { x: 40, fill: 'green' });
