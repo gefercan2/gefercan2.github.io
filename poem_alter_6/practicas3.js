@@ -8,4 +8,4 @@
 
 //---------------------------------------------------------------
 
-gsap.fromTo( "#logo1",{ x: -140, fill: 'blue', }, { x: 40, fill: 'green' });
+gsap.fromTo( "#logo1",{ x: -440, fill: 'blue', }, { x: 40, fill: 'green' });
