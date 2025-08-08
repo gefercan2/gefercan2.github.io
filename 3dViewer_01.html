@@ -42,9 +42,9 @@
         /* Controls Panel */
         #controls {
             position: absolute;
-            top: 20px;
+            bottom: 20px;
             left: 20px;
-            background: rgba(255, 255, 255, 0.9);
+            <!--background: rgba(255, 255, 255, 0.9);-->
             padding: 15px;
             border-radius: 8px;
             z-index: 200;
@@ -54,14 +54,16 @@
             margin: 5px;
             padding: 8px 12px;
             border: none;
-            border-radius: 4px;
-            background: #007bff;
-            color: white;
+            border-radius: 4px;color: white;
+	    background:none;
+            <!--background: #007bff;-->
+            
             cursor: pointer;
         }
 
         #controls button:hover {
             background: #0056b3;
+	    color: white;
         }
 
         /* Annotation Tooltips */
@@ -91,8 +93,8 @@
         /* Hotspot Markers */
         .hotspot {
             position: absolute;
-            width: 20px;
-            height: 20px;
+            width: 10px;
+            height: 10px;
             background: #ff6b6b;
             border: 2px solid white;
             border-radius: 50%;
@@ -146,7 +148,7 @@
         
         <!-- Control Panel -->
         <div id="controls">
-            <h4>3D Model Controls</h4>
+            <!--<h4>3D Model Controls</h4>-->
             <button onclick="ModelViewer.resetCamera()">Reset View</button>
             <button onclick="ModelViewer.toggleWireframe()">Toggle Wireframe</button>
             <button onclick="ModelViewer.changeModel()">Change Model</button>
@@ -167,6 +169,7 @@
         <div id="hotspot-1" class="hotspot" data-annotation="annotation-1"></div>
         <div id="hotspot-2" class="hotspot" data-annotation="annotation-2"></div>
         <div id="hotspot-3" class="hotspot" data-annotation="annotation-3"></div>
+	<div id="hotspot-4" class="hotspot" data-annotation="annotation-4"></div>
     </div>
 
     <!-- Three.js Library -->
@@ -208,21 +211,28 @@
             annotations: [
                 {
                     id: 'hotspot-1',
-                    position: { x: 2, y: 1, z: 0 },    // 3D world position
+                    position: { x:-21, y:-5, z: -39 },    // 3D world position
                     annotationId: 'annotation-1'
                 },
                 {
                     id: 'hotspot-2', 
-                    position: { x: -1, y: 2, z: 1.5 }, // 3D world position
+                    position: { x:-12, y: -8, z: -19 }, // 3D world position
                     annotationId: 'annotation-2'
                 },
                 {
                     id: 'hotspot-3',
-                    position: { x: 0, y: -1, z: -2 },  // 3D world position
+                    position: { x:-19, y: -10, z: -19},  // 3D world position
                     annotationId: 'annotation-3'
+                },
+                {
+                    id: 'hotspot-4',
+                    position: { x:-19, y: -10, z: -12},  // 3D world position
+                    annotationId: 'annotation-4'
                 }
             ],
             
+
+	    
             // State variables
             isWireframe: false,
             isLoading: false
@@ -260,7 +270,7 @@
          */
         function setupScene() {
             ModelViewer.scene = new THREE.Scene();
-            ModelViewer.scene.background = new THREE.Color(0x222222);
+            ModelViewer.scene.background = new THREE.Color(0x767676);
             console.log('Scene created');
         }
 
