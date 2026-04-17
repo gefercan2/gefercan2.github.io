@@ -513,9 +513,9 @@
             nodes.forEach((node, i) => {
                 if (node.id === "ROME") {
                     node.x = centerX;
-                    node.y = centerY + radius;
+                    node.y = centerY + radius* 0.01;
                     node.fx = centerX;
-                    node.fy = centerY + radius;
+                    node.fy = centerY + radius* 0.01;
                 } else if (node.id === "NAPLES") {
                     node.x = centerX + radius * 0.3;
                     node.y = centerY + radius * 0.35;
