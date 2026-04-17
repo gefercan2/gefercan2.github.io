@@ -26,38 +26,13 @@
             position: absolute;
             background-color: white;
             padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             opacity: 0;
             transition: opacity 0.2s;
-            max-width: 280px;
+            max-width: 200px;
             pointer-events: auto;
             z-index: 100;
-        }
-
-        .tooltip-image {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        .tooltip-image.loading {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-        }
-
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        .tooltip-content {
-            font-size: 0.9em;
-            line-height: 1.4;
         }
         
         .tooltip a {
@@ -97,52 +72,6 @@
             height: 15px;
             margin-right: 8px;
         }
-
-        /* Zoom Controls */
-        .zoom-controls {
-            position: absolute;
-            bottom: 30px;
-            left: 30px;
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .zoom-controls button {
-            width: 40px;
-            height: 40px;
-            border: none;
-            background-color: #667eea;
-            color: white;
-            font-size: 20px;
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .zoom-controls button:hover {
-            background-color: #5568d3;
-        }
-
-        .zoom-controls button:active {
-            background-color: #4557b8;
-        }
-
-        .zoom-level {
-            text-align: center;
-            font-size: 12px;
-            color: #666;
-            padding: 5px 0;
-        }
         
         .node, .link, .node-label {
             transition: all 0.3s ease;
@@ -165,7 +94,56 @@
             z-index: 1000;
         }
 
-        /* Side Menu Styles */
+        /* Zoom Controls */
+        .zoom-controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            background-color: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .zoom-btn:hover {
+            background-color: #5568d3;
+            transform: scale(1.1);
+        }
+
+        .zoom-btn:active {
+            transform: scale(0.95);
+        }
+
+        .zoom-level {
+            min-width: 60px;
+            text-align: center;
+            font-weight: bold;
+            color: #333;
+            font-size: 14px;
+        }
+
+        /* Menu Toggle Button */
         .menu-toggle {
             position: fixed;
             top: 20px;
@@ -353,6 +331,14 @@
         <span></span>
     </button>
 
+    <!-- Zoom Controls -->
+    <div class="zoom-controls">
+        <button class="zoom-btn" id="zoomOut" title="Zoom Out">−</button>
+        <div class="zoom-level" id="zoomLevel">100%</div>
+        <button class="zoom-btn" id="zoomIn" title="Zoom In">+</button>
+        <button class="zoom-btn" id="zoomReset" title="Reset Zoom">⟲</button>
+    </div>
+
     <!-- Overlay -->
     <div class="overlay" id="overlay"></div>
 
@@ -429,4 +415,8 @@
                     <p>This knowledge allowed them to depict the human form with unprecedented realism and grace. Michelangelo's David and his figures on the Sistine Chapel ceiling demonstrate a profound understanding of human anatomy and the ability to represent the body in complex, dynamic poses.</p>
                     
                     <h3>Master Artists</h3>
-                    <p>Leonardo da Vinci (1452-1519) epitomized the Renaissance ideal of the universal genius, excelling not only as a painter but als
+                    <p>Leonardo da Vinci (1452-1519) epitomized the Renaissance ideal of the universal genius, excelling not only as a painter but also as a scientist, inventor, and engineer. His notebooks contain detailed observations of nature, innovative designs for machines, and studies of human anatomy that were centuries ahead of their time.</p>
+                    
+                    <p>Michelangelo Buonarroti (1475-1564) was renowned primarily as a sculptor but also created some of the most iconic paintings in Western art, including the ceiling of the Sistine Chapel. His works are characterized by heroic figures with powerful, muscular bodies that express intense emotion and spiritual struggle.</p>
+                    
+                    <p>Raphael Sanzio (1483-1520) was celebrated for his graceful compositions and the serene beauty of his figures. His frescoes in the Vatican, particularly "The School of Athens," exemplify the Renaissance ideals of harmony, balanc
