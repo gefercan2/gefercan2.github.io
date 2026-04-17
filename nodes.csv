@@ -1,0 +1,59 @@
+id,type,birth,death,discipline,value,link
+Veronese,artist,b. 1528,d. 1588,painter,0.5,https://en.wikipedia.org/wiki/Paolo_Veronese
+Tintoretto,artist,b. 1518,d. 1594,painter,0.5,https://en.wikipedia.org/wiki/Tintoretto
+VENICE,city,city state,(Veneto),Republic of Venice (La Serenissima),5,https://en.wikipedia.org/wiki/Republic_of_Venice
+Jacopo Bassano,artist,b. 1510,d. 1592,painter,0.5,
+Andrea Palladio,artist,b. 1508,d. 1580,architect,0.5,https://en.wikipedia.org/wiki/Andrea_Palladio
+Ghirlandaio,artist,b. 1508,d. 1580,architect,0.5,https://en.wikipedia.org/wiki/Domenico_Ghirlandaio
+NAPLES,city,Kingdom (Spanish Crown),Campania,Sicilia Kingdom of Naples,5,https://en.wikipedia.org/wiki/Kingdom_of_Naples
+FLORENCE,city state,Medici dinasty,(Tuscany),Republic of Florence,4,https://en.wikipedia.org/wiki/Republic_of_Florence
+MANTUA,city,House of Gonzaga,,Duchy of Mantua,3,https://en.wikipedia.org/wiki/Duchy_of_Mantua
+MILAN,city,city state,(Lombardia),Duchy oF Milan,3,
+PADUA,city,city state,,,2,
+ROME,city state,Seat of the Pope,(Lazio),Papal Estates,6,https://en.wikipedia.org/wiki/Papal_States
+SIENA,city state,citizen-based,(Tuscany),Republic of Siena,2,https://en.wikipedia.org/wiki/Republic_of_Siena
+URBINO,city,city state,House of Montefeltro,Duchy of Urbino,2,https://en.wikipedia.org/wiki/Duchy_of_Urbino
+Pontormo,artist,b. 1494,d. 1557,painter,0.5,https://en.wikipedia.org/wiki/Pontormo
+Andrea del Sarto,artist,b. 1486,d. 1531,painter,0.5,https://en.wikipedia.org/wiki/Andrea_del_Sarto
+Titian,artist,b. 1485,d. 1576,painter,0.5,https://en.wikipedia.org/wiki/Titian
+Raphael,artist,b. 1483,d. 1520 Rome,painter,0.5,https://en.wikipedia.org/wiki/Raphael
+Michelangelo,artist,b. 1475,d. 1564,sculptor,0.5,https://en.wikipedia.org/wiki/Michelangelo
+Lorenzo Ghiberti,artist,b. 1378,d. 1455,sculptor,0.5,https://en.wikipedia.org/wiki/Lorenzo_Ghiberti
+Giorgione,artist,b. 1473-78,d. 1510,painter,0.5,https://en.wikipedia.org/wiki/Giorgione
+Leonardo,artist,b. 1452 Vinci,d. 1519 Loire,painter,0.5,https://en.wikipedia.org/wiki/Leonardo_da_Vinci
+Perugino,artist,b. 1446,d. 1523,painter,0.5,https://en.wikipedia.org/wiki/Pietro_Perugino
+Bramante,artist,b. 1444,d. 1514,architect,0.5,https://en.wikipedia.org/wiki/Donato_Bramante
+Verrocchio,artist,b. 1435,d. 1488,sculptor,0.5,https://en.wikipedia.org/wiki/Andrea_del_Verrocchio
+Mantegna,artist,b. 1431,d. 1506,painter,0.5,https://en.wikipedia.org/wiki/Andrea_Mantegna
+Giovanni Bellini,artist,b. 1430,d. 1516,painter,0.5,https://en.wikipedia.org/wiki/Giovanni_Bellini
+Gentile Bellini,artist,b. 1429,d. 1507,painter,0.5,https://en.wikipedia.org/wiki/Gentile_Bellini
+Antonello de Messina,artist,b. 1425 1430,d. 1479,painter,0.5,https://en.wikipedia.org/wiki/Antonello_da_Messina
+Piero della Francesca,artist,b. 1415,d. 1492,painter,0.5,https://en.wikipedia.org/wiki/Piero_della_Francesca
+Luca Della Robia,artist,b. 1399,d. 1482,sculptor,0.5,https://en.wikipedia.org/wiki/Luca_della_Robbia
+Andrea Della Robia,artist,b. 1435,d. 1525,sculptor,0.5,https://en.wikipedia.org/wiki/Andrea_della_Robbia
+Filippo Lippi,artist,b. 1406,d. 1469,painter,0.5,https://en.wikipedia.org/wiki/Filippo_Lippi
+Alberti,artist,b. 1404,d. 1472,architect,0.5,https://en.wikipedia.org/wiki/Leon_Battista_Alberti
+Massaccio,artist,b. 1401,d. 1428,painter,0.5,https://en.wikipedia.org/wiki/Masaccio
+Paolo Ucello,artist,b. 1397,d. 1475,painter,0.5,https://en.wikipedia.org/wiki/Paolo_Uccello
+Fra Angelico,artist,b. 1395,d. 1455,painter,0.5,https://en.wikipedia.org/wiki/Fra_Angelico
+Donatello,artist,b. 1386,d. 1466,sculptor,0.5,https://en.wikipedia.org/wiki/Donatello
+Brunelleschi,artist,b. 1377,d. 1446,sculptor,0.5,https://en.wikipedia.org/wiki/Filippo_Brunelleschi
+Taddeo Gaddi,artist,b. 1300,d,painter,0.5,https://en.wikipedia.org/wiki/Taddeo_Gaddi
+Antonio Bazzi,artist,b. 1477,d. 1549,painter,0.5,https://en.wikipedia.org/wiki/Il_Sodoma
+Duccio Buonisegna,artist,b. 1255,d. 1318–1319,painter,0.5,https://en.wikipedia.org/wiki/Duccio
+Giovanni Pisano,artist,b. 1250,d. 1315,sculptor,0.5,https://en.wikipedia.org/wiki/Giovanni_Pisano
+Giulio Romano,artist,b. 1499,Roma,d. 1546,0.5,https://en.wikipedia.org/wiki/Giulio_Romano
+Sandro Botticelli,artist,b. 1445,d. 1510,painter,0.5,https://en.wikipedia.org/wiki/Sandro_Botticelli
+Jacopo Bellini,artist,b. 1396,d. 1470,Venice,0.5,https://en.wikipedia.org/wiki/Jacopo_Bellini
+Giotto di Bondone,artist,b. 1267,d. 1337,painter,0.5,https://en.wikipedia.org/wiki/Giotto
+Lorenzo Lotto,artist,b. 1480,d. 1556,painter,0.5,https://en.wikipedia.org/wiki/Lorenzo_Lotto
+Sebastiano del Piombo,artist,b. 1485,d. 1547,painter,0.5,https://en.wikipedia.org/wiki/Sebastiano_del_Piombo
+Signorelli,artist,b. 1441,d. 1523,painter,0.5,https://en.wikipedia.org/wiki/Luca_Signorelli
+Pinturicchio,artist,b. 1454,d. 1513,painter,0.5,https://en.wikipedia.org/wiki/Pinturicchio
+Antonio Pollaiuolo,artist,b. 1429,d. 1498,painter sculptor,0.5,https://en.wikipedia.org/wiki/Antonio_del_Pollaiuolo
+Andrea Schiavone,artist,b. 1510,d. 1563,painter,0.5,https://en.wikipedia.org/wiki/Andrea_Schiavone
+Parmigianino,artist,b. 1503,d. 1540,painter,0.5,https://en.wikipedia.org/wiki/Parmigianino
+Carlo Crivelli,artist,b. 1430,d. 1495,painter,0.5,https://en.wikipedia.org/wiki/Carlo_Crivelli
+Vittore Carpaccio,artist,b. 1460,d. 1525,painter,0.5,https://en.wikipedia.org/wiki/Vittore_Carpaccio
+Cimabue,artist,b. 1240,d. 1302,painter,0.5,https://en.wikipedia.org/wiki/Cimabue
+PERUGIA,city,,(Umbria),,2,https://en.wikipedia.org/wiki/Perugia
