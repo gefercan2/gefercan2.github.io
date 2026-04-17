@@ -564,8 +564,8 @@
                 } else {
                     const artistCount = nodes.length - 1;
                     const angle = ((i - (node.id === "ROME" ? 1 : 0)) * 2 * Math.PI) / artistCount;
-                    node.x = centerX - radius * Math.cos(angle);
-                    node.y = centerY - radius * Math.sin(angle);
+                    node.x = centerX - radius * Math.cos(angle)-2;
+                    node.y = centerY - radius * Math.sin(angle)-2;
                 }
             });
         }
