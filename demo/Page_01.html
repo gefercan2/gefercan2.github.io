@@ -26,25 +26,38 @@
             position: absolute;
             background-color: white;
             padding: 10px;
-            border-radius: 4px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             opacity: 0;
             transition: opacity 0.2s;
             max-width: 280px;
             pointer-events: auto;
             z-index: 100;
         }
-        
+
         .tooltip-image {
             width: 100%;
             height: 150px;
             object-fit: cover;
             border-radius: 4px;
             margin-bottom: 10px;
+            display: block;
         }
-        
+
+        .tooltip-image.loading {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
         .tooltip-content {
             font-size: 0.9em;
+            line-height: 1.4;
         }
         
         .tooltip a {
@@ -84,6 +97,52 @@
             height: 15px;
             margin-right: 8px;
         }
+
+        /* Zoom Controls */
+        .zoom-controls {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .zoom-controls button {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background-color: #667eea;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .zoom-controls button:hover {
+            background-color: #5568d3;
+        }
+
+        .zoom-controls button:active {
+            background-color: #4557b8;
+        }
+
+        .zoom-level {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            padding: 5px 0;
+        }
         
         .node, .link, .node-label {
             transition: all 0.3s ease;
@@ -104,44 +163,6 @@
             font-size: 24px;
             color: #666;
             z-index: 1000;
-        }
-
-        /* Zoom Controls */
-        .zoom-controls {
-            position: absolute;
-            bottom: 30px;
-            left: 30px;
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .zoom-button {
-            width: 40px;
-            height: 40px;
-            background-color: #667eea;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 20px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .zoom-button:hover {
-            background-color: #5568d3;
-        }
-
-        .zoom-button:active {
-            transform: scale(0.95);
         }
 
         /* Side Menu Styles */
@@ -408,95 +429,4 @@
                     <p>This knowledge allowed them to depict the human form with unprecedented realism and grace. Michelangelo's David and his figures on the Sistine Chapel ceiling demonstrate a profound understanding of human anatomy and the ability to represent the body in complex, dynamic poses.</p>
                     
                     <h3>Master Artists</h3>
-                    <p>Leonardo da Vinci (1452-1519) epitomized the Renaissance ideal of the universal genius, excelling not only as a painter but also as a scientist, inventor, and engineer. His notebooks contain detailed observations of nature, innovative designs for machines, and studies of human anatomy that were centuries ahead of their time.</p>
-                    
-                    <p>Michelangelo Buonarroti (1475-1564) was renowned primarily as a sculptor but also created some of the most iconic paintings in Western art, including the ceiling of the Sistine Chapel. His works are characterized by heroic figures with powerful, muscular bodies that express intense emotion and spiritual struggle.</p>
-                    
-                    <p>Raphael Sanzio (1483-1520) was celebrated for his graceful compositions and the serene beauty of his figures. His frescoes in the Vatican, particularly "The School of Athens," exemplify the Renaissance ideals of harmony, balance, and the synthesis of classical philosophy with Christian theology.</p>
-                    
-                    <h3>Color and Composition</h3>
-                    <p>Renaissance artists developed sophisticated approaches to color theory and composition. The Venetian school, including artists like Titian and Giorgione, became famous for their use of rich, luminous colors and their ability to capture the effects of light on different surfaces.</p>
-                    
-                    <p>Composition became more dynamic and complex, with artists carefully orchestrating the arrangement of figures and objects to guide the viewer's eye through the painting and create a sense of narrative drama. The triangular composition, often used to create stability and focus, became a standard device in Renaissance art.</p>
-                    
-                    <h3>Lasting Impact</h3>
-                    <p>The techniques developed during the Renaissance formed the foundation of Western art education for centuries. Art academies taught students to master perspective, anatomy, and classical composition, ensuring that Renaissance principles continued to shape artistic practice long after the period itself had ended. Even today, these fundamental skills remain essential components of art training around the world.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Visualization Container -->
-    <div class="container">
-        <div class="legend">
-            <div class="legend-item">
-                <svg class="legend-color" height="15" width="15">
-                    <polygon points="7.5,0 15,7.5 7.5,15 0,7.5" fill="red"/>
-                </svg>
-                <span>Artist</span>
-            </div>
-            <div class="legend-item">
-                <svg class="legend-color" height="15" width="15">
-                    <polygon points="6,0 12,2.5 15,7.5 12,12.5 6,15 0,12.5 -3,7.5 0,2.5" fill="blue"/>
-                </svg>
-                <span>City</span>
-            </div>
-        </div>
-
-        <!-- Zoom Controls -->
-        <div class="zoom-controls">
-            <button class="zoom-button" id="zoomIn" title="Zoom In">+</button>
-            <button class="zoom-button" id="zoomOut" title="Zoom Out">−</button>
-            <button class="zoom-button" id="zoomReset" title="Reset Zoom">⟲</button>
-        </div>
-
-        <div class="loading" id="loading">Loading data...</div>
-        <canvas id="network">
-        <div class="tooltip" id="tooltip"></div>
-        </canvas>
-    </div>
-
-    <script>
-        // Menu functionality
-        const menuToggle = document.getElementById('menuToggle');
-        const sideMenu = document.getElementById('sideMenu');
-        const overlay = document.getElementById('overlay');
-        const menuOptions = document.querySelectorAll('.menu-option');
-
-        menuToggle.addEventListener('click', function() {
-            menuToggle.classList.toggle('active');
-            sideMenu.classList.toggle('active');
-            overlay.classList.toggle('active');
-        });
-
-        overlay.addEventListener('click', function() {
-            menuToggle.classList.remove('active');
-            sideMenu.classList.remove('active');
-            overlay.classList.remove('active');
-        });
-
-        menuOptions.forEach(option => {
-            option.addEventListener('click', function() {
-                const articleNum = this.getAttribute('data-article');
-                showArticle(articleNum);
-            });
-        });
-
-        function showArticle(num) {
-            document.getElementById('menuOptions').style.display = 'none';
-            document.getElementById('article' + num).classList.add('active');
-        }
-
-        function showMenu() {
-            document.querySelectorAll('.article-view').forEach(article => {
-                article.classList.remove('active');
-            });
-            document.getElementById('menuOptions').style.display = 'block';
-        }
-
-        // Function to get image URL for nodes
-        function getNodeImageUrl(nodeId) {
-            // Placeholder images - you can replace these with actual image URLs
-            const imageMap = {
-                'Leonardo': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Leonardo_self.jpg/220px-Leonardo_self.jpg',
-                'Michelangelo': 'https://upload.wikime
+                    <p>Leonardo da Vinci (1452-1519) epitomized the Renaissance ideal of the universal genius, excelling not only as a painter but als
