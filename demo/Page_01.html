@@ -94,56 +94,7 @@
             z-index: 1000;
         }
 
-        /* Zoom Controls */
-        .zoom-controls {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            z-index: 1001;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .zoom-btn {
-            width: 40px;
-            height: 40px;
-            background-color: #667eea;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 20px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .zoom-btn:hover {
-            background-color: #5568d3;
-            transform: scale(1.1);
-        }
-
-        .zoom-btn:active {
-            transform: scale(0.95);
-        }
-
-        .zoom-level {
-            min-width: 60px;
-            text-align: center;
-            font-weight: bold;
-            color: #333;
-            font-size: 14px;
-        }
-
-        /* Menu Toggle Button */
+        /* Side Menu Styles */
         .menu-toggle {
             position: fixed;
             top: 20px;
@@ -304,6 +255,7 @@
             color: #667eea;
         }
 
+        /* Overlay */
         .overlay {
             position: fixed;
             top: 0;
@@ -330,14 +282,6 @@
         <span></span>
         <span></span>
     </button>
-
-    <!-- Zoom Controls -->
-    <div class="zoom-controls">
-        <button class="zoom-btn" id="zoomOut" title="Zoom Out">−</button>
-        <div class="zoom-level" id="zoomLevel">100%</div>
-        <button class="zoom-btn" id="zoomIn" title="Zoom In">+</button>
-        <button class="zoom-btn" id="zoomReset" title="Reset Zoom">⟲</button>
-    </div>
 
     <!-- Overlay -->
     <div class="overlay" id="overlay"></div>
@@ -419,4 +363,400 @@
                     
                     <p>Michelangelo Buonarroti (1475-1564) was renowned primarily as a sculptor but also created some of the most iconic paintings in Western art, including the ceiling of the Sistine Chapel. His works are characterized by heroic figures with powerful, muscular bodies that express intense emotion and spiritual struggle.</p>
                     
-                    <p>Raphael Sanzio (1483-1520) was celebrated for his graceful compositions and the serene beauty of his figures. His frescoes in the Vatican, particularly "The School of Athens," exemplify the Renaissance ideals of harmony, balanc
+                    <p>Raphael Sanzio (1483-1520) was celebrated for his graceful compositions and the serene beauty of his figures. His frescoes in the Vatican, particularly "The School of Athens," exemplify the Renaissance ideals of harmony, balance, and the synthesis of classical philosophy with Christian theology.</p>
+                    
+                    <h3>Color and Composition</h3>
+                    <p>Renaissance artists developed sophisticated approaches to color theory and composition. The Venetian school, including artists like Titian and Giorgione, became famous for their use of rich, luminous colors and their ability to capture the effects of light on different surfaces.</p>
+                    
+                    <p>Composition became more dynamic and complex, with artists carefully orchestrating the arrangement of figures and objects to guide the viewer's eye through the painting and create a sense of narrative drama. The triangular composition, often used to create stability and focus, became a standard device in Renaissance art.</p>
+                    
+                    <h3>Lasting Impact</h3>
+                    <p>The techniques developed during the Renaissance formed the foundation of Western art education for centuries. Art academies taught students to master perspective, anatomy, and classical composition, ensuring that Renaissance principles continued to shape artistic practice long after the period itself had ended. Even today, these fundamental skills remain essential components of art training around the world.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visualization Container -->
+    <div class="container">
+        <div class="legend">
+            <div class="legend-item">
+                <svg class="legend-color" height="15" width="15">
+                    <polygon points="7.5,0 15,7.5 7.5,15 0,7.5" fill="red"/>
+                </svg>
+                <span>Artist</span>
+            </div>
+            <div class="legend-item">
+                <svg class="legend-color" height="15" width="15">
+                    <polygon points="6,0 12,2.5 15,7.5 12,12.5 6,15 0,12.5 -3,7.5 0,2.5" fill="blue"/>
+                </svg>
+                <span>City</span>
+            </div>
+        </div>
+        <div class="loading" id="loading">Loading data...</div>
+        <canvas id="network"></canvas>
+        <div class="tooltip" id="tooltip"></div>
+    </div>
+
+    <script>
+        // Menu functionality
+        const menuToggle = document.getElementById('menuToggle');
+        const sideMenu = document.getElementById('sideMenu');
+        const overlay = document.getElementById('overlay');
+        const menuOptions = document.querySelectorAll('.menu-option');
+
+        menuToggle.addEventListener('click', function() {
+            menuToggle.classList.toggle('active');
+            sideMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+
+        overlay.addEventListener('click', function() {
+            menuToggle.classList.remove('active');
+            sideMenu.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        menuOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const articleNum = this.getAttribute('data-article');
+                showArticle(articleNum);
+            });
+        });
+
+        function showArticle(num) {
+            document.getElementById('menuOptions').style.display = 'none';
+            document.getElementById('article' + num).classList.add('active');
+        }
+
+        function showMenu() {
+            document.querySelectorAll('.article-view').forEach(article => {
+                article.classList.remove('active');
+            });
+            document.getElementById('menuOptions').style.display = 'block';
+        }
+
+        // D3 Visualization code
+        let nodes = [];
+        let links = [];
+        let simulation;
+        let svg;
+        let container;
+        let tooltip;
+        let width, height, radius, centerX, centerY;
+
+        Promise.all([
+            d3.csv('nodes.csv'),
+            d3.csv('links.csv')
+        ]).then(function([nodesData, linksData]) {
+            document.getElementById('loading').style.display = 'none';
+            
+            nodes = nodesData.map(d => ({
+                id: d.id,
+                type: d.type,
+                birth: d.birth || '',
+                death: d.death || '',
+                discipline: d.discipline || '',
+                value: parseFloat(d.value),
+                link: d.link || ''
+            }));
+            
+            links = linksData.map(d => ({
+                source: d.source,
+                target: d.target
+            }));
+            
+            initVisualization();
+        }).catch(function(error) {
+            console.error('Error loading CSV files:', error);
+            document.getElementById('loading').textContent = 'Error loading data. Please ensure nodes.csv and links.csv are in the same directory.';
+        });
+
+        function initVisualization() {
+            container = document.querySelector('.container');
+            width = container.clientWidth;
+            height = container.clientHeight;
+            
+            radius = Math.min(width, height) * 0.5;
+            centerX = width / 2;
+            centerY = height / 2;
+
+            svg = d3.select(".container")
+                .append("svg")
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .attr("viewBox", `0 0 ${width} ${height}`)
+                .attr("preserveAspectRatio", "xMidYMid meet")
+                .attr("class", "network-svg");
+                
+            svg.append("circle")
+                .attr("class", "boundary-circle")
+                .attr("cx", centerX)
+                .attr("cy", centerY)
+                .attr("r", radius);
+
+            tooltip = d3.select("#tooltip");
+
+            positionNodes();
+            createSimulation();
+            createLinks();
+            createNodes();
+            createLabels();
+            setupInteractions();
+            
+            simulation.on("tick", updatePositions);
+        }
+
+        function positionNodes() {
+            nodes.forEach((node, i) => {
+                if (node.id === "ROME") {
+                    node.x = centerX;
+                    node.y = centerY + radius * 0.3;
+                    node.fx = centerX;
+                    node.fy = centerY + radius * 0.3;
+                } else if (node.id === "NAPLES") {
+                    node.x = centerX + radius * 0.6;
+                    node.y = centerY + radius * 0.35;
+                    node.fx = centerX + radius * 0.6;
+                    node.fy = centerY + radius * 0.35;
+                } else if (node.id === "VENICE") {
+                    node.x = centerX + radius * 0.4;
+                    node.y = centerY - radius * 0.35;
+                    node.fx = centerX + radius * 0.4;
+                    node.fy = centerY - radius * 0.35;
+                } else if (node.id === "MILAN") {
+                    node.x = centerX - radius * 0.33;
+                    node.y = centerY - radius * 0.4;
+                    node.fx = centerX - radius * 0.33;
+                    node.fy = centerY - radius * 0.4;
+                } else if (node.id === "FLORENCE") {
+                    node.x = centerX - radius * 0.2;
+                    node.y = centerY - radius * 0.15;
+                    node.fx = centerX - radius * 0.2;
+                    node.fy = centerY - radius * 0.15;
+                } else if (node.id === "MANTUA") {
+                    node.x = centerX - radius * 0.1;
+                    node.y = centerY - radius * 0.3;
+                    node.fx = centerX - radius * 0.1;
+                    node.fy = centerY - radius * 0.3;
+                } else if (node.id === "PADUA") {
+                    node.x = centerX + radius * 0.2;
+                    node.y = centerY - radius * 0.35;
+                    node.fx = centerX + radius * 0.2;
+                    node.fy = centerY - radius * 0.35;
+                } else if (node.id === "SIENA") {
+                    node.x = centerX - radius * 0.4;
+                    node.y = centerY + radius * 0.09;
+                    node.fx = centerX - radius * 0.4;
+                    node.fy = centerY + radius * 0.09;
+                } else if (node.id === "URBINO") {
+                    node.x = centerX + radius * 0.4;
+                    node.y = centerY - radius * 0.1;
+                    node.fx = centerX + radius * 0.4;
+                    node.fy = centerY - radius * 0.1;
+                } else if (node.id === "PERUGIA") {
+                    node.x = centerX - radius * 0.09;
+                    node.y = centerY - radius * 0.09;
+                    node.fx = centerX - radius * 0.09;
+                    node.fy = centerY - radius * 0.09;
+                } else {
+                    const artistCount = nodes.length - 1;
+                    const angle = ((i - (node.id === "ROME" ? 1 : 0)) * 2 * Math.PI) / artistCount;
+                    node.x = centerX - radius * Math.cos(angle);
+                    node.y = centerY - radius * Math.sin(angle);
+                }
+            });
+        }
+
+        function createSimulation() {
+            simulation = d3.forceSimulation(nodes)
+                .force("link", d3.forceLink(links).id(d => d.id).distance(radius * 0.2))
+                .force("charge", d3.forceManyBody().strength(-100))
+                .force("center", d3.forceCenter(centerX, centerY))
+                .force("radial", d3.forceRadial(d => d.id === "ROME" ? 0 : radius, centerX, centerY).strength(0.9))
+                .force("x", d3.forceX(centerX).strength(0.1))
+                .force("y", d3.forceY(centerY).strength(0.1))
+                .alphaDecay(0.01);
+        }
+
+        function createLinks() {
+            window.linkElements = svg.append("g")
+                .selectAll("path")
+                .data(links)
+                .enter()
+                .append("path")
+                .attr("class", "link")
+                .attr("fill", "none")
+                .attr("stroke", "#888888")
+                .attr("stroke-width", 0.5);
+        }
+
+        function createNodes() {
+            const artistShape = d3.symbol().type(d3.symbolDiamond).size(80);
+            const cityShape = d3.symbol().type(d3.symbolDiamond2).size(200);
+
+            window.nodeElements = svg.append("g")
+                .selectAll("path")
+                .data(nodes)
+                .enter()
+                .append("path")
+                .attr("class", "node")
+                .attr("d", d => d.type === "artist" ? artistShape() : cityShape())
+                .attr("fill", d => d.type === "artist" ? "#FF9999" : "#8888FF")
+                .call(d3.drag()
+                    .on("start", dragstarted)
+                    .on("drag", dragged)
+                    .on("end", dragended));
+        }
+
+        function createLabels() {
+            window.labelElements = svg.append("g")
+                .selectAll("text")
+                .data(nodes)
+                .enter()
+                .append("text")
+                .attr("class", "node-label")
+                .text(d => d.id)
+                .attr("font-size", "0.7em")
+                .attr("dx", d => d.id === "ROME" ? 0 : 6)
+                .attr("dy", d => d.id === "ROME" ? -15 : 4)
+                .attr("text-anchor", d => d.id === "ROME" ? "middle" : "start");
+        }
+
+        function setupInteractions() {
+            const nodeConnections = {};
+            links.forEach(link => {
+                const sourceId = link.source.id || link.source;
+                const targetId = link.target.id || link.target;
+                
+                if (!nodeConnections[sourceId]) nodeConnections[sourceId] = [];
+                if (!nodeConnections[targetId]) nodeConnections[targetId] = [];
+                
+                nodeConnections[sourceId].push(targetId);
+                nodeConnections[targetId].push(sourceId);
+            });
+
+            window.nodeElements.on("mouseover", function(event, d) {
+                d3.select(this).attr("fill", d.type === "artist" ? "red" : "blue");
+                
+                if (nodeConnections[d.id]) {
+                    nodeConnections[d.id].forEach(connectedId => {
+                        const connectedNode = nodes.find(n => n.id === connectedId);
+                        window.nodeElements.filter(n => n.id === connectedId)
+                            .attr("fill", connectedNode.type === "artist" ? "red" : "blue");
+                        
+                        window.labelElements.filter(n => n.id === connectedId)
+                            .attr("font-size", "0.9em")
+                            .attr("font-weight", "bold");
+                    });
+                }
+                
+                window.linkElements.filter(l => (l.source.id === d.id || l.target.id === d.id))
+                    .attr("stroke", "#000000")
+                    .attr("stroke-width", 2);
+                
+                window.labelElements.filter(n => n.id === d.id)
+                    .attr("font-size", "1em")
+                    .attr("font-weight", "bold");
+            })
+            .on("mouseout", function(event, d) {
+                window.nodeElements.attr("fill", d => d.type === "artist" ? "#FF9999" : "#8888FF");
+                window.linkElements.attr("stroke", "#888888").attr("stroke-width", 0.5);
+                window.labelElements.attr("font-weight", "normal").attr("font-size", "0.7em");
+            });
+
+            let activeNode = null;
+            
+            window.nodeElements.on("click", function(event, d) {
+                event.stopPropagation();
+                
+                if (activeNode === d) {
+                    tooltip.style("opacity", 0);
+                    activeNode = null;
+                } else {
+                    activeNode = d;
+                    let content = `<strong>${d.id}</strong><br>${d.type}`;
+                    
+                    if (d.type === "artist") {
+                        content += `<br>${d.birth}, ${d.death}<br>${d.discipline}`;
+                    } else {
+                        content += `<br>${d.birth}, ${d.death}<br>${d.discipline}`;
+                    }
+                    
+                    if (d.link) {
+                        content += `<br><a href="${d.link}" target="_blank">Wikipedia</a>`;
+                    }
+                    
+                    tooltip
+                        .html(content)
+                        .style("left", (event.pageX - container.offsetLeft + 10) + "px")
+                        .style("top", (event.pageY - container.offsetTop - 20) + "px")
+                        .style("opacity", 1);
+                }
+            });
+
+            tooltip.on("click", function(event) {
+                event.stopPropagation();
+            });
+
+            svg.on("click", function() {
+                if (activeNode) {
+                    tooltip.style("opacity", 0);
+                    activeNode = null;
+                }
+            });
+        }
+
+        function updatePositions() {
+            window.linkElements.attr("d", function(d) {
+                const dx = d.target.x - d.source.x;
+                const dy = d.target.y - d.source.y;
+                const dr = Math.sqrt(dx * dx + dy * dy) * 1.5;
+                return `M${d.source.x},${d.source.y}A${dr},${dr} 0 0,1 ${d.target.x},${d.target.y}`;
+            });
+
+            window.nodeElements.attr("transform", d => `translate(${d.x}, ${d.y})`);
+            window.labelElements.attr("x", d => d.x).attr("y", d => d.y);
+        }
+
+        function dragstarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+
+        function dragended(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            if (d.id !== "ROME") {
+                d.fx = null;
+                d.fy = null;
+            }
+        }
+
+        window.addEventListener('resize', function() {
+            const newWidth = container.clientWidth;
+            const newHeight = container.clientHeight;
+            const newRadius = Math.min(newWidth, newHeight) * 0.4;
+            
+            svg.attr("viewBox", `0 0 ${newWidth} ${newHeight}`);
+            
+            svg.select(".boundary-circle")
+                .attr("cx", newWidth / 2)
+                .attr("cy", newHeight / 2)
+                .attr("r", newRadius);
+            
+            simulation.force("center", d3.forceCenter(newWidth / 2, newHeight / 2));
+            simulation.force("radial", d3.forceRadial(d => d.id === "ROME" ? 0 : newRadius, newWidth / 2, newHeight / 2));
+            simulation.force("x", d3.forceX(newWidth / 2));
+            simulation.force("y", d3.forceY(newHeight / 2));
+            
+            simulation.alpha(0.3).restart();
+        });
+    </script>
+</body>
+</html>
