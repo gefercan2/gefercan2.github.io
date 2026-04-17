@@ -513,18 +513,18 @@
             nodes.forEach((node, i) => {
                 if (node.id === "ROME") {
                     node.x = centerX;
-                    node.y = centerY + radius* 0.01;
+                    node.y = centerY + radius* 0.1;
                     node.fx = centerX;
-                    node.fy = centerY + radius* 0.01;
+                    node.fy = centerY + radius* 0.1;
                 } else if (node.id === "NAPLES") {
                     node.x = centerX + radius * 0.3;
                     node.y = centerY + radius * 0.35;
                     node.fx = centerX + radius * 0.3;
                     node.fy = centerY + radius * 0.35;
                 } else if (node.id === "VENICE") {
-                    node.x = centerX + radius * 0.5;
+                    node.x = centerX + radius * 0.4;
                     node.y = centerY - radius * 0.4;
-                    node.fx = centerX + radius * 0.5;
+                    node.fx = centerX + radius * 0.4;
                     node.fy = centerY - radius * 0.4;
                 } else if (node.id === "MILAN") {
                     node.x = centerX - radius * 0.5;
