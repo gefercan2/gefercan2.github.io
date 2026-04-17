@@ -479,7 +479,7 @@
             width = container.clientWidth;
             height = container.clientHeight;
             
-            radius = Math.min(width, height) * 0.8;
+            radius = Math.min(width, height) * 0.5;
             centerX = width / 2;
             centerY = height / 2;
 
@@ -495,7 +495,7 @@
                 .attr("class", "boundary-circle")
                 .attr("cx", centerX)
                 .attr("cy", centerY)
-                .attr("r", radius -10);
+                .attr("r", radius );
 
             tooltip = d3.select("#tooltip");
 
