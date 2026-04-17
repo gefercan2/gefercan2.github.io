@@ -479,13 +479,13 @@
             width = container.clientWidth;
             height = container.clientHeight;
             
-            radius = Math.min(width, height) * 0.5;
+            radius = Math.min(width, height) * 0.8;
             centerX = width / 2;
             centerY = height / 2;
 
             svg = d3.select(".container")
                 .append("svg")
-                .attr("width", "100%")
+                .attr("width", "110%")
                 .attr("height", "100%")
                 .attr("viewBox", `0 0 ${width} ${height}`)
                 .attr("preserveAspectRatio", "xMidYMid meet")
@@ -495,7 +495,7 @@
                 .attr("class", "boundary-circle")
                 .attr("cx", centerX)
                 .attr("cy", centerY)
-                .attr("r", radius);
+                .attr("r", radius -10);
 
             tooltip = d3.select("#tooltip");
 
