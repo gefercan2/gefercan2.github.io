@@ -1,0 +1,2078 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renaissance Artists Interactive Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+
+
+
+
+    <style>
+        /* ======= GLOBAL STYLES ==================== */
+        body {
+            margin: 0;
+            padding: 0px;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            min-height: 100vh;
+        }
+	/* ======= SIDEMENU STYLES ==================== */
+	    /* Side Menu Styles */
+        .menu-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: #667eea;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-toggle:hover {
+            background-color: #5568d3;
+        }
+
+        .menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background-color: white;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: -65%;
+            width: 65%;
+            height: 100vh;
+            background-color: white;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+            transition: right 0.4s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .side-menu.active {
+            right: 0;
+        }
+
+        .menu-content {
+            padding: 80px 40px 40px 40px;
+        }
+
+        .menu-options {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .menu-option {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .menu-option:hover {
+            background-color: #e9ecef;
+            border-color: #667eea;
+        }
+
+        .menu-option h2 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 1.5em;
+        }
+
+        .menu-option p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .article-view {
+            display: none;
+            padding: 20px;
+        }
+
+        .article-view.active {
+            display: block;
+        }
+
+        .article-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .back-button {
+            background-color: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #5568d3;
+        }
+
+        .article-title {
+            font-size: 2em;
+            color: #333;
+            margin: 0;
+        }
+
+        .article-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .article-content {
+            line-height: 1.8;
+            color: #444;
+            font-size: 1.1em;
+        }
+
+        .article-content p {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .article-content h3 {
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+       /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+
+
+
+
+	/* Zoom Controls */
+        .zoom-controls {
+            position: fixed;
+            top: 10%;
+            left:2.5%;
+            transform: translateX(-50%);
+            background-color: none;
+            padding: 10px;
+            border-radius: 8px;
+	    border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            width:2%;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            background-color: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .zoom-btn:hover {
+            background-color: #5568d3;
+            transform: scale(1.1);
+        }
+
+        .zoom-btn:active {
+            transform: scale(0.95);
+        }
+
+        .zoom-level {
+            min-width: 60px;
+            text-align: center;
+            font-weight: bold;
+            color: #333;
+            font-size: 14px;
+        }
+
+	/* ==================== PANNING STYLES ==================== */
+	.network-svg-wrapper {
+    		cursor: grab;
+    		overflow: hidden;
+	}
+
+	.network-svg-wrapper.panning {
+    		cursor: grabbing;
+	}
+
+
+        /* ==================== LAYOUT STYLES ==================== */
+        .dashboard {
+            max-width: 100%;
+            margin: 0%; top:-10%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+	     overflow:hidden;
+        }
+
+        .network-container, .timeline-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+	   
+           
+        }
+
+        .network-container {
+	    position;absolute;
+	   
+            height: 100vh;
+        }
+
+        .timeline-container {
+	    width: 80%;
+	    position:absolute;
+            height: 200px;
+	    z-index:9;
+	    margin: 0% 10%;
+	    bottom:-5%;
+        }
+
+        .section-title {
+             
+        }
+	
+	 #title-network {
+            font-size: 3em;
+            font-weight: bold;
+            top: 5%;
+	    left:10%;
+	    opacity:0.3;
+            text-align: left;
+            color: #66ccff;
+	    position:absolute;
+	    z-index:45;
+	    width:10%;
+        }
+
+	   #section-timeline {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: left;
+            color: #66ccff;
+	    position:relative;
+	 }
+
+        /* ==================== LEGEND STYLES ==================== */
+        .color-legend {
+            position: absolute;
+            top: 30%;
+            left: 15px;
+            background:none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .legend-item {
+            
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .legend-symbol {
+            width: 10px;
+            height: 10px;
+            margin: 10px;
+            border: 2px solid white;
+        }
+
+        .legend-artist {
+            background: #ff4444;
+            transform: rotate(45deg);
+        }
+
+        .legend-city {
+            background: #4444ff;
+            clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+        }
+
+        /* ==================== TOOLTIP STYLES ==================== */
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            pointer-events: auto;
+            z-index: 1000;
+            max-width: 250px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .tooltip.visible {
+            opacity: 1;
+        }
+
+        .tooltip a {
+            color: #66ccff;
+            text-decoration: none;
+            display: block;
+            margin-top: 8px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: rgba(102, 204, 255, 0.1);
+            transition: background 0.2s ease;
+        }
+
+        .tooltip a:hover {
+            text-decoration: underline;
+            background: rgba(102, 204, 255, 0.2);
+        }
+
+        /* ==================== NETWORK GRAPH STYLES ==================== */
+        .network-node {
+            cursor: pointer;
+            stroke: white;
+            stroke-width: 2;
+            transition: opacity 0.3s ease;
+        }
+
+        .network-link {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.4);
+            stroke-width: 2;
+            transition: opacity 0.3s ease;
+        }
+
+        .node-label {
+            fill: white;
+            font-size: 11px;
+            text-anchor: middle;
+            pointer-events: none;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            transition: opacity 0.3s ease;
+        }
+
+        /* ==================== TIMELINE STYLES ==================== */
+        .timeline-axis {
+            stroke: white;
+            stroke-width: 2;
+        }
+
+        .timeline-tick {
+            stroke: rgba(255, 255, 255, 0.6);
+            stroke-width: 1;
+        }
+
+        .timeline-label {
+            fill: white;
+            font-size: 10px;
+            text-anchor: middle;
+        }
+
+        .timeline-node {
+            cursor: pointer;
+            stroke: white;
+            stroke-width: 2;
+            transition: opacity 0.3s ease;
+        }
+
+        .timeline-arc {
+            fill: none;
+            stroke: #ff4444;
+            stroke-width: 3;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .timeline-node-label {
+            fill: white;
+            font-size: 9px;
+            text-anchor: middle;
+            pointer-events: none;
+            font-weight: bold;
+            transition: opacity 0.3s ease;
+        }
+
+        /* ==================== RESPONSIVE STYLES ==================== */
+        @media (max-width: 768px) {
+            .dashboard {
+                padding: 10px;
+                gap: 20px;
+            }
+            
+            .network-container {
+                height: 400px;
+            }
+            
+            .color-legend {
+                font-size: 10px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+
+
+<body>
+
+
+    <!-- Menu Toggle Button -->
+    <button class="menu-toggle" id="menuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <!-- Zoom Controls -->
+    <div class="zoom-controls">
+        <button class="zoom-btn" id="zoomOut" title="Zoom Out">− <br></button>
+        <button class="zoom-btn" id="zoomIn" title="Zoom In">+ <br ></button>
+        <button class="zoom-btn" id="zoomReset" title="Reset Zoom"> ⟲</button>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+	 <!-- Side Menu -->
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-content">
+            <!-- Main Menu Options -->
+            <div class="menu-options" id="menuOptions">
+                <div class="menu-option" data-article="1">
+                    <h2>The Renaissance Period</h2>
+                    <p>Discover the historical context and cultural significance of the Italian Renaissance</p>
+                </div>
+                <div class="menu-option" data-article="2">
+                    <h2>Renaissance Artists & Techniques</h2>
+                    <p>Explore the innovative artistic techniques and master artists of this golden age</p>
+                </div>
+            </div>
+
+            <!-- Article 1 -->
+            <div class="article-view" id="article1">
+                <div class="article-header">
+                    <button class="back-button" onclick="showMenu()">← Back</button>
+                    <h1 class="article-title">The Renaissance Period</h1>
+                </div>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Eyck_-_Arnolfini_Portrait.jpg/400px-Van_Eyck_-_Arnolfini_Portrait.jpg" alt="Renaissance Art" class="article-image">
+                <div class="article-content">
+                    <p>The Italian Renaissance was a period of great cultural change and achievement that began in Italy during the 14th century and lasted until the 17th century. It marked the transition from the Middle Ages to modernity and was characterized by an effort to revive and surpass the ideas and achievements of classical antiquity.</p>
+                    
+                    <h3>Historical Context</h3>
+                    <p>The Renaissance began in Florence, Italy, in the 14th century. The city's wealthy merchants and bankers, particularly the Medici family, became great patrons of the arts and humanities. This patronage system allowed artists, scholars, and thinkers to pursue their work without the burden of financial constraints, leading to an explosion of creativity and innovation.</p>
+                    
+                    <p>The period saw the rise of humanism, a movement that emphasized the value and agency of human beings and favored critical thinking and evidence over acceptance of religious dogma. Humanist scholars studied classical texts from ancient Greece and Rome, seeking to understand and emulate the achievements of these ancient civilizations.</p>
+                    
+                    <h3>Cultural Significance</h3>
+                    <p>The Renaissance had a profound impact on European culture, transforming art, architecture, politics, science, and literature. It represented a rebirth of classical learning and wisdom after the stagnation of the Middle Ages. The period witnessed the emergence of a new approach to art that emphasized naturalism, perspective, and the human form.</p>
+                    
+                    <p>Artists began to see themselves as intellectuals rather than mere craftsmen, and their work reflected a deep understanding of anatomy, mathematics, and the natural world. The invention of linear perspective revolutionized painting, allowing artists to create the illusion of three-dimensional space on a two-dimensional surface.</p>
+                    
+                    <h3>Major City-States</h3>
+                    <p>Italy during the Renaissance was not a unified nation but rather a collection of independent city-states, each with its own government, culture, and artistic traditions. Florence, Venice, Rome, Milan, and Naples were among the most powerful and influential of these city-states.</p>
+                    
+                    <p>Florence, under the rule of the Medici family, became the birthplace of the Renaissance. Venice, with its vast maritime empire and wealth from trade, developed a distinctive artistic style characterized by rich colors and sensuous beauty. Rome, as the seat of the Catholic Church, attracted artists from across Italy to work on papal commissions, including the decoration of the Sistine Chapel.</p>
+                    
+                    <h3>Legacy</h3>
+                    <p>The Renaissance laid the foundations for modern Western culture. Its emphasis on individual achievement, scientific inquiry, and artistic excellence continues to influence our world today. The period produced some of history's greatest artists, including Leonardo da Vinci, Michelangelo, and Raphael, whose works remain celebrated and studied centuries after their creation.</p>
+                    
+                    <p>The Renaissance also saw significant advances in science, with figures like Galileo Galilei challenging traditional beliefs about the universe. The printing press, invented by Johannes Gutenberg, revolutionized the spread of knowledge, making books more accessible and contributing to increased literacy rates across Europe.</p>
+                </div>
+            </div>
+
+            <!-- Article 2 -->
+            <div class="article-view" id="article2">
+                <div class="article-header">
+                    <button class="back-button" onclick="showMenu()">← Back</button>
+                    <h1 class="article-title">Renaissance Artists & Techniques</h1>
+                </div>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/402px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg" alt="Mona Lisa" class="article-image">
+                <div class="article-content">
+                    <p>The Renaissance period witnessed revolutionary developments in artistic techniques and the emergence of master artists whose works continue to captivate audiences worldwide. These innovations transformed the way artists approached their craft and set new standards for artistic excellence that would influence generations to come.</p>
+                    
+                    <h3>Linear Perspective</h3>
+                    <p>One of the most significant innovations of Renaissance art was the development of linear perspective by Filippo Brunelleschi in the early 15th century. This mathematical system allowed artists to create the illusion of three-dimensional space on a flat surface, with parallel lines appearing to converge at a vanishing point on the horizon.</p>
+                    
+                    <p>Artists like Masaccio and Piero della Francesca mastered this technique, creating paintings that seemed to open windows onto realistic scenes. The use of perspective transformed painting from a flat, decorative art into a medium capable of representing the visible world with unprecedented accuracy.</p>
+                    
+                    <h3>Sfumato and Chiaroscuro</h3>
+                    <p>Leonardo da Vinci pioneered the technique of sfumato, which involves the subtle blending of colors and tones to create soft, almost imperceptible transitions between light and shadow. This technique, most famously employed in the Mona Lisa, gave his paintings a mysterious, atmospheric quality and made his figures appear more lifelike and three-dimensional.</p>
+                    
+                    <p>Chiaroscuro, the dramatic use of light and shadow to create volume and depth, became another hallmark of Renaissance painting. Artists like Caravaggio would later take this technique to new extremes, using stark contrasts between light and dark to create powerful, emotionally charged compositions.</p>
+                    
+                    <h3>Anatomical Study</h3>
+                    <p>Renaissance artists were deeply interested in the accurate representation of the human body. Many, including Leonardo da Vinci and Michelangelo, conducted detailed anatomical studies, even performing dissections to better understand the structure of muscles, bones, and organs beneath the skin.</p>
+                    
+                    <p>This knowledge allowed them to depict the human form with unprecedented realism and grace. Michelangelo's David and his figures on the Sistine Chapel ceiling demonstrate a profound understanding of human anatomy and the ability to represent the body in complex, dynamic poses.</p>
+                    
+                    <h3>Master Artists</h3>
+                    <p>Leonardo da Vinci (1452-1519) epitomized the Renaissance ideal of the universal genius, excelling not only as a painter but also as a scientist, inventor, and engineer. His notebooks contain detailed observations of nature, innovative designs for machines, and studies of human anatomy that were centuries ahead of their time.</p>
+                    
+                    <p>Michelangelo Buonarroti (1475-1564) was renowned primarily as a sculptor but also created some of the most iconic paintings in Western art, including the ceiling of the Sistine Chapel. His works are characterized by heroic figures with powerful, muscular bodies that express intense emotion and spiritual struggle.</p>
+                    
+                    <p>Raphael Sanzio (1483-1520) was celebrated for his graceful compositions and the serene beauty of his figures. His frescoes in the Vatican, particularly "The School of Athens," exemplify the Renaissance ideals of harmony, balance, and the synthesis of classical philosophy with Christian theology.</p>
+                    
+                    <h3>Color and Composition</h3>
+                    <p>Renaissance artists developed sophisticated approaches to color theory and composition. The Venetian school, including artists like Titian and Giorgione, became famous for their use of rich, luminous colors and their ability to capture the effects of light on different surfaces.</p>
+                    
+                    <p>Composition became more dynamic and complex, with artists carefully orchestrating the arrangement of figures and objects to guide the viewer's eye through the painting and create a sense of narrative drama. The triangular composition, often used to create stability and focus, became a standard device in Renaissance art.</p>
+                    
+                    <h3>Lasting Impact</h3>
+                    <p>The techniques developed during the Renaissance formed the foundation of Western art education for centuries. Art academies taught students to master perspective, anatomy, and classical composition, ensuring that Renaissance principles continued to shape artistic practice long after the period itself had ended. Even today, these fundamental skills remain essential components of art training around the world.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+    <div id="title-network"> Renaissance Artists Network  </div>
+
+    <div class="dashboard">
+	
+	 	<div class="color-legend">
+                	<div class="legend-item">
+                    		<div class="legend-symbol legend-artist"></div>
+                    		<span>Artists</span>
+                	</div>
+                	<div class="legend-item">
+                    		<div class="legend-symbol legend-city"></div>
+                    	<span>Cities</span>
+                	</div>
+           
+		</div>
+
+        <!-- ===== NETWORK SECTION ==================== -->
+        <div class="network-container">
+            <svg id="network-svg"></svg>
+        </div>
+        
+        <!-- ====== TIMELINE SECTION ==================== -->
+        <div class="timeline-container">
+            <div class="section-title" id="section-network">Timeline (1350-1600)</div>
+            <svg id="timeline-svg"></svg>
+        </div>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+
+
+
+
+
+
+
+ 	<!-- ==================== SCRIPT ==================== -->
+
+    <script>
+
+	 // Menu functionality
+        const menuToggle = document.getElementById('menuToggle');
+        const sideMenu = document.getElementById('sideMenu');
+        const overlay = document.getElementById('overlay');
+        const menuOptions = document.querySelectorAll('.menu-option');
+
+        menuToggle.addEventListener('click', function() {
+            menuToggle.classList.toggle('active');
+            sideMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+
+        overlay.addEventListener('click', function() {
+            menuToggle.classList.remove('active');
+            sideMenu.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        menuOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const articleNum = this.getAttribute('data-article');
+                showArticle(articleNum);
+            });
+        });
+
+        function showArticle(num) {
+            document.getElementById('menuOptions').style.display = 'none';
+            document.getElementById('article' + num).classList.add('active');
+        }
+
+        function showMenu() {
+            document.querySelectorAll('.article-view').forEach(article => {
+                article.classList.remove('active');
+            });
+            document.getElementById('menuOptions').style.display = 'block';
+        }
+
+
+
+        // ==================== CONFIGURATION PARAMETERS ====================
+        const CONFIG = {
+            // ------Network Graph Configuration
+            network: {
+                nodeColors: {
+                    artist: '#ff4444',
+                    city: '#4444ff'
+                },
+                nodeSize: {
+                    artist: 15,
+                    city: 18
+                },
+                linkDistance: 100,
+                chargeStrength: -300,
+                labelOffset: 35
+            },
+            
+            //---- Timeline Configuration parameters
+            timeline: {
+                yearRange: [1350, 1600],
+                tickYears: [1350,1375,1400, 1425, 1450, 1475, 1500, 1525, 1550, 1575, 1600],
+                nodeRadius: 8,
+                squareSize: 12,
+                arcOffset: 40,
+                arcControlOffset:80,
+                margin: { left: 50, right: 50 }
+            },
+            
+            //------General Visual Effects
+            effects: {
+                selectedOpacity: 1.0,
+                deselectedOpacity: 0.1,
+                linkDeselectedOpacity: 0.1,
+                transitionDuration: 300
+            }
+        };
+
+        // ==================== DATA DEFINITIONS ====================
+        
+	const NODES_DATA = [
+            
+            	{ name: "VENICE", 
+		type: "city", 
+		birth: "city state", 
+		death: "(Veneto)", 
+		discipline: "Republic of Venice (La Serenissima)", 
+		value: 5, 
+		link: "https://en.wikipedia.org/wiki/Republic_of_Venice" 
+		},
+          
+                {
+		name: "NAPLES", 
+		type: "city", 
+		birth: "Kingdom (Spanish Crown)", 
+		death: " Campania",  
+		discipline: " Sicilia, Kingdom of Naples",
+		link:"https://en.wikipedia.org/wiki/Kingdom_of_Naples",
+                value: "5"
+		},
+
+  	    	{
+		name: "FLORENCE", 
+		type: "city state",
+ 		birth: "Medici dinasty", 
+		death: "(Tuscany)",
+		discipline: "Republic of Florence",
+		link:"https://en.wikipedia.org/wiki/Republic_of_Florence",
+      		value: "4"
+		},
+
+                {
+			name: "MANTUA", 
+		 type: "city", 
+		 birth: "House of Gonzaga", 
+		 death: "", 
+		 discipline: "Duchy of Mantua",
+		 link:"https://en.wikipedia.org/wiki/Duchy_of_Mantua",
+                 value: "3"
+		},
+
+                {
+		name: "MILAN",
+                  type: "city",
+                  birth: "city state",
+                  death: "(Lombardia)",
+                  discipline: "Duchy oF Milan",
+		 link:"https://en.wikipedia.org/wiki/Duchy_of_Milan",
+                  value: "3"},
+                {
+		  name: "PADUA",
+                  type: "city",
+                  birth: "city state",
+                  death: "",
+                  discipline: "city of Padova",
+		  link:"https://en.wikipedia.org/wiki/Padua",
+                  value: "2"
+                },
+                {name: "ROME",
+                  type: "city state",
+                  birth: "Seat of the Pope",
+                  death: "(Lazio)",
+                  discipline: "Papal Estates",
+		  link:"https://en.wikipedia.org/wiki/Papal_States",
+                  value: "6"
+		},
+                {name: "SIENA",
+                  type: "city state",
+                    birth: "citizen-based",
+                    death: "(Tuscany)",
+                    discipline: "Republic of Siena",
+			link:"https://en.wikipedia.org/wiki/Republic_of_Siena",
+                    value: "2"
+		},
+                {
+		name: "URBINO",
+                    type: "city",
+                    	birth: "city state",
+                    	death: "House of Montefeltro",
+			link:"https://en.wikipedia.org/wiki/Duchy_of_Urbino",
+                    	discipline: "Duchy of Urbino",
+                	value: "2"
+		},
+
+		{ name: "Veronese",
+			type: "artist", 
+			birth: "b. 1528", 
+			death: "d. 1588", 
+			discipline: "painter", 
+			value: 0.5, 
+			link: "https://en.wikipedia.org/wiki/Paolo_Veronese" ,
+			birthYear:   1528, 
+			deathYear:   1588 
+			},
+            	{ name: "Tintoretto", 
+			type: "artist", 
+			birth: "b. 1518", 
+			death: "d. 1594", 
+			discipline: "painter",
+			value: 0.5, 
+			link: "https://en.wikipedia.org/wiki/Tintoretto" ,
+			birthYear:   1518, 
+			deathYear:   1594
+			}, 
+		{ name: "Jacopo Bassano", type: "artist", 
+                	birth: "b. 1510", 
+                	death: "d. 1592", 
+                	discipline: "painter", 
+                	value: 0.5,
+			link: "https://en.wikipedia.org/wiki/Tintoretto" ,
+			birthYear:   1510, 
+			deathYear:   1592
+			},
+                 {name: "Andrea Palladio", 
+                	type: "artist", 
+			birth: "b. 1508", 
+			death: "d. 1580", 
+			discipline: "architect",
+			link:"https://en.wikipedia.org/wiki/Andrea_Palladio", 
+                	value: 0.5, 
+			birthYear:   1508, 
+			deathYear:   1580
+			},
+
+                 { name: "Ghirlandaio", 
+			type: "artist", 
+			birth: "b. 1508", death: "d. 1580", 
+                	discipline: "architect",
+			link:"https://en.wikipedia.org/wiki/Domenico_Ghirlandaio", 
+                	value: 0.5,
+			birthYear:   1508, 
+			deathYear:   1580
+			},
+                {
+                name: "Pontormo",
+                type: "artist",
+                birth: " b. 1494",
+                death: " d. 1557 ",
+                discipline: "painter ",
+                link: " https://en.wikipedia.org/wiki/Pontormo",
+                value: "0.5",
+		birthYear:   1494, 
+		deathYear:   1557
+              },
+              {
+                name: "Andrea del Sarto",
+                type: "artist",
+                birth: "b. 1486",
+                death: "d. 1531",
+                discipline: "painter",
+		link:"https://en.wikipedia.org/wiki/Andrea_del_Sarto",
+                value: "0.5",
+		birthYear:   1486, 
+		deathYear:   1531
+              },
+              {
+                name: "Titian",
+                type: "artist",
+                birth: "b. 1485",
+                death: "d. 1576",
+                discipline: "painter",
+		link:"https://en.wikipedia.org/wiki/Titian",
+                value: "0.5",
+		birthYear:   1485, 
+		deathYear:   1576
+
+              },
+              {
+                name: "Raphael",
+                type: "artist",
+                birth: " b. 1483",
+                death: "d. 1520 Rome",
+                discipline: "painter",
+                value: "0.5",
+                link: "https://en.wikipedia.org/wiki/Raphael",
+		birthYear:   1483, 
+		deathYear:   1520
+              },
+              {
+                name: "Michelangelo",
+                type: "artist",
+                birth: "b. 1475",
+                death: "d. 1564",
+                discipline: "sculptor",
+                value: "0.5",
+		link: "https://en.wikipedia.org/wiki/Michelangelo",
+		birthYear:   1475, 
+		deathYear:   1564
+              },
+              {
+                name: "Lorenzo Ghiberti",
+                type: "artist",
+                birth: "b. 1378",
+                death: "d. 1455",
+                discipline: "sculptor",
+                link: "https://en.wikipedia.org/wiki/Lorenzo_Ghiberti",
+                value: "0.5",
+		birthYear:   1378, 
+		deathYear:   1455
+              },
+		{
+                name: "Giorgione",
+                type: "artist",
+                birth: "b. 1473-78",
+                death: "d. 1510",
+                discipline: "painter",
+                link: "https://en.wikipedia.org/wiki/Giorgione",
+                value: "0.5",
+		birthYear:   1473, 
+		deathYear:   1510
+              },
+              {
+                name: "Leonardo",
+                type: "artist",
+                birth: " b. 1452 Vinci",
+                death: " d. 1519 Loire ",
+                discipline: "painter",
+                link: "https://en.wikipedia.org/wiki/Leonardo_da_Vinci",
+                value: "0.5",
+		birthYear:   1452, 
+		deathYear:   1519
+              },
+              {
+                name: "Perugino",
+                type: "artist",
+                birth: "b. 1446",
+                death: "d. 1523",
+                discipline: "painter",
+		link:"https://en.wikipedia.org/wiki/Pietro_Perugino",
+                value: "0.5",
+		birthYear:   1446, 
+		deathYear:   1523
+              },
+              {
+                name: "Bramante",
+                type: "artist",
+                birth: "b. 1444",
+                death: "d. 1514",
+                discipline: "architect",
+		link:"https://en.wikipedia.org/wiki/Donato_Bramante",
+                value: "0.5",
+		birthYear:   1444, 
+		deathYear:   1514
+              },
+              {
+                name: "Verrocchio",
+                type: "artist",
+                birth: "b. 1435",
+                death: "d. 1488",
+                discipline: "sculptor",
+		link:"https://en.wikipedia.org/wiki/Andrea_del_Verrocchio",
+                value: "0.5",
+		birthYear:   1435, 
+		deathYear:   1488
+              },
+              {
+                name: "Mantegna",
+                type: "artist",
+                birth: "b. 1431",
+                death: "d. 1506",
+                discipline: "painter",
+		link:"https://en.wikipedia.org/wiki/Andrea_Mantegna",
+                value: "0.5",
+		birthYear:   1431, 
+		deathYear:   1506
+              },
+              {
+                name: "Giovanni Bellini",
+                type: "artist",
+                birth: "b. 1430",
+                death: "d. 1516",
+                discipline: "painter",
+		link:"https://en.wikipedia.org/wiki/Giovanni_Bellini",
+                value: "0.5",
+		birthYear:   1430, 
+		deathYear:   1516
+              },
+              {
+                name: "Gentile Bellini",
+                type: "artist",
+                birth: "b. 1429",
+                death: "d. 1507",
+                discipline: "painter",
+		link:"https://en.wikipedia.org/wiki/Gentile_Bellini",
+                value: "0.5",
+		birthYear:   1429, 
+		deathYear:   1507
+              },
+              {
+                name: "Antonello de Messina",
+                type: "artist",
+                birth: "b. 1425,1430",
+                death: "d. 1479",
+                discipline: "painter",link:"https://en.wikipedia.org/wiki/Antonello_da_Messina",
+                value: "0.5",
+		birthYear:   1425, 
+		deathYear:   1479
+              },
+              {
+                name: "Piero della Francesca",
+                type: "artist",
+                birth: "b. 1415",
+                death: "d. 1492",
+                discipline: "painter", link:"https://en.wikipedia.org/wiki/Piero_della_Francesca",
+                value: "0.5",
+		birthYear:   1415, 
+		deathYear:   1492
+              },
+		{
+                name: "Luca Della Robia",
+                type: "artist",
+                birth: "b. 1399",
+                death: "d. 1482",
+                discipline: "sculptor",link:"https://en.wikipedia.org/wiki/Luca_della_Robbia",
+                value: "0.5",
+		birthYear:   1399, 
+		deathYear:   1482
+              },
+		{
+                name: "Andrea Della Robia",
+                type: "artist",
+                birth: "b. 1435",
+                death: "d. 1525",
+                discipline: "sculptor",
+		link:"https://en.wikipedia.org/wiki/Andrea_della_Robbia",
+                value: "0.5",
+		birthYear:   1435, 
+		deathYear:   1525
+              },
+              {
+                name: "Filippo Lippi",
+                type: "artist",
+                birth: "b. 1406",
+                death: "d. 1469",
+                discipline: "painter",
+		link:"https://en.wikipedia.org/wiki/Filippo_Lippi",
+                value: "0.5",
+		birthYear:   1406, 
+		deathYear:   1469
+              },
+              { name: "Alberti",
+                type: "artist",
+                birth: "b. 1404",
+                death: "d. 1472",
+                discipline: "architect",
+	      	link:"https://en.wikipedia.org/wiki/Leon_Battista_Alberti",
+                value: "0.5",
+		birthYear:   1404, 
+		deathYear:   1472
+              },
+              {name: "Massaccio",
+                type: "artist",
+                birth: "b. 1401",
+                death: "d. 1428",
+                discipline: "painter",link:"https://en.wikipedia.org/wiki/Masaccio",
+                value: "0.5",
+		birthYear:   1401, 
+		deathYear:   1428
+              },
+              {
+                name: "Paolo Ucello",
+                type: "artist",
+                birth: "b. 1397",
+                death: "d. 1475",
+                discipline: "painter",link:"https://en.wikipedia.org/wiki/Paolo_Uccello",
+                value: "0.5",
+		birthYear:   1397, 
+		deathYear:   1475
+              },
+              {
+                name: "Fra Angelico",
+                type: "artist",
+                birth: "b. 1395",
+                death: "d. 1455",
+                discipline: "painter",
+		link:"https://en.wikipedia.org/wiki/Fra_Angelico",
+                value: "0.5",
+		birthYear:   1395, 
+		deathYear:   1455
+              },
+              {
+                name: "Donatello",
+                type: "artist",
+                birth: "b. 1386",
+                death: "d. 1466",
+                discipline: "sculptor",
+		link:"https://en.wikipedia.org/wiki/Donatello",
+                value: "0.5",
+		birthYear:   1386, 
+		deathYear:   1466
+              },
+              {
+                name: "Brunelleschi",
+                type: "artist",
+                birth: "b. 1377",
+                death: "d. 1446",
+                discipline: "sculptor",
+		link:"https://en.wikipedia.org/wiki/Filippo_Brunelleschi",
+                value: "0.5",
+		birthYear:   1377, 
+		deathYear:   1446
+              },
+              {
+                name: "Taddeo Gaddi",
+                type: "artist",
+                birth: "b. 1300",
+                death: " d. 1366",
+                discipline: " painter ",
+		link:"https://en.wikipedia.org/wiki/Taddeo_Gaddi",
+                value: "0.5",
+		birthYear:   1300, 
+		deathYear:   1366
+              },
+		{
+                name: "Antonio Bazzi",
+                type: "artist",
+                birth: "b. 1477",
+                death: " d. 1549",
+                discipline: " painter ",
+		link:"https://en.wikipedia.org/wiki/Il_Sodoma",
+                value: "0.5",
+		birthYear:   1477, 
+		deathYear:   1549
+              },
+              {
+                name: "Duccio Buonisegna",
+                type: "artist",
+                birth: "b. 1255",
+                death: "d. 1318–1319",
+                discipline: "painter",link:"https://en.wikipedia.org/wiki/Duccio",
+                value: "0.5",
+		birthYear:   1255, 
+		deathYear:   1318
+              },
+              {
+                name: "Giovanni Pisano",
+                type: "artist",
+                birth: "b. 1250",
+                death: "d. 1315",
+                discipline: "sculptor",
+		link:"https://en.wikipedia.org/wiki/Giovanni_Pisano",
+                value: "0.5",
+		birthYear:   1250, 
+		deathYear:   1315
+              },
+              {
+                name: "Giulio Romano",
+                type: "artist",
+                birth: " b. 1499",
+                death: " Roma ",
+                discipline: " d. 1546", 			
+		link:"https://en.wikipedia.org/wiki/Giulio_Romano",
+                value: "0.5",
+		birthYear:   1499, 
+		deathYear:   1546
+              },
+              {
+                name: "Sandro Botticelli",
+                type: "artist",
+                birth: "b. 1445",
+                death: "d. 1510",
+                discipline: "painter",
+		link:"https://en.wikipedia.org/wiki/Sandro_Botticelli",
+                value: "0.5",
+		birthYear:   1445, 
+		deathYear:   1510
+              },
+              {
+                name: "Jacopo Bellini",
+                type: "artist",
+                birth: "b. 1396",
+                death: " d. 1470",
+                discipline: " Venice ",
+		link:"https://en.wikipedia.org/wiki/Jacopo_Bellini",
+                value: "0.5",
+		birthYear:   1396, 
+		deathYear:   1470
+              },
+              {
+                name: "Giotto di Bondone",
+                type: "artist",
+                birth: "b. 1267",
+                death: "d. 1337",
+                discipline: "painter",link:"https://en.wikipedia.org/wiki/Giotto",
+                value: "0.5",
+		birthYear:   1267, 
+		deathYear:   1337
+              },
+	      {
+                name: "Lorenzo Lotto",
+                type: "artist",
+                birth: "b. 1480",
+                death: "d. 1556",
+                discipline: "painter",
+		link:"https://en.wikipedia.org/wiki/Lorenzo_Lotto",
+                value: "0.5",
+		birthYear:   1480, 
+		deathYear:   1556
+              },
+		{
+                name: "Sebastiano del Piombo",
+                type: "artist",
+                birth: "b. 1485",
+                death: "d. 1547",
+                discipline: "painter",
+		link:"https://en.wikipedia.org/wiki/Sebastiano_del_Piombo",
+                value: "0.5",
+		birthYear:   1485, 
+		deathYear:   1547
+              },
+ 		{
+                name: "Signorelli",
+                type: "artist",
+                birth: "b. 1441",
+                death: "d. 1523",
+                discipline: "painter",
+		link:"https://en.wikipedia.org/wiki/Luca_Signorelli",
+                value: "0.5",
+		birthYear:   1441, 
+		deathYear:   1523
+              },
+	      {
+                name: "Pinturicchio",
+                type: "artist",
+                birth: "b. 1454",
+                death: "d. 1513",
+                discipline: "painter",
+		link:"https://en.wikipedia.org/wiki/Pinturicchio",
+                value: "0.5",
+		birthYear:   1454, 
+		deathYear:   1513
+              },
+	      {
+                name: "Antonio Pollaiuolo",
+                type: "artist",
+                birth: "b. 1429",
+                death: "d. 1498",
+                discipline: "painter, sculptor",
+		link:"https://en.wikipedia.org/wiki/Antonio_del_Pollaiuolo",
+                value: "0.5",
+		birthYear:   1429, 
+		deathYear:   1498
+              },
+		{
+                name: "Andrea Schiavone",
+                type: "artist",
+                birth: "b. 1510",
+                death: "d. 1563",
+                discipline: "painter",
+		link:"https://en.wikipedia.org/wiki/Andrea_Schiavone",
+                value: "0.5",
+		birthYear:   1510, 
+		deathYear:   1563
+              },
+		{
+                name: "Parmigianino",
+                type: "artist",
+                birth: "b. 1503",
+                death: "d. 1540",
+                discipline: "painter",
+		link:"https://en.wikipedia.org/wiki/Parmigianino",
+                value: "0.5",
+		birthYear:   1503, 
+		deathYear:   1531
+              },
+		{
+                name: "Carlo Crivelli",
+                type: "artist",
+                birth: "b. 1430",
+                death: "d. 1495",
+                discipline: "painter",
+		link:"https://en.wikipedia.org/wiki/Carlo_Crivelli",
+                value: "0.5",
+		birthYear:   1430, 
+		deathYear:   1495
+              },
+ 		{
+                name: "Vittore Carpaccio",
+                type: "artist",
+                birth: "b. 1460",
+                death: "d. 1525",
+                discipline: "painter",
+		link:"https://en.wikipedia.org/wiki/Vittore_Carpaccio",
+                value: "0.5",
+		birthYear:   1460, 
+		deathYear:   1525
+              },
+              {
+                name: "Cimabue",
+                type: "artist",
+                birth: "b. 1240",
+                death: "d. 1302",
+                discipline: "painter",
+		link:"https://en.wikipedia.org/wiki/Cimabue",
+                value: "0.5",
+		birthYear:   1248, 
+		deathYear:   1302
+              },
+              {
+                name: "PERUGIA",
+                type: "city",
+                birth: "",
+                death: "(Umbria)",
+                discipline: "",
+		link:"https://en.wikipedia.org/wiki/Perugia",
+                value: "2",
+		
+		}
+        ];
+
+        const LINKS_DATA = [
+            {city: "VENICE", artists: "Veronese" },
+              {city: "VENICE", artists: "Tintoretto" },
+              {city: "VENICE", artists: "Jacopo Bassano" },
+              {city: "VENICE", artists: "Andrea Palladio" },
+	      {city:"FLORENCE", artists:"ROME" },
+  	      {city:"FLORENCE", artists:"Pontormo"},
+ 	      {city:"FLORENCE",artists:"Andrea del Sarto"},
+  	      {city:"FLORENCE",artists:"Alberti"},
+ 	      {city:"FLORENCE",artists:"Sandro Botticelli"},
+              {city:"FLORENCE",artists:"Brunelleschi"},
+	      {city:"FLORENCE",artists:"Lorenzo Ghiberti"},
+              {city:"FLORENCE",artists:"Cimabue"},
+              {city:"FLORENCE", artists:"Duccio Buonisegna"},
+              {city:"FLORENCE", artists:"Donatello"},
+  	      {city:"FLORENCE",artists:"Filippo Lippi"},
+ 	      {city:"FLORENCE",artists:"Fra Angelico"},
+              {city:"FLORENCE",artists:"Ghirlandaio" },
+              {city:"FLORENCE",artists:"Giotto di Bondone"},
+              {city:"FLORENCE",artists:"Leonardo"},
+              {city:"FLORENCE",artists:"Mantegna"},
+              {city:"FLORENCE",artists:"Massaccio"},
+	      {city:"FLORENCE",artists:"Parmigianino"},
+              {city:"FLORENCE",artists:"Michelangelo"},
+              {city:"FLORENCE",artists:"Perugino"},
+              {city:"FLORENCE",artists:"Piero della Francesca"},
+              {city:"FLORENCE",artists:"Luca Della Robia"},
+              {city:"FLORENCE", artists:"Signorelli"},
+              {city:"FLORENCE",artists:"Andrea Della Robia"},
+ 	      {city:"FLORENCE",artists:"Raphael"},
+              {city:"FLORENCE",artists:"Antonio Pollaiuolo"},
+              {city:"FLORENCE",artists:"Taddeo Gaddi"},
+              {city:"FLORENCE",artists:"Verrocchio"},
+              {city:"FLORENCE",artists:"Paolo Ucello"},
+              {city:"FLORENCE",artists:"ROME"},
+              {city:"Gentile Bellini",artists:"Giovanni Bellini"},
+              {city:"MANTUA",artists:"Giulio Romano"},
+              {city:"MANTUA",artists:"Alberti"},
+              {city:"MANTUA",artists:"Andrea Palladio"},
+              {city:"MANTUA",artists:"Mantegna"},
+              {city:"MILAN",artists:"Bramante"},
+              {city:"MILAN",artists:"Leonardo"},
+              {city:"NAPLES",artists:"ROME"},
+              {city:"NAPLES",artists:"Antonello de Messina"},
+              {city:"PADUA",artists:"Donatello"},
+              {city:"PADUA",artists:"Filippo Lippi"},
+              {city:"PADUA",artists:"Giotto di Bondone"},
+              {city:"PADUA",artists:"Jacopo Bellini"},
+              {city:"PADUA",artists:"Mantegna"},
+              {city:"PERUGIA",artists:"Perugino"},
+              {city:"PERUGIA", artists:"Pinturicchio"},
+              {city:"ROME",artists:"Sandro Botticelli"},
+              {city:"ROME",artists:"Fra Angelico"},
+              {city:"ROME",artists:"Giulio Romano"},
+              {city:"ROME",artists:"Sandro Botticelli"},
+              {city:"ROME",artists:"Bramante"},
+              {city:"ROME",artists:"Cimabue"},
+              {city:"ROME",artists:"Donatello"},
+              {city:"ROME",artists:"Leonardo"},
+              {city:"ROME",artists:"Michelangelo"},
+              {city:"ROME",artists:"Perugino"},
+              {city:"ROME",artists:"Raphael"},
+	      {city:"ROME",artists:"Parmigianino"},
+	      {city:"ROME", artists:"Signorelli"},
+	      {city:"ROME", artists:"Antonio Bazzi"},
+	      {city:"ROME", artists:"Pinturicchio"},
+	      {city:"ROME", artists:"Sebastiano del Piombo"},
+              {city:"SIENA", artists:"Duccio Buonisegna"},
+	      {city:"SIENA", artists:"Antonio Bazzi"},
+	      {city:"SIENA", artists:"Signorelli"},
+              {city:"SIENA", artists:"FLORENCE"},
+              {city:"SIENA",artists:"Giovanni Pisano"},
+              {city:"URBINO",artists:"Bramante"},
+              {city:"URBINO",artists:"Piero della Francesca"},
+ 	      {city:"URBINO",artists:"Raphael"},
+              {city:"VENICE",artists:"Andrea Palladio"},
+              {city:"VENICE",artists:"Antonello de Messina"},
+              {city:"VENICE",artists:"Gentile Bellini"},
+              {city:"VENICE",artists:"Giorgione"},
+              {city:"VENICE",artists:"Giovanni Bellini"},
+              {city:"VENICE",artists:"Jacopo Bellini"},
+              {city:"VENICE",artists:"Mantegna"},
+              {city:"VENICE",artists:"ROME"},
+	      {city:"VENICE",artists:"PADUA"},
+              {city:"VENICE",artists:"Titian"},
+              {city:"VENICE", artists:"Verrocchio"},
+	      {city:"VENICE", artists:"Sebastiano del Piombo"},
+	      {city:"VENICE", artists:"Lorenzo Lotto"},
+	      {city:"VENICE", artists:"Carlo Crivelli"},
+              {city:"VENICE", artists:"Vittore Carpaccio"},
+	      {city:"VENICE", artists:"Andrea Schiavone"},
+	      {city:"SIENA", artists:"Pinturicchio"}
+
+        ];
+
+        // ==================== GLOBAL STATE ====================
+        let selectedNode = null;
+        let networkDimensions = {};
+        let timelineDimensions = {};
+        let tooltipVisible = false;
+        let currentTooltipNode = null;
+
+        // ==================== UTILITY FUNCTIONS ====================
+        
+        /**
+         * Convert links data to proper network format
+         */
+        function processLinksData(linksData) {
+            return linksData.map(link => ({
+                source: link.city,
+                target: link.artists
+            }));
+        }
+
+
+        /**
+         * Create timeline nodes from artist data
+         */
+        function createTimelineNodes(nodesData) {
+            const artistNodes = nodesData.filter(d => d.type === "artist" && d.birthYear);
+            const timelineNodes = [];
+            const timelineArcs = [];
+
+            artistNodes.forEach(artist => {
+                // Birth node (circle)
+                timelineNodes.push({
+                    ...artist,
+                    year: artist.birthYear,
+                    nodeType: "birth",
+                    id: `${artist.name}-birth`
+                });
+                
+                // Death node (square)
+                timelineNodes.push({
+                    ...artist,
+                    year: artist.deathYear,
+                    nodeType: "death",
+                    id: `${artist.name}-death`
+                });
+
+                // Arc data
+                timelineArcs.push({
+                    ...artist,
+                    startYear: artist.birthYear,
+                    endYear: artist.deathYear,
+                    id: `${artist.name}-arc`
+                });
+            });
+
+            return { timelineNodes, timelineArcs };
+        }
+
+        /**
+         * Generate node path based on type
+         */
+        function generateNodePath(nodeData) {
+            if (nodeData.type === "artist") {
+                // Diamond/rhombus shape
+                const size = CONFIG.network.nodeSize.artist;
+                return `M 0,-${size} L ${size},0 L 0,${size} L -${size},0 Z`;
+            } else {
+                // Octagon shape
+                const size = CONFIG.network.nodeSize.city;
+                const angle = Math.PI / 4;
+                let path = "M ";
+                for (let i = 0; i < 8; i++) {
+                    const x = size * Math.cos(i * angle);
+                    const y = size * Math.sin(i * angle);
+                    path += (i === 0 ? "" : "L ") + x + "," + y + " ";
+                }
+                path += "Z";
+                return path;
+            }
+        }
+
+        // ==================== DIMENSION MANAGEMENT ====================
+        
+        /**
+         * Update network graph dimensions
+         */
+        function updateNetworkDimensions() {
+            const container = d3.select(".network-container");
+            const containerRect = container.node().getBoundingClientRect();
+            
+            networkDimensions = {
+                width: containerRect.width - 40,
+                height: containerRect.height - 60
+            };
+            
+            d3.select("#network-svg")
+                .attr("width", networkDimensions.width)
+                .attr("height", networkDimensions.height);
+                
+            return networkDimensions;
+        }
+
+        /**
+         * Update timeline dimensions
+         */
+        function updateTimelineDimensions() {
+            const container = d3.select(".timeline-container");
+            const containerRect = container.node().getBoundingClientRect();
+            
+            timelineDimensions = {
+                width: containerRect.width - 40,
+                height: containerRect.height - 60
+            };
+            
+            d3.select("#timeline-svg")
+                .attr("width", timelineDimensions.width)
+                .attr("height", timelineDimensions.height);
+                
+            return timelineDimensions;
+        }
+
+        // ==================== TOOLTIP MANAGEMENT ====================
+        
+        /**
+         * Show persistent tooltip with node information
+         */
+        function showPersistentTooltip(event, nodeData) {
+            const tooltip = d3.select("#tooltip");
+            
+            const tooltipContent = `
+                <strong>${nodeData.name}</strong><br>
+                ${nodeData.type}, ${nodeData.birth}, ${nodeData.death}<br>
+                ${nodeData.discipline}
+                <a href="${nodeData.link}" target="_blank" rel="noopener noreferrer">More info</a>
+            `;
+            
+            tooltip
+                .classed("visible", true)
+                .html(tooltipContent)
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 10) + "px");
+                
+            tooltipVisible = true;
+            currentTooltipNode = nodeData.name;
+        }
+
+        /**
+         * Show temporary tooltip on hover (only if no persistent tooltip is visible)
+         */
+        function showTooltip(event, nodeData) {
+            if (!tooltipVisible) {
+                const tooltip = d3.select("#tooltip");
+                
+                const tooltipContent = `
+                    <strong>${nodeData.name}</strong><br>
+                    ${nodeData.type}, ${nodeData.birth}, ${nodeData.death}<br>
+                    ${nodeData.discipline}
+                    <a href="${nodeData.link}" target="_blank" rel="noopener noreferrer">More info</a>
+                `;
+                
+                tooltip
+                    .style("opacity", 1)
+                    .html(tooltipContent)
+                    .style("left", (event.pageX + 10) + "px")
+                    .style("top", (event.pageY - 10) + "px");
+            }
+        }
+
+        /**
+         * Hide temporary tooltip (only if no persistent tooltip is visible)
+         */
+        function hideTooltip() {
+            if (!tooltipVisible) {
+                d3.select("#tooltip").style("opacity", 0);
+            }
+        }
+
+        /**
+         * Hide persistent tooltip
+         */
+        function hidePersistentTooltip() {
+            const tooltip = d3.select("#tooltip");
+            tooltip
+                .classed("visible", false)
+                .style("opacity", 0);
+                
+            tooltipVisible = false;
+            currentTooltipNode = null;
+        }
+
+        /**
+         * Handle clicks outside tooltip to close it
+         */
+        function handleDocumentClick(event) {
+            const tooltip = document.getElementById("tooltip");
+            const clickedElement = event.target;
+            
+            // Check if click is outside tooltip and not on a node
+            if (tooltipVisible && 
+                !tooltip.contains(clickedElement) && 
+                !clickedElement.closest('.network-node') && 
+                !clickedElement.closest('.timeline-node')) {
+                hidePersistentTooltip();
+            }
+        }
+
+        // ==================== INTERACTION HANDLERS ====================
+        
+        /**
+         * Handle node selection and show persistent tooltip
+         */
+        function selectNode(nodeName, event, nodeData) {
+            selectedNode = nodeName;
+            updateNodeOpacity();
+            updateTimelineOpacity();
+            
+            // Show persistent tooltip if nodeData is provided
+            if (nodeData && event) {
+                showPersistentTooltip(event, nodeData);
+            }
+        }
+
+        /**
+         * Get connected nodes for a given node name
+         */
+        function getConnectedNodes(nodeName) {
+            const connectedNodes = new Set([nodeName]); // Include the selected node itself
+            
+            // Find all nodes connected to the selected node
+            const networkLinks = processLinksData(LINKS_DATA);
+            networkLinks.forEach(link => {
+                if (link.source === nodeName) {
+                    connectedNodes.add(link.target);
+                } else if (link.target === nodeName) {
+                    connectedNodes.add(link.source);
+                }
+            });
+            
+            return connectedNodes;
+        }
+
+        /**
+         * Update network node opacity based on selection
+         */
+        function updateNodeOpacity() {
+            const { selectedOpacity, deselectedOpacity, linkDeselectedOpacity } = CONFIG.effects;
+            
+            // Get all connected nodes
+            const connectedNodes = getConnectedNodes(selectedNode);
+            
+            // Update network nodes - highlight selected node and all connected nodes
+            d3.selectAll(".network-node")
+                .style("opacity", d => connectedNodes.has(d.name) ? selectedOpacity : deselectedOpacity);
+            
+            d3.selectAll(".node-label")
+                .style("opacity", d => connectedNodes.has(d.name) ? selectedOpacity : deselectedOpacity);
+            
+            // Update network links - highlight links connected to selected node
+            d3.selectAll(".network-link")
+                .style("opacity", d => 
+                    d.source.name === selectedNode || d.target.name === selectedNode ? 
+                    selectedOpacity : linkDeselectedOpacity);
+        }
+
+        /**
+         * Update timeline opacity and show arcs
+         */
+        function updateTimelineOpacity() {
+            const { selectedOpacity, deselectedOpacity } = CONFIG.effects;
+            
+            // Update timeline nodes
+            d3.selectAll(".timeline-node")
+                .style("opacity", d => d.name === selectedNode ? selectedOpacity : deselectedOpacity);
+            
+            d3.selectAll(".timeline-node-label")
+                .style("opacity", d => d.name === selectedNode ? selectedOpacity : deselectedOpacity);
+            
+            // Show/hide timeline arcs
+            d3.selectAll(".timeline-arc")
+                .style("opacity", d => d.name === selectedNode ? selectedOpacity : 0);
+        }
+
+        // ==================== DRAG BEHAVIOR ====================
+        
+        function dragstarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+
+        function dragended(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+
+        // ==================== NETWORK GRAPH INITIALIZATION ====================
+        
+        /**
+         * Initialize network graph
+         */
+        function initializeNetworkGraph() {
+            updateNetworkDimensions();
+            
+            const networkLinks = processLinksData(LINKS_DATA);
+            const networkSvg = d3.select("#network-svg");
+            
+            // Create simulation
+            window.simulation = d3.forceSimulation(NODES_DATA)
+                .force("link", d3.forceLink(networkLinks).id(d => d.name).distance(CONFIG.network.linkDistance))
+                .force("charge", d3.forceManyBody().strength(CONFIG.network.chargeStrength))
+                .force("center", d3.forceCenter(networkDimensions.width / 2, networkDimensions.height / 2));
+
+            // Create network group
+            const networkGroup = networkSvg.append("g").attr("class", "network-group");
+
+	     // Set up zoom behavior
+	    const g = networkGroup.append("g");
+	    const zoom = d3.zoom()
+            .scaleExtent([0.1, 10])
+            .on("zoom", function(event) {
+                g.attr("transform", event.transform);
+            });
+	    networkGroup.call(zoom);
+	    // Zoom control buttons
+        	d3.select("#zoom-in").on("click", function() {
+            networkGroup.transition().duration(300).call(
+                zoom.scaleBy, 1.5
+           	 );
+        	});
+
+        	d3.select("#zoom-out").on("click", function() {
+            networkGroup.transition().duration(300).call(
+                zoom.scaleBy, 1 / 1.5
+            	);
+        	});
+
+        	d3.select("#reset-zoom").on("click", function() {
+            networkGroup.transition().duration(500).call(
+                zoom.transform,
+                d3.zoomIdentity
+            );
+        });
+
+
+
+
+
+            // Create links
+            const links = networkGroup.append("g")
+                .selectAll("path")
+                .data(networkLinks)
+                .join("path")
+                .attr("class", "network-link");
+
+            // Create nodes
+            const nodes = networkGroup.append("g")
+                .selectAll("path")
+                .data(NODES_DATA)
+                .join("path")
+                .attr("class", "network-node")
+                .attr("fill", d => CONFIG.network.nodeColors[d.type])
+                .attr("d", generateNodePath)
+                .call(d3.drag()
+                    .on("start", dragstarted)
+                    .on("drag", dragged)
+                    .on("end", dragended))
+                .on("click", (event, d) => {
+                    event.stopPropagation();
+                    selectNode(d.name, event, d);
+                })
+                .on("mouseover", showTooltip)
+                .on("mouseout", hideTooltip);
+
+            // Create node labels
+            const nodeLabels = networkGroup.append("g")
+                .selectAll("text")
+                .data(NODES_DATA)
+                .join("text")
+                .attr("class", "node-label")
+                .text(d => d.name)
+                .attr("dy", CONFIG.network.labelOffset);
+
+            // Simulation tick function
+            simulation.on("tick", () => {
+                links.attr("d", d => {
+                    const dx = d.target.x - d.source.x;
+                    const dy = d.target.y - d.source.y;
+                    const dr = Math.sqrt(dx * dx + dy * dy) * 2;
+                    return `M ${d.source.x},${d.source.y} A ${dr},${dr} 0 0,1 ${d.target.x},${d.target.y}`;
+                });
+
+                nodes.attr("transform", d => `translate(${d.x},${d.y})`);
+                nodeLabels.attr("transform", d => `translate(${d.x},${d.y})`);
+            });
+        }
+
+        // ==================== TIMELINE INITIALIZATION ====================
+        
+        /**
+         * Initialize timeline
+         */
+        function initializeTimeline() {
+            updateTimelineDimensions();
+            
+            const { timelineNodes, timelineArcs } = createTimelineNodes(NODES_DATA);
+            const timelineSvg = d3.select("#timeline-svg");
+            const timelineGroup = timelineSvg.append("g").attr("class", "timeline-group");
+            
+            // Create timeline scale
+            const timelineScale = d3.scaleLinear()
+                .domain(CONFIG.timeline.yearRange)
+                .range([CONFIG.timeline.margin.left, timelineDimensions.width - CONFIG.timeline.margin.right]);
+
+            // Create timeline axis
+            timelineGroup.append("line")
+                .attr("class", "timeline-axis")
+                .attr("x1", CONFIG.timeline.margin.left)
+                .attr("y1", timelineDimensions.height / 2)
+                .attr("x2", timelineDimensions.width - CONFIG.timeline.margin.right)
+                .attr("y2", timelineDimensions.height / 2);
+
+            // Create timeline ticks
+            timelineGroup.selectAll(".timeline-tick")
+                .data(CONFIG.timeline.tickYears)
+                .join("line")
+                .attr("class", "timeline-tick")
+                .attr("x1", d => timelineScale(d))
+                .attr("y1", timelineDimensions.height / 2 - 10)
+                .attr("x2", d => timelineScale(d))
+                .attr("y2", timelineDimensions.height / 2 + 10);
+
+            // Create year labels
+            timelineGroup.selectAll(".timeline-year-label")
+                .data(CONFIG.timeline.tickYears)
+                .join("text")
+                .attr("class", "timeline-label")
+                .attr("x", d => timelineScale(d))
+                .attr("y", timelineDimensions.height / 2 + 25)
+                .text(d => d);
+
+            // Create timeline arcs
+            timelineGroup.selectAll(".timeline-arc")
+                .data(timelineArcs)
+                .join("path")
+                .attr("class", "timeline-arc")
+                .attr("d", d => {
+                    const x1 = timelineScale(d.startYear);
+                    const x2 = timelineScale(d.endYear);
+                    const y = timelineDimensions.height / 2 - CONFIG.timeline.arcOffset;
+                    const midX = (x1 + x2) /2;
+                    const controlY = y - CONFIG.timeline.arcControlOffset;
+                    return `M ${x1} ${y} Q ${midX} ${controlY} ${x2} ${y}`;
+                });
+
+            // Create timeline nodes
+            timelineGroup.selectAll(".timeline-node")
+                .data(timelineNodes)
+                .join(enter => enter.append(d => {
+                    return d.nodeType === "birth" ? 
+                        document.createElementNS("http://www.w3.org/2000/svg", "circle") :
+                        document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                }))
+                .attr("class", "timeline-node")
+                .attr("fill", CONFIG.network.nodeColors.artist)
+                .each(function(d) {
+                    const element = d3.select(this);
+                    const x = timelineScale(d.year);
+                    const y = timelineDimensions.height / 2 - CONFIG.timeline.arcOffset;
+                    
+                    if (d.nodeType === "birth") {
+                        element
+                            .attr("cx", x)
+                            .attr("cy", y)
+                            .attr("r", CONFIG.timeline.nodeRadius);
+                    } else {
+                        element
+                            .attr("x", x - CONFIG.timeline.squareSize / 2)
+                            .attr("y", y - CONFIG.timeline.squareSize / 2)
+                            .attr("width", CONFIG.timeline.squareSize)
+                            .attr("height", CONFIG.timeline.squareSize);
+                    }
+                })
+                .on("click", (event, d) => {
+                    event.stopPropagation();
+                    selectNode(d.name, event, d);
+                })
+                .on("mouseover", showTooltip)
+                .on("mouseout", hideTooltip);
+
+            // Create timeline node labels
+            timelineGroup.selectAll(".timeline-node-label")
+                .data(timelineNodes)
+                .join("text")
+                .attr("class", "timeline-node-label")
+                .attr("x", d => timelineScale(d.year))
+                .attr("y", timelineDimensions.height / 2 - CONFIG.timeline.arcOffset - 15)
+                .text(d => `${d.name} ${d.nodeType === 'birth' ? 'b.' : 'd.'} ${d.year}`);
+
+            // Store timeline elements for resize
+            window.timelineScale = timelineScale;
+            window.timelineNodes = timelineNodes;
+            window.timelineArcs = timelineArcs;
+        }
+
+        // ==================== RESIZE HANDLING ====================
+        
+        /**
+         * Handle window resize
+         */
+        function handleResize() {
+            // Update network
+            updateNetworkDimensions();
+            simulation.force("center", d3.forceCenter(networkDimensions.width / 2, networkDimensions.height / 2));
+            simulation.alpha(1).restart();
+            
+            // Update timeline
+            updateTimelineDimensions();
+            const timelineScale = d3.scaleLinear()
+                .domain(CONFIG.timeline.yearRange)
+                .range([CONFIG.timeline.margin.left, timelineDimensions.width - CONFIG.timeline.margin.right]);
+            
+            // Update timeline elements
+            d3.select(".timeline-axis")
+                .attr("x2", timelineDimensions.width - CONFIG.timeline.margin.right);
+                
+            d3.selectAll(".timeline-tick")
+                .attr("x1", d => timelineScale(d))
+                .attr("x2", d => timelineScale(d));
+                
+            d3.selectAll(".timeline-label")
+                .attr("x", d => timelineScale(d));
+                
+            d3.selectAll(".timeline-arc")
+                .attr("d", d => {
+                    const x1 = timelineScale(d.startYear);
+                    const x2 = timelineScale(d.endYear);
+                    const y = timelineDimensions.height / 2 - CONFIG.timeline.arcOffset;
+                    const midX = (x1 + x2) / 2;
+                    const controlY = y - CONFIG.timeline.arcControlOffset;
+                    return `M ${x1} ${y} Q ${midX} ${controlY} ${x2} ${y}`;
+                });
+            
+            d3.selectAll(".timeline-node")
+                .each(function(d) {
+                    const element = d3.select(this);
+                    const x = timelineScale(d.year);
+                    const y = timelineDimensions.height / 2 - CONFIG.timeline.arcOffset;
+                    
+                    if (d.nodeType === "birth") {
+                        element.attr("cx", x).attr("cy", y);
+                    } else {
+                        element
+                            .attr("x", x - CONFIG.timeline.squareSize / 2)
+                            .attr("y", y - CONFIG.timeline.squareSize / 2);
+                    }
+                });
+            
+            d3.selectAll(".timeline-node-label")
+                .attr("x", d => timelineScale(d.year));
+        }
+	
+
+		// ==================== ZOOM MANAGEMENT ====================
+
+let currentZoomLevel = 1;
+const ZOOM_STEP = 0.2;
+const MIN_ZOOM = 0.5;
+const MAX_ZOOM = 3;
+
+
+// ==================== PANNING VARIABLES ====================
+let isPanning = false;
+let panStartX = 0;
+let panStartY = 0;
+let panOffsetX = 0;
+let panOffsetY = 0;
+let networkGroup = null;
+
+
+
+/**
+ * Apply zoom transformation to network graph
+ */
+function applyZoom(zoomLevel) {
+    currentZoomLevel = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoomLevel));
+    
+    const networkGroup = d3.select(".network-group");
+    const networkSvg = d3.select("#network-svg");
+    const { width, height } = networkDimensions;
+    
+    networkGroup.transition()
+        .duration(300)
+        .attr("transform", 
+            `translate(${width / 2}, ${height / 2}) scale(${currentZoomLevel}) translate(-${width / 2}, -${height / 2})`);
+}
+
+// Zoom in handler 
+function handleZoomIn() {
+    const newZoomLevel = currentZoomLevel + ZOOM_STEP;
+    applyZoom(newZoomLevel);
+}
+
+// Zoom out handler
+function handleZoomOut() {
+    const newZoomLevel = currentZoomLevel - ZOOM_STEP;
+    applyZoom(newZoomLevel);
+}
+
+// Zoom reset handler
+function handleZoomReset() {
+    const newZoomLevel = currentZoomLevel-0.5;
+    applyZoom(newZoomLevel);
+}
+
+        // ==================== INITIALIZATION ====================
+        
+        /**
+         * Initialize the entire dashboard
+         */
+        function initializeDashboard() {
+            initializeNetworkGraph();
+            initializeTimeline();
+            
+            // Add resize listener
+            window.addEventListener('resize', handleResize);
+            
+            // Start simulation
+            simulation.alpha(1).restart();
+
+	    // Add zoom button listeners
+    	    document.getElementById('zoomIn').addEventListener('click', handleZoomIn);
+    	    document.getElementById('zoomOut').addEventListener('click', handleZoomOut);
+	    document.getElementById('zoomReset').addEventListener('click', handleZoomReset);
+
+	            }
+
+        // ==================== START APPLICATION ====================
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
+    </script>
+</body>
+</html>
