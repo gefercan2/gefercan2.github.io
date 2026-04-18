@@ -17,9 +17,8 @@
         .container {
             background-color: #e0e0e0;
             width: 100%;
-            height: 120vh;
-            position: absolute;
-			top:-20%;
+            height: 100vh;
+            position: relative;
             overflow: hidden;
         }
         
@@ -53,13 +52,13 @@
         
         .legend {
             position: absolute;
-            top: 20%;
+            top: 20px;
             left: 20px;
             background-color: rgba(255, 255, 255, 0.8);
             padding: 10px;
             border-radius: 4px;
             font-size: 12px;
-            z-index: 200;
+            z-index: 10;
         }
         
         .legend-item {
@@ -95,7 +94,56 @@
             z-index: 1000;
         }
 
-        /* Side Menu Styles */
+        /* Zoom Controls */
+        .zoom-controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            background-color: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .zoom-btn:hover {
+            background-color: #5568d3;
+            transform: scale(1.1);
+        }
+
+        .zoom-btn:active {
+            transform: scale(0.95);
+        }
+
+        .zoom-level {
+            min-width: 60px;
+            text-align: center;
+            font-weight: bold;
+            color: #333;
+            font-size: 14px;
+        }
+
+        /* Menu Toggle Button */
         .menu-toggle {
             position: fixed;
             top: 20px;
@@ -256,7 +304,6 @@
             color: #667eea;
         }
 
-        /* Overlay */
         .overlay {
             position: fixed;
             top: 0;
@@ -276,9 +323,6 @@
         }
     </style>
 </head>
-
-
- <!--------------- BODY ----------------->	
 <body>
     <!-- Menu Toggle Button -->
     <button class="menu-toggle" id="menuToggle">
@@ -286,6 +330,14 @@
         <span></span>
         <span></span>
     </button>
+
+    <!-- Zoom Controls -->
+    <div class="zoom-controls">
+        <button class="zoom-btn" id="zoomOut" title="Zoom Out">−</button>
+        <div class="zoom-level" id="zoomLevel">100%</div>
+        <button class="zoom-btn" id="zoomIn" title="Zoom In">+</button>
+        <button class="zoom-btn" id="zoomReset" title="Reset Zoom">⟲</button>
+    </div>
 
     <!-- Overlay -->
     <div class="overlay" id="overlay"></div>
@@ -400,7 +452,6 @@
         <div class="loading" id="loading">Loading data...</div>
         <canvas id="network"></canvas>
         <div class="tooltip" id="tooltip"></div>
-	
     </div>
 
     <script>
@@ -449,6 +500,9 @@
         let container;
         let tooltip;
         let width, height, radius, centerX, centerY;
+        let zoomBehavior;
+        let currentZoom = 1;
+        let graphGroup;
 
         Promise.all([
             d3.csv('nodes.csv'),
@@ -482,23 +536,35 @@
             width = container.clientWidth;
             height = container.clientHeight;
             
-            radius = Math.min(width, height) * 0.5;
+            radius = Math.min(width, height) * 0.45;
             centerX = width / 2;
             centerY = height / 2;
 
             svg = d3.select(".container")
                 .append("svg")
-                .attr("width", "110%")
+                .attr("width", "100%")
                 .attr("height", "100%")
                 .attr("viewBox", `0 0 ${width} ${height}`)
                 .attr("preserveAspectRatio", "xMidYMid meet")
                 .attr("class", "network-svg");
+
+            // Create a group for zoom transformations
+            graphGroup = svg.append("g")
+                .attr("class", "graph-group");
                 
-            svg.append("circle")
+            // Add boundary circle to the graph group
+            graphGroup.append("circle")
                 .attr("class", "boundary-circle")
                 .attr("cx", centerX)
                 .attr("cy", centerY)
-                .attr("r", radius );
+                .attr("r", radius);
+
+            // Setup zoom behavior
+            zoomBehavior = d3.zoom()
+                .scaleExtent([0.5, 3])
+                .on("zoom", zoomed);
+
+            svg.call(zoomBehavior);
 
             tooltip = d3.select("#tooltip");
 
@@ -508,47 +574,78 @@
             createNodes();
             createLabels();
             setupInteractions();
+            setupZoomControls();
             
             simulation.on("tick", updatePositions);
+        }
+
+        function zoomed(event) {
+            graphGroup.attr("transform", event.transform);
+            currentZoom = event.transform.k;
+            updateZoomLevel();
+        }
+
+        function updateZoomLevel() {
+            document.getElementById('zoomLevel').textContent = Math.round(currentZoom * 100) + '%';
+        }
+
+        function setupZoomControls() {
+            document.getElementById('zoomIn').addEventListener('click', function() {
+                svg.transition().duration(300).call(
+                    zoomBehavior.scaleBy, 1.3
+                );
+            });
+
+            document.getElementById('zoomOut').addEventListener('click', function() {
+                svg.transition().duration(300).call(
+                    zoomBehavior.scaleBy, 0.7
+                );
+            });
+
+            document.getElementById('zoomReset').addEventListener('click', function() {
+                svg.transition().duration(500).call(
+                    zoomBehavior.transform, d3.zoomIdentity
+                );
+            });
         }
 
         function positionNodes() {
             nodes.forEach((node, i) => {
                 if (node.id === "ROME") {
                     node.x = centerX;
-                    node.y = centerY + radius* 0.1;
+                    node.y = centerY;  // Changed from centerY + radius * 0.3
                     node.fx = centerX;
-                    node.fy = centerY + radius* 0.1;
+                    node.fy = centerY;  // Changed from centerY + radius * 0.3
                 } else if (node.id === "NAPLES") {
-                    node.x = centerX + radius * 0.3;
-                    node.y = centerY + radius * 0.2;
-                    node.fx = centerX + radius * 0.3;
-                    node.fy = centerY + radius * 0.2;
+                    node.x = centerX + radius * 0.6;
+                    node.y = centerY + radius * 0.35;
+                    node.fx = centerX + radius * 0.6;
+                    node.fy = centerY + radius * 0.35;
                 } else if (node.id === "VENICE") {
                     node.x = centerX + radius * 0.4;
-                    node.y = centerY - radius * 0.7;
+                    node.y = centerY - radius * 0.35;
                     node.fx = centerX + radius * 0.4;
-                    node.fy = centerY - radius * 0.7;
+                    node.fy = centerY - radius * 0.35;
                 } else if (node.id === "MILAN") {
-                    node.x = centerX - radius * 0.7;
-                    node.y = centerY - radius * 0.7;
-                    node.fx = centerX - radius * 0.7;
-                    node.fy = centerY - radius * 0.7;
+                    node.x = centerX - radius * 0.33;
+                    node.y = centerY - radius * 0.4;
+                    node.fx = centerX - radius * 0.33;
+                    node.fy = centerY - radius * 0.4;
                 } else if (node.id === "FLORENCE") {
-                    node.x = centerX - radius * 0.3;
-                    node.y = centerY - radius * 0.3;
-                    node.fx = centerX - radius * 0.3;
-                    node.fy = centerY - radius * 0.3;
+                    node.x = centerX - radius * 0.2;
+                    node.y = centerY - radius * 0.15;
+                    node.fx = centerX - radius * 0.2;
+                    node.fy = centerY - radius * 0.15;
                 } else if (node.id === "MANTUA") {
                     node.x = centerX - radius * 0.1;
-                    node.y = centerY - radius * 0.4;
+                    node.y = centerY - radius * 0.3;
                     node.fx = centerX - radius * 0.1;
-                    node.fy = centerY - radius * 0.4;
+                    node.fy = centerY - radius * 0.3;
                 } else if (node.id === "PADUA") {
                     node.x = centerX + radius * 0.2;
-                    node.y = centerY - radius * 0.6;
+                    node.y = centerY - radius * 0.35;
                     node.fx = centerX + radius * 0.2;
-                    node.fy = centerY - radius * 0.6;
+                    node.fy = centerY - radius * 0.35;
                 } else if (node.id === "SIENA") {
                     node.x = centerX - radius * 0.4;
                     node.y = centerY + radius * 0.09;
@@ -556,9 +653,9 @@
                     node.fy = centerY + radius * 0.09;
                 } else if (node.id === "URBINO") {
                     node.x = centerX + radius * 0.4;
-                    node.y = centerY - radius * 0.3;
+                    node.y = centerY - radius * 0.1;
                     node.fx = centerX + radius * 0.4;
-                    node.fy = centerY - radius * 0.3;
+                    node.fy = centerY - radius * 0.1;
                 } else if (node.id === "PERUGIA") {
                     node.x = centerX - radius * 0.09;
                     node.y = centerY - radius * 0.09;
@@ -567,8 +664,8 @@
                 } else {
                     const artistCount = nodes.length - 1;
                     const angle = ((i - (node.id === "ROME" ? 1 : 0)) * 2 * Math.PI) / artistCount;
-                    node.x = centerX - radius * Math.cos(angle) ;
-                    node.y = centerY - radius * Math.sin(angle) ;
+                    node.x = centerX - radius * Math.cos(angle);
+                    node.y = centerY - radius * Math.sin(angle);
                 }
             });
         }
@@ -585,7 +682,7 @@
         }
 
         function createLinks() {
-            window.linkElements = svg.append("g")
+            window.linkElements = graphGroup.append("g")
                 .selectAll("path")
                 .data(links)
                 .enter()
@@ -600,7 +697,7 @@
             const artistShape = d3.symbol().type(d3.symbolDiamond).size(80);
             const cityShape = d3.symbol().type(d3.symbolDiamond2).size(200);
 
-            window.nodeElements = svg.append("g")
+            window.nodeElements = graphGroup.append("g")
                 .selectAll("path")
                 .data(nodes)
                 .enter()
@@ -609,13 +706,14 @@
                 .attr("d", d => d.type === "artist" ? artistShape() : cityShape())
                 .attr("fill", d => d.type === "artist" ? "#FF9999" : "#8888FF")
                 .call(d3.drag()
+                    .subject(d => d)
                     .on("start", dragstarted)
                     .on("drag", dragged)
                     .on("end", dragended));
         }
 
         function createLabels() {
-            window.labelElements = svg.append("g")
+            window.labelElements = graphGroup.append("g")
                 .selectAll("text")
                 .data(nodes)
                 .enter()
@@ -658,7 +756,7 @@
                 
                 window.linkElements.filter(l => (l.source.id === d.id || l.target.id === d.id))
                     .attr("stroke", "#000000")
-                    .attr("stroke-width", 1);
+                    .attr("stroke-width", 2);
                 
                 window.labelElements.filter(n => n.id === d.id)
                     .attr("font-size", "1em")
@@ -731,8 +829,9 @@
         }
 
         function dragged(event, d) {
-            d.fx = event.x;
-            d.fy = event.y;
+            const transform = d3.zoomTransform(svg.node());
+            d.fx = (event.x - transform.x) / transform.k;
+            d.fy = (event.y - transform.y) / transform.k;
         }
 
         function dragended(event, d) {
@@ -746,11 +845,11 @@
         window.addEventListener('resize', function() {
             const newWidth = container.clientWidth;
             const newHeight = container.clientHeight;
-            const newRadius = Math.min(newWidth, newHeight) * 0.4;
+            const newRadius = Math.min(newWidth, newHeight) * 0.45;
             
             svg.attr("viewBox", `0 0 ${newWidth} ${newHeight}`);
             
-            svg.select(".boundary-circle")
+            graphGroup.select(".boundary-circle")
                 .attr("cx", newWidth / 2)
                 .attr("cy", newHeight / 2)
                 .attr("r", newRadius);
@@ -758,7 +857,7 @@
             simulation.force("center", d3.forceCenter(newWidth / 2, newHeight / 2));
             simulation.force("radial", d3.forceRadial(d => d.id === "ROME" ? 0 : newRadius, newWidth / 2, newHeight / 2));
             simulation.force("x", d3.forceX(newWidth / 2));
-            simulation.force("y", d3.forceY(newHeight / 2));
+            simulation.force("y", d3.forceY(newWidth / 2));
             
             simulation.alpha(0.3).restart();
         });
