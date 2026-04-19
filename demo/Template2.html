@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Refined Feature Layout</title>
+
+<style>
+
+body {
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    background: #f6f6f6;
+    color: #121212;
+}
+
+/* HERO */
+
+.hero {
+    height: 100vh;
+    background: url("https://picsum.photos/1600/1000") center/cover no-repeat;
+    display: flex;
+    align-items: flex-end;
+}
+
+.hero-overlay {
+    width: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,0.75), transparent);
+    padding: 80px 20px;
+    color: #ffffff;
+}
+
+.hero-inner {
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.kicker {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #ffcc00;
+    margin-bottom: 10px;
+}
+
+.title {
+    font-size: 52px;
+    line-height: 1.1;
+    margin-bottom: 12px;
+}
+
+.standfirst {
+    font-size: 20px;
+    color: #dddddd;
+}
+
+/* LAYOUT */
+
+.wrapper {
+    display: grid;
+    grid-template-columns: 1fr 640px 260px 1fr;
+    gap: 20px;
+    margin-top: 40px;
+}
+
+.article {
+    grid-column: 2;
+}
+
+.sidebar {
+    grid-column: 3;
+    position: sticky;
+    top: 40px;
+}
+
+/* BYLINE */
+
+.byline {
+    font-size: 14px;
+    color: #555555;
+    border-top: 1px solid #dddddd;
+    border-bottom: 1px solid #dddddd;
+    padding: 12px 0;
+    margin-bottom: 30px;
+}
+
+/* PARAGRAPHS */
+
+.article p {
+    font-size: 18px;
+    line-height: 1.85;
+    margin-bottom: 26px;
+}
+
+/* DROP CAPS ON MULTIPLE PARAGRAPHS */
+
+.dropcap::first-letter {
+    float: left;
+    font-size: 64px;
+    line-height: 0.85;
+    padding-right: 8px;
+    font-weight: bold;
+}
+
+/* IMAGE */
+
+.image {
+    width: 100%;
+    height: 380px;
+    background: url("https://picsum.photos/900/600") center/cover no-repeat;
+    margin: 30px 0;
+}
+
+/* DIVIDER */
+
+.divider {
+    height: 1px;
+    background: #dddddd;
+    margin: 40px 0;
+}
+
+/* INSET BOX (IN-ARTICLE) */
+
+.inset {
+    border-left: 4px solid #c70000;
+    padding: 15px 18px;
+    margin: 30px 0;
+    background: #fafafa;
+}
+
+.inset-title {
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.inset-text {
+    font-size: 15px;
+    color: #444444;
+}
+
+/* SIDEBAR CARDS */
+
+.card {
+    border-top: 3px solid #c70000;
+    padding-top: 10px;
+    margin-bottom: 25px;
+}
+
+.card-title {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.card-text {
+    font-size: 13px;
+    color: #555555;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+    .wrapper {
+        grid-template-columns: 1fr 90% 1fr;
+    }
+
+    .article {
+        grid-column: 2;
+    }
+
+    .sidebar {
+        grid-column: 2;
+        position: relative;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="hero">
+    <div class="hero-overlay">
+        <div class="hero-inner">
+            <div class="kicker">Food & Craft</div>
+            <div class="title">The Discipline Behind Perfection</div>
+            <div class="standfirst">
+                In a quiet world defined by repetition and refinement, mastery emerges through precision, patience, and time.
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="wrapper">
+
+    <div class="article">
+
+        <div class="byline">
+            By Editorial Studio • Photography by Placeholder • April 2026
+        </div>
+
+        <p class="dropcap">The history of the FIFA World Cup offers a compelling lens through which to analyze the relative success of global football confederations. Since the inaugural tournament in 1930, the distribution of victories has been strikingly uneven, revealing both structural inequalities and deep-rooted footballing cultures. Among the six continental confederations—UEFA (Europe), CONMEBOL (South America), CAF (Africa), AFC (Asia), CONCACAF (North and Central America), and OFC (Oceania)—two have overwhelmingly dominated: UEFA and CONMEBOL. Together, they account for all World Cup victories to date, with UEFA leading in total titles and CONMEBOL closely following.</p>
+
+      <p>The dominance of UEFA is the most pronounced feature of World Cup history. European teams have secured the majority of titles, supported by extensive domestic leagues, advanced training systems, and a dense network of elite competitions. This environment fosters tactical innovation and consistent production of world-class talent.</p>
+
+      <p>CONMEBOL, the South American confederation, stands as UEFA’s only true rival in World Cup success. Despite having far fewer member nations, CONMEBOL has produced a disproportionate number of champions, including legendary teams like Brazil national football team and Argentina national football team. Brazil alone accounts for a significant share of World Cup titles, embodying a footballing culture that emphasizes creativity, flair, and technical mastery. Argentina, with its own rich tradition, has also contributed multiple victories, reinforcing the region’s elite status. The success of CONMEBOL can be linked to a deeply embedded football culture, where the sport plays a central role in national identity and social life. Informal street football, combined with competitive domestic leagues, creates a fertile environment for talent development. However, unlike UEFA, CONMEBOL operates with fewer financial resources and less infrastructural depth. Its success is therefore remarkable in proportional terms: with only ten member associations, it rivals Europe’s output of champions. This efficiency highlights the intensity of competition within the region, where qualifying for the World Cup is itself a formidable challenge. Over time, however, the balance has shifted slightly toward UEFA, as European teams have become more dominant in recent tournaments. Nonetheless, CONMEBOL remains a powerhouse, consistently producing finalists and maintaining a high success ratio relative to its size.</p>
+
+        <div class="divider"></div>
+
+        <div class="image"></div>
+
+        <p class="dropcap">Curabitur non purus sit amet erat fermentum egestas. Duis non orci sed nisl dapibus fermentum. Aenean vel nisl at elit fermentum tincidunt.</p>
+
+        <div class="inset">
+            <div class="inset-title">Inside the process</div>
+            <div class="inset-text">
+                Precision is not a single act but a repeated discipline, refined over years of quiet repetition and attention to detail.
+            </div>
+        </div>
+
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent feugiat, sapien sit amet fermentum hendrerit.</p>
+
+        <div class="divider"></div>
+
+        <p class="dropcap">Vivamus euismod turpis vel nisi viverra, non auctor odio tempor. Donec a luctus lorem. Proin tincidunt tincidunt aliquam.</p>
+
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer dignissim turpis sit amet magna ultricies.</p>
+
+        <div class="inset">
+            <div class="inset-title">Related insight</div>
+            <div class="inset-text">
+                Mastery often appears invisible to outsiders, but it is built on thousands of small, deliberate decisions.
+            </div>
+        </div>
+
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at justo vel sapien posuere gravida.</p>
+
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis non orci sed nisl dapibus fermentum.</p>
+
+        <div class="divider"></div>
+
+        <p class="dropcap">Suspendisse potenti. Vivamus euismod turpis vel nisi viverra. Donec a luctus lorem. Proin tincidunt tincidunt aliquam.</p>
+
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer dignissim turpis sit amet magna ultricies.</p>
+
+    </div>
+
+    <div class="sidebar">
+
+        <div class="card">
+            <div class="card-title">Related story</div>
+            <div class="card-text">Exploring the quiet rituals of traditional craftsmanship.</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">More features</div>
+            <div class="card-text">Inside the discipline of world-class artisans.</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Read next</div>
+            <div class="card-text">How mastery evolves over decades of repetition.</div>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

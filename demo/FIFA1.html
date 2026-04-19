@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FIFA World Cup winners</title>
+
+<style>
+
+body {
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    background: #f6f6f6;
+    color: #121212;
+}
+
+/* HERO */
+
+.hero {
+    height: 100vh;
+    background: url("https://upload.wikimedia.org/wikipedia/commons/f/ff/Brazil_and_Croatia_match_at_the_FIFA_World_Cup_2014-06-12_%2847%29.jpg") center/cover no-repeat;
+    display: flex;
+    align-items: flex-end;    
+    opacity:0.5;
+}
+
+.hero-overlay {
+    width: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,0.75), transparent);
+    padding: 80px 20px;
+    color: #ffffff;
+}
+
+.hero-inner {
+    max-width: 640px;
+    margin: 0 auto;    
+}
+
+.kicker {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #ffcc00;
+    margin-bottom: 10px;
+}
+
+.title {
+    font-size: 52px;
+    line-height: 1.1;
+    margin-bottom: 12px;
+}
+
+.standfirst {
+    font-size: 20px;
+    color: #dddddd;
+}
+
+/* LAYOUT */
+
+.wrapper {
+    display: grid;
+    grid-template-columns: 1fr 640px 260px 1fr;
+    gap: 20px;
+    margin-top: 40px;
+}
+
+.article {
+    grid-column: 2;
+}
+
+.sidebar {
+    grid-column: 3;
+    position: sticky;
+    top: 40px;
+}
+
+/* BYLINE */
+
+.byline {
+    font-size: 14px;
+    color: #555555;
+    border-top: 1px solid #dddddd;
+    border-bottom: 1px solid #dddddd;
+    padding: 12px 0;
+    margin-bottom: 30px;
+}
+
+/* PARAGRAPHS */
+
+.article p {
+    font-size: 18px;
+    line-height: 1.85;
+    margin-bottom: 26px;
+}
+
+/* DROP CAPS ON MULTIPLE PARAGRAPHS */
+
+.dropcap::first-letter {
+    float: left;
+    font-size: 64px;
+    line-height: 0.85;
+    padding-right: 8px;
+    font-weight: bold;
+}
+
+/* IMAGE */
+
+.image {
+    width: 100%;
+    height: 380px;
+    background: url("https://upload.wikimedia.org/wikipedia/commons/f/ff/Brazil_and_Croatia_match_at_the_FIFA_World_Cup_2014-06-12_%2847%29.jpg") center/cover no-repeat;
+    margin: 30px 0;
+}
+
+/* DIVIDER */
+
+.divider {
+    height: 1px;
+    background: #dddddd;
+    margin: 40px 0;
+}
+
+/* INSET BOX (IN-ARTICLE) */
+
+.inset {
+    border-left: 4px solid #c70000;
+    padding: 15px 18px;
+    margin: 30px 0;
+    background: #fafafa;
+}
+
+.inset-title {
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.inset-text {
+    font-size: 15px;
+    color: #444444;
+}
+
+/* SIDEBAR CARDS */
+
+.card {
+    border-top: 3px solid #c70000;
+    padding-top: 10px;
+    margin-bottom: 25px;
+}
+
+.card-title {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.card-text {
+    font-size: 13px;
+    color: #555555;
+}
+
+
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+    .wrapper {
+        grid-template-columns: 1fr 90% 1fr;
+    }
+
+    .article {
+        grid-column: 2;
+    }
+
+    .sidebar {
+        grid-column: 2;
+        position: relative;
+    }
+	
+    .article p {
+    	font-size: 2em;
+    	line-height: 1.85;
+    	margin-bottom: 26px;
+       }
+ }
+
+</style>
+</head>
+
+
+
+
+
+
+
+
+<body>
+
+<div class="hero">
+    <div class="hero-overlay">
+        <div class="hero-inner">
+            <div class="kicker">FIFA World Cupt</div>
+            <div class="title">Who has won it most?</div>
+            <div class="standfirst">
+                In a quiet world defined by repetition and refinement, mastery emerges through precision, patience, and time.
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="wrapper">
+
+    <div class="article">
+
+        <div class="byline">
+            By Editorial Studio • 
+<br>
+Photography by Placeholder • April 2026
+        </div>
+ <div class="divider"></div>
+        <p class="dropcap">The history of the FIFA World Cup offers a compelling lens through which to analyze the relative success of global football confederations. Since the inaugural tournament in 1930, the distribution of victories has been strikingly uneven, revealing both structural inequalities and deep-rooted footballing cultures. Among the six continental confederations—UEFA (Europe), CONMEBOL (South America), CAF (Africa), AFC (Asia), CONCACAF (North and Central America), and OFC (Oceania)—two have overwhelmingly dominated: UEFA and CONMEBOL. Together, they account for all World Cup victories to date, with UEFA leading in total titles and CONMEBOL closely following. The dominance of UEFA is the most pronounced feature of World Cup history. European teams have secured the majority of titles, supported by extensive domestic leagues, advanced training systems, and a dense network of elite competitions. This environment fosters tactical innovation and consistent production of world-class talent.</p>
+
+      <p>CONMEBOL, the South American confederation, stands as UEFA’s only true rival in World Cup success. Despite having far fewer member nations, CONMEBOL has produced a disproportionate number of champions, including legendary teams like Brazil national football team and Argentina national football team. Brazil alone accounts for a significant share of World Cup titles, embodying a footballing culture that emphasizes creativity, flair, and technical mastery. Argentina, with its own rich tradition, has also contributed multiple victories, reinforcing the region’s elite status. The success of CONMEBOL can be linked to a deeply embedded football culture, where the sport plays a central role in national identity and social life. Informal street football, combined with competitive domestic leagues, creates a fertile environment for talent development. However, unlike UEFA, CONMEBOL operates with fewer financial resources and less infrastructural depth. Its success is therefore remarkable in proportional terms: with only ten member associations, it rivals Europe’s output of champions. This efficiency highlights the intensity of competition within the region, where qualifying for the World Cup is itself a formidable challenge. Over time, however, the balance has shifted slightly toward UEFA, as European teams have become more dominant in recent tournaments. Nonetheless, CONMEBOL remains a powerhouse, consistently producing finalists and maintaining a high success ratio relative to its size.</p>
+
+       <div class="flourish-embed flourish-chart" data-src="visualisation/19984598"><script src="https://public.flourish.studio/resources/embed.js"></script><noscript><img src="https://public.flourish.studio/visualisation/19984598/thumbnail" width="100%" alt="visualization" /></noscript></div>
+
+
+ 
+     
+
+
+      <p class="dropcap">In contrast, the Confederation of African Football (CAF) has yet to produce a World Cup champion, though its trajectory reveals significant progress. African teams began participating more regularly in the tournament from the late 20th century, gradually improving their performance. Notable milestones include quarterfinal appearances by teams such as Cameroon in 1990, Senegal in 2002, and Ghana in 2010. These achievements demonstrate the growing competitiveness of African football, driven by increased investment, diaspora players, and exposure to European leagues. Many African players now compete at the highest levels globally, contributing to a rising standard within the continent. However, structural challenges persist, including inconsistent governance, limited domestic league development, and infrastructural constraints. The proportion of success for CAF, when measured in terms of titles, remains at zero, but this metric alone obscures the confederation’s upward trajectory. In recent tournaments, African teams have shown greater tactical discipline and resilience, narrowing the gap with traditional powers. The absence of a semifinalist until recently highlighted the difficulty of breaking into the elite tier, yet each successive tournament brings new opportunities. CAF’s future success will likely depend on consolidating its developmental gains and translating individual talent into cohesive team performance on the world stage.</p>
+
+<div class="flourish-embed flourish-chart" data-src="visualisation/22462630"><script src="https://public.flourish.studio/resources/embed.js"></script><noscript><img src="https://public.flourish.studio/visualisation/22462630/thumbnail" width="100%" alt="visualization" /></noscript></div>
+
+
+
+ <p class="dropcap">The Asian Football Confederation (AFC) presents a similar narrative of gradual improvement without ultimate success. Asia’s best World Cup performance came when South Korea reached the semifinals in 2002, co-hosting the tournament. This achievement marked a turning point, demonstrating that Asian teams could compete with established powers under favorable conditions. Countries like Japan, Iran, and South Korea have since become नियमित participants, often advancing to the knockout stages. The growth of domestic leagues, such as Japan’s J-League, has strengthened the region’s football infrastructure, while increased investment from governments and private entities has enhanced training facilities and youth development programs. Despite these advances, AFC teams have struggled to achieve consistent deep runs in the tournament. The proportion of success remains modest, with no titles and limited semifinal appearances. Factors such as tactical conservatism, physical disparities, and less exposure to high-intensity competition have been cited as barriers. However, globalization is gradually mitigating these challenges, as more Asian players compete in European leagues and bring back experience. The AFC’s trajectory suggests a slow but steady convergence with global standards, though a breakthrough World Cup victory remains a distant goal.</p>
+
+        <div class="inset">
+            <div class="inset-title">Related insight</div>
+            <div class="inset-text">
+                Mastery often appears invisible to outsiders, but it is built on thousands of small, deliberate decisions.
+            </div>
+        </div>
+
+
+ <div class="image"></div>
+
+      <p class="dropcap">CONCACAF The Confederation of North, Central America and Caribbean Association Football (CONCACAF) occupies an intermediate position in the hierarchy of success. While it has not produced a World Cup champion, it has achieved notable milestones, particularly through the performances of Mexico and the United States. Mexico has consistently reached the knockout stages, often acting as a competitive outsider, while the United States reached the semifinals in the inaugural 1930 tournament. More recently, the United States has demonstrated steady improvement, supported by the growth of Major League Soccer and increased youth development initiatives. The region’s success proportion is therefore limited in terms of titles but more substantial in terms of participation and consistency. CONCACAF benefits from proximity to South America and exposure to diverse playing styles, yet it also faces challenges such as uneven development across member nations. The dominance of a few teams within the confederation can limit competitive depth, affecting overall progress. Nonetheless, the region’s increasing investment in infrastructure and coaching suggests potential for future breakthroughs. While a World Cup victory remains elusive, CONCACAF’s steady presence in the latter stages indicates a level of competitiveness that distinguishes it from less successful confederations.</p>
+
+<div class="flourish-embed flourish-chart" data-src="visualisation/12169828"><script src="https://public.flourish.studio/resources/embed.js"></script><noscript><img src="https://public.flourish.studio/visualisation/12169828/thumbnail" width="100%" alt="visualization" /></noscript></div>
+
+<p>Oceania, represented by the Oceania Football Confederation (OFC), has the lowest proportion of success in World Cup history. With limited representation and resources, OFC teams have struggled to make an impact on the global stage. Australia, once a member of OFC, achieved the region’s most notable successes before moving to the AFC in 2006, seeking stronger competition. Since then, New Zealand has been the primary representative, achieving modest results, including an unbeaten group-stage performance in 2010 without advancing. The structural limitations of OFC are significant: small populations, limited professional leagues, and geographic isolation hinder development. As a result, the confederation’s success proportion remains minimal across all metrics, from wins to knockout appearances. However, football development initiatives and increased international exposure may gradually improve competitiveness. The expansion of the World Cup format in future editions could also provide more opportunities for OFC teams to gain experience. While the gap between Oceania and the leading confederations is substantial, the region’s participation remains important for the global inclusivity of the tournament.</p>
+
+<div class="divider"></div>
+
+      <p class="dropcap">Comparing these confederations reveals a stark concentration of success within UEFA and CONMEBOL. Together, they account for 100% of World Cup titles, a statistic that underscores the persistent imbalance in global football. UEFA holds the largest share, reflecting its structural advantages and sustained excellence, while CONMEBOL’s success is remarkable given its smaller size. The remaining confederations—CAF, AFC, CONCACAF, and OFC—collectively account for zero titles but contribute to the tournament’s diversity and competitiveness. Their success must therefore be evaluated through alternative metrics, such as progression to later stages and consistency of performance. Over time, the gap between the dominant and emerging confederations has narrowed slightly, driven by globalization, player mobility, and increased investment. However, the concentration of resources and elite competition within Europe continues to reinforce its dominance. This distribution raises important questions about equity and development within global football, highlighting the need for policies that support underrepresented regions.</p>
+
+<iframe title="FIFA men rankings" aria-label="Dot Plot" id="datawrapper-chart-40Yr2" src="https://datawrapper.dwcdn.net/40Yr2/4/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; margin:10px;border: none;" height="580" data-external="1"></iframe><script type="text/javascript">window.addEventListener("message",function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r,i=0;r=e[i];i++)if(r.contentWindow===a.source){var d=a.data["datawrapper-height"][t]+"px";r.style.height=d}}});</script>
+
+
+ <p >Historical trends also reveal shifts in the balance of power between UEFA and CONMEBOL. In the early decades of the World Cup, South American teams were more dominant, with Uruguay and Brazil establishing themselves as early champions. However, from the latter half of the 20th century onward, European teams began to assert greater control, culminating in a period of near-total dominance in recent tournaments. This shift reflects broader changes in the football ecosystem, including the commercialization of European leagues and the migration of top talent to Europe. As a result, even South American players often develop their skills within European კლუბs, blurring the distinction between confederations. This dynamic has reinforced UEFA’s structural advantages while simultaneously integrating global talent into its system. The proportion of success has thus become increasingly skewed toward Europe, though South America continues to produce world-class teams capable of challenging for titles. This evolving balance highlights the interplay between regional identity and global integration in shaping football success.</p>
+
+        <div class="inset">
+            <div class="inset-title">Related insight</div>
+            <div class="inset-text">
+                Mastery often appears invisible to outsiders, but it is built on thousands of small, deliberate decisions.
+            </div>
+        </div>
+
+
+      <p>Looking forward, the future distribution of World Cup success may be influenced by several factors, including tournament expansion, technological advancements, and shifting investment patterns. The expansion of the World Cup to include more teams could provide greater opportunities for underrepresented confederations to gain experience and exposure. Advances in sports science and data analytics may also help level the playing field, enabling teams from less dominant regions to optimize performance. Additionally, increased investment in football infrastructure across Asia, Africa, and North America could accelerate their development, potentially leading to breakthroughs in future tournaments. However, the entrenched advantages of UEFA and, to a lesser extent, CONMEBOL, suggest that change will be gradual rather than abrupt. The proportion of success is likely to remain concentrated in the short term, though incremental progress by other confederations could reshape the competitive landscape over time. Ultimately, the World Cup’s global appeal lies in this tension between dominance and aspiration, where established powers coexist with emerging challengers.</p>
+
+      <p>In conclusion, the proportion of success among FIFA’s confederations reflects a complex interplay of history, culture, and structural inequality. UEFA and CONMEBOL dominate the tournament, accounting for all World Cup victories and setting the benchmark for excellence. Their success is rooted in deep footballing traditions, मजबूत infrastructures, and continuous innovation. Meanwhile, CAF, AFC, CONCACAF, and OFC represent regions of growing potential, where progress is measured not in titles but in incremental achievements and increasing competitiveness. The disparity in success highlights both the global reach of football and the uneven distribution of its resources. As the sport continues to evolve, the possibility of a more balanced distribution remains an open question, shaped by ongoing efforts to develop the game worldwide. The World Cup thus serves not only as a competition but also as a reflection of global inequalities and aspirations, where each confederation’s journey contributes to the broader narrative of football’s development.</p>
+
+
+<div class="divider"></div>
+
+
+   <div class="inset">
+            <div class="inset-title">Related insight</div>
+            <div class="inset-text">
+                Mastery often appears invisible to outsiders, but it is built on thousands of small, deliberate decisions.<br><br>
+            </div>
+   	    <div class="inset-title">Related insight</div>
+            <div class="inset-text">
+                Mastery often appears invisible to outsiders, but it is built on thousands of small, deliberate decisions.<br><br>
+            </div>
+        </div>
+
+  
+    </div>
+
+    <div class="sidebar">
+
+        <div class="card">
+            <div class="card-title">Related story</div>
+            <div class="card-text">Exploring the quiet rituals of traditional craftsmanship.</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">More features</div>
+            <div class="card-text">Inside the discipline of world-class artisans.</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Read next</div>
+            <div class="card-text">How mastery evolves over decades of repetition.</div>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

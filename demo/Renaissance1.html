@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title> Italian Renaissance 1</title>
+
+<style>
+
+body {
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    background: #f6f6f6;
+    color: #121212;
+}
+
+/* HERO */
+
+.hero {
+    height: 100vh;
+    background: url("The_School_of_Athens;_a_gathering_of_renaissance_artists_in_Wellcome_V0006835.jpg") center/cover no-repeat;
+    display: flex;
+    align-items: flex-end;    
+    opacity:0.5;
+}
+
+.hero-overlay {
+    width: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,0.75), transparent);
+    padding: 80px 20px;
+    color: #ffffff;
+}
+
+.hero-inner {
+    max-width: 640px;
+    margin: 0 auto;    
+}
+
+.kicker {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #ffcc00;
+    margin-bottom: 10px;
+}
+
+.title {
+    font-size: 52px;
+    line-height: 1.1;
+    margin-bottom: 12px;
+}
+
+.standfirst {
+    font-size: 20px;
+    color: #dddddd;
+}
+
+/* LAYOUT */
+
+.wrapper {
+    display: grid;
+    grid-template-columns: 1fr 640px 260px 1fr;
+    gap: 20px;
+    margin-top: 40px;
+}
+
+.article {
+    grid-column: 2;
+}
+
+.sidebar {
+    grid-column: 3;
+    position: sticky;
+    top: 40px;
+}
+
+/* BYLINE */
+
+.byline {
+    font-size: 14px;
+    color: #555555;
+    border-top: 1px solid #dddddd;
+    border-bottom: 1px solid #dddddd;
+    padding: 12px 0;
+    margin-bottom: 30px;
+}
+
+/* PARAGRAPHS */
+
+.article p {
+    font-size: 18px;
+    line-height: 1.85;
+    margin-bottom: 26px;
+}
+
+/* DROP CAPS ON MULTIPLE PARAGRAPHS */
+
+.dropcap::first-letter {
+    float: left;
+    font-size: 64px;
+    line-height: 0.85;
+    padding-right: 8px;
+    font-weight: bold;
+}
+
+/* IMAGE */
+
+.image {
+    width: 100%;
+    height: 380px;
+    background: url("1280px-Botticelli-primavera.jpg") center/cover no-repeat;
+    margin: 30px 0;
+}
+
+/* DIVIDER */
+
+.divider {
+    height: 1px;
+    background: #dddddd;
+    margin: 40px 0;
+}
+
+/* INSET BOX (IN-ARTICLE) */
+
+.inset {
+    border-left: 4px solid #c70000;
+    padding: 15px 18px;
+    margin: 30px 0;
+    background: #fafafa;
+}
+
+.inset-title {
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.inset-text {
+    font-size: 15px;
+    color: #444444;
+}
+
+/* SIDEBAR CARDS */
+
+.card {
+    border-top: 3px solid #c70000;
+    padding-top: 10px;
+    margin-bottom: 25px;
+}
+
+.card-title {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.card-text {
+    font-size: 13px;
+    color: #555555;
+}
+
+
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+    .wrapper {
+        grid-template-columns: 1fr 90% 1fr;
+    }
+
+    .article {
+        grid-column: 2;
+    }
+
+    .sidebar {
+        grid-column: 2;
+        position: relative;
+    }
+	
+    .article p {
+    	font-size: 2em;
+    	line-height: 1.85;
+    	margin-bottom: 26px;
+       }
+ }
+
+</style>
+</head>
+
+
+
+
+
+
+
+
+<body>
+
+<div class="hero">
+    <div class="hero-overlay">
+        <div class="hero-inner">
+            <div class="kicker">FIFA World Cupt</div>
+            <div class="title">Who has won it most?</div>
+            <div class="standfirst">
+                In a quiet world defined by repetition and refinement, mastery emerges through precision, patience, and time.
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="wrapper">
+
+    <div class="article">
+
+        <div class="byline">
+            By Editorial Studio • 
+<br>
+Photography by Placeholder • April 2026
+        </div>
+ <div class="divider"></div>
+        <p class="dropcap">The Italian Renaissance stands as one of the most transformative epochs in the history of visual culture, marking a profound reorientation in how art was conceived, produced, and understood. Emerging in the late 14th century and flourishing through the 15th and 16th centuries, this period witnessed a renewed engagement with the classical traditions of ancient Greece and Rome, combined with an unprecedented emphasis on observation, naturalism, and the intellectual status of the artist. The Renaissance was not merely a stylistic shift; it was a reconfiguration of perception itself. Artists began to see the world as something measurable, representable, and ultimately intelligible through visual means. This transformation was deeply intertwined with broader developments in philosophy, science, and politics, particularly the rise of humanism, which placed human experience and rational inquiry at the center of intellectual life. Cities such as Florence, Rome, and Venice became vibrant centers of artistic production, supported by powerful patrons including the Medici family and the papacy. Within this context, visual arts—painting, sculpture, and architecture—developed new techniques and conceptual frameworks that would shape Western art for centuries.</p>
+
+      <p>Painting during the Renaissance underwent a radical transformation, moving away from the stylized conventions of medieval art toward a more naturalistic and spatially coherent representation of the world. Central to this shift was the development of linear perspective, a mathematical system that allowed artists to create the illusion of depth on a flat surface. Filippo Brunelleschi is often credited with formalizing this technique, which was later codified in treatises and widely adopted by painters. Artists such as Masaccio employed perspective to construct convincing architectural spaces, as seen in works like The Holy Trinity, where figures inhabit a clearly defined three-dimensional environment. This innovation fundamentally altered the viewer’s relationship to the image, inviting them to enter a rationally ordered visual world. Alongside perspective, the use of light and shadow—known as chiaroscuro—allowed artists to model forms with greater realism, enhancing the sense of volume and presence. The study of anatomy also became crucial, enabling painters to depict the human body with unprecedented accuracy. Figures were no longer symbolic abstractions but dynamic, corporeal beings, capable of expressing emotion and movement.
+</p>
+
+      <p class="dropcap">The High Renaissance represents the culmination of these developments, characterized by a harmonious balance between composition, form, and meaning. Artists such as Leonardo da Vinci, Michelangelo, and Raphael exemplify this period, each contributing to the refinement of visual language in distinct ways. Leonardo’s approach to painting was deeply scientific; his use of sfumato—a technique that creates soft transitions between tones—produced atmospheric effects that enhanced the lifelike quality of his figures. Works like the Mona Lisa demonstrate a subtle interplay between observation and imagination, where the boundaries between figure and environment dissolve. Michelangelo, primarily known as a sculptor, brought a sculptural sensibility to painting, emphasizing the शक्ति and tension of the human form. His frescoes on the ceiling of the Sistine Chapel are monumental in both scale and conceptual ambition, depicting biblical narratives with a dramatic intensity that redefines the possibilities of the medium. Raphael, meanwhile, achieved a clarity and grace that made his compositions models of classical harmony, as seen in The School of Athens, where philosophical ideas are embodied in elegantly arranged figures.
+</p>
+
+
+
+<iframe title="Cities of the Italian Renaissance" aria-label="Locator map" id="datawrapper-chart-pvZUy" src="https://datawrapper.dwcdn.net/pvZUy/5/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="570" data-external="1"></iframe><script type="text/javascript">window.addEventListener("message",function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r,i=0;r=e[i];i++)if(r.contentWindow===a.source){var d=a.data["datawrapper-height"][t]+"px";r.style.height=d}}});</script>
+
+
+
+ <p class="dropcap"> Sculpture during the Renaissance also experienced a profound revival, drawing inspiration from ancient Roman and Greek models while introducing new levels of realism and expressiveness. The rediscovery of classical statues provided artists with tangible examples of idealized human proportions and contrapposto—a stance that suggests movement and balance. Donatello was among the first to fully embrace these principles, creating works that combined classical form with psychological depth. His bronze David is notable for its naturalism and introspective quality, marking a departure from the more rigid figures of the medieval period. Michelangelo’s contributions to sculpture further elevated the medium, with works such as David and the Pietà demonstrating an extraordinary mastery of marble. These sculptures are characterized by their anatomical precision and emotional intensity, capturing moments of tension and introspection that resonate with viewers. The Renaissance sculptor was no longer a mere craftsman but an intellectual creator, capable of shaping not only material but also meaning.
+</p>
+
+        <div class="inset">
+            <div class="inset-title">Related insight</div>
+            <div class="inset-text">
+                Mastery often appears invisible to outsiders, but it is built on thousands of small, deliberate decisions.
+            </div>
+        </div>
+
+
+ <div class="image"></div>
+
+      <p class="dropcap">  Architecture, too, underwent significant transformation during the Renaissance, reflecting the same principles of order, proportion, and harmony that defined painting and sculpture. Drawing on the writings of ancient architects such as Vitruvius, Renaissance architects sought to create buildings that embodied mathematical precision and aesthetic balance. Filippo Brunelleschi played a निर्णायक role in this development, particularly through his design of the dome of Florence Cathedral, which combined innovative engineering with classical inspiration. His work established a new architectural language characterized by symmetry, clarity, and the use of geometric forms. Leon Battista Alberti further articulated these principles in his treatises, emphasizing the importance of proportion and the relationship between parts and whole. Buildings such as churches and palaces were designed not only for functional purposes but also as expressions of civic pride and intellectual ideals. The use of columns, arches, and domes created spaces that were both visually coherent and symbolically rich, reflecting the Renaissance belief in the harmony of the universe.
+</p>
+
+<p> The Venetian Renaissance introduced a distinct approach to visual art, emphasizing color, light, and atmospheric effects over the linear precision favored in Florence and Rome. Artists such as Titian and Giorgione developed techniques that prioritized the sensuous qualities of paint, using rich pigments and fluid brushwork to create dynamic compositions. In Venice, the interaction of light with water and architecture influenced the visual language of artists, leading to a greater emphasis on mood and environment. This approach expanded the possibilities of painting, allowing for a more subjective and expressive interpretation of reality. The Venetian school thus represents an alternative trajectory within the Renaissance, one that complements the more structured approaches of central Italy.
+ </p>
+
+<div class="flourish-embed flourish-chart" data-src="visualisation/20225777"><script src="https://public.flourish.studio/resources/embed.js"></script><noscript><img src="https://public.flourish.studio/visualisation/20225777/thumbnail" width="100%" alt="visualization" /></noscript></div>
+
+
+<div class="divider"></div>
+
+      <p class="dropcap">The role of patronage was crucial in shaping the visual arts of the Renaissance. Wealthy families, religious institutions, and political leaders commissioned works that reflected their power, piety, and cultural aspirations. The Medici family in Florence, for example, supported numerous artists, fostering an environment of innovation and experimentation. Similarly, the papacy in Rome commissioned large-scale projects that transformed the city into a center of artistic excellence. Patronage not only provided financial support but also influenced the themes and forms of artistic production. Religious subjects remained dominant, but they were increasingly infused with humanistic elements, blending sacred narratives with classical motifs and contemporary concerns. This interplay between patron and artist contributed to the richness and diversity of Renaissance art.
+</p>
+
+<div class="flourish-embed flourish-chart" data-src="visualisation/11795331"><script src="https://public.flourish.studio/resources/embed.js"></script><noscript><img src="https://public.flourish.studio/visualisation/11795331/thumbnail" width="100%" alt="visualization" /></noscript></div>
+
+
+ <p >The Renaissance also marked a shift in the status of the artist, who began to be recognized as a creative genius rather than a manual laborer. Figures like Leonardo da Vinci and Michelangelo cultivated public personas that emphasized their intellectual and artistic abilities, challenging traditional hierarchies. This redefinition of the artist’s role was closely կապված to the broader humanist movement, which valued individual achievement and creativity. Artists engaged with a wide range of disciplines, including science, engineering, and philosophy, reflecting the interdisciplinary nature of Renaissance thought. This integration of knowledge contributed to the development of new techniques and ideas, further advancing the visual arts.
+</p>
+
+        <div class="inset">
+            <div class="inset-title">Related insight</div>
+            <div class="inset-text">
+                Mastery often appears invisible to outsiders, but it is built on thousands of small, deliberate decisions.
+            </div>
+        </div>
+
+
+      <p> In conclusion, the Italian Renaissance represents a pivotal moment in the history of visual arts, characterized by innovation, experimentation, and a profound engagement with both classical traditions and contemporary realities. Through advancements in painting, sculpture, and architecture, artists redefined the possibilities of visual representation, creating works that continue to inspire and influence. The emphasis on observation, proportion, and human experience transformed not only art but also the way people understood the world around them. The legacy of the Renaissance is evident in the enduring relevance of its techniques and ideas, which continue to shape artistic practice and cultural discourse.
+</p>
+
+      <p> As a cultural movement, the Renaissance encompassed innovative flowering of literary Latin and an explosion of vernacular literatures, beginning with the 14th-century resurgence of learning based on classical sources, which contemporaries credited to Petrarch; the development of linear perspective and other techniques of rendering a more natural reality in painting; and gradual but widespread educational reform. It saw myriad artistic developments and contributions from such polymaths as Leonardo da Vinci and Michelangelo, who inspired the term "Renaissance man".[8][9] In politics, the Renaissance contributed to the development of the customs and conventions of diplomacy, and in science to an increased reliance on observation and inductive reasoning. The period also saw revolutions in other intellectual and social scientific pursuits, as well as the introduction of modern banking and the field of accounting.  </p>
+
+
+<div class="divider"></div>
+
+
+   <div class="inset">
+            <div class="inset-title">Related insight</div>
+            <div class="inset-text">
+                Mastery often appears invisible to outsiders, but it is built on thousands of small, deliberate decisions.<br><br>
+            </div>
+   	    <div class="inset-title">Related insight</div>
+            <div class="inset-text">
+                Mastery often appears invisible to outsiders, but it is built on thousands of small, deliberate decisions.<br><br>
+            </div>
+        </div>
+
+  
+    </div>
+
+    <div class="sidebar">
+
+        <div class="card">
+            <div class="card-title">Related story</div>
+            <div class="card-text">Exploring the quiet rituals of traditional craftsmanship.</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">More features</div>
+            <div class="card-text">Inside the discipline of world-class artisans.</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Read next</div>
+            <div class="card-text">How mastery evolves over decades of repetition.</div>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
