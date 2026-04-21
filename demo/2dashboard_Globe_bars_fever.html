@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Global Financial Centers Dashboard</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://unpkg.com/topojson@3"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #bbb9b9;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  .header {
+    /* background:#949393; */
+    /* border: 2px  solid #FFD700; */
+    color: #5e5d5d;
+    padding: 15px;
+    text-align: left;
+    font-weight: bold;
+    font-size: 2.5em;
+    line-height:1;
+    width:10%;
+    position:absolute;
+    z-index:3;
+    left:4%;
+    top:12%;
+  }
+  .dashboard {
+    display: flex;
+    flex: 1;
+    gap: 0px;
+    padding: 0px;
+    overflow: hidden;
+  
+  }
+  .left-section {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 0px;
+  }
+  .right-section {
+    display: flex;
+    flex-direction: column;
+    width: 380px;
+    gap: 0px;
+    overflow-y: auto;
+  }
+  .globe-container {
+    /* background: #1a1a1a; 
+    border: 1px solid #444;
+    border-radius: 4px;*/
+    width:40%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    position:absolute;
+    left:18%;
+
+  }
+  .chart-container {
+    /* background: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 4px; */
+    padding: 15px;
+    flex: 1;
+    overflow-y: auto;
+  }
+    #chart1 {
+    /* background: #1a1a1a; 
+    border: 1px solid #444;
+    border-radius: 4px;*/
+    padding:25px;
+    flex: 1;
+    overflow-y: auto;
+    position:absolute;
+    top:33%; 
+    right:2%;
+    /* z-index:4;  */
+  }
+
+    #chart2 {
+    /* background: #1a1a1a; 
+    border: 1px solid #444;
+    border-radius: 54px;*/
+    padding: 25px;
+    flex: 1;
+    overflow-y: auto;
+    position:fixed; 
+    top:33%; 
+    right:20%;
+    /* z-index:4; */
+  }
+  .chart-title {
+    color: #353535;
+    font-weight: bold;
+    margin-bottom: 12px;
+    font-size: 13px;
+  }
+  .chart-item {
+    margin-bottom: 10px;
+    padding: 1px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.2s;
+  }
+  .chart-item:hover {
+    background: #5f5f5f;
+  }
+  .chart-item.active {
+    /* background: #a9a9ac; */
+  }
+  .chart-item.active .chart-bar {
+    background: linear-gradient(90deg, #254277, #254277);
+    box-shadow: 0 0 10px rgba(207, 204, 195, 0.1);
+  }
+  .chart-item.active .chart-label {
+    color: #353535;
+    font-weight: bold;
+  }
+
+  .chart-item.active .chart-value {
+    color: #254277;
+    font-weight: bold;
+  }
+  .chart-item:not(.active) {
+    opacity: 0.5;
+  }
+  .chart-label {
+    color: #454545;
+    font-size: 11px;
+    margin-bottom: 4px;
+  }
+  .chart-bar {
+    height: 10px;
+    background: linear-gradient(90deg, #666, #888);
+    border-radius: 2px;
+    position: relative;
+    transition: all 0.2s;
+  }
+  .chart-value {
+    color: #353535;
+    font-size: 10px;
+    margin-left: 4px;
+    position: absolute;
+    top: 0;
+    right: -50px;
+    width: 45px;
+    text-align: right;
+  }
+  .fever-container {
+    /* background: #1a1a1a; */  
+    /* display: flex;
+    flex-direction: column; 
+    border: 1px solid #444;
+    border-radius: 4px;*/
+    padding: 10px;
+    margin:0px;
+    height: 280px;
+    position:absolute;
+    right:3%;
+    bottom:30px;
+    z-index:2;
+  }
+  .fever-title {
+    color: #FFD700;
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 13px;display:none;
+  }
+  .fever-chart {
+    flex: 1; display:none;
+  }
+  .info-container {
+    /* background: #1a1a1a; 
+    border: 1px solid #444;
+    border-radius: 4px;*/
+    padding: 0px;
+    position:absolute;
+    z-index:1;
+    left:5%;
+    top:35%;
+  }
+
+  .textIntro{
+    font-size:0.8em;
+    color:#353535;
+    width:30%;
+    position:absolute;
+    top:5%;
+    right:8.5%;
+  }
+  .time-box {
+    /* background: #0b3d91; */
+    border: 1px solid #656565;
+     border-radius: 34px;
+    padding: 5% 2% 2% 2%;
+    text-align: center;
+    margin-bottom: 12px;
+    position:absolute;
+    top:-8%;
+    left:5%;
+  }
+  .time-label {
+    color: #353535;
+    font-size: 10px;
+    margin-bottom: 6px;
+  }
+  .time-display {
+    color: #254277;
+    font-weight: bold;
+    font-size: 20px;
+    font-family: monospace;
+  }
+  .info-title {
+    color: #656565;
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    color: #ccc;
+    font-size: 11px;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  .detail-label {
+    font-weight: bold;
+    color: #656565;
+    min-width: 75px;
+  }
+  svg {
+    cursor: grab;
+  }
+  svg:active {
+    cursor: grabbing;
+  }
+  .land {
+    stroke: #333;
+    stroke-width: 0.3px;
+  }
+  .graticule {
+    fill: none;
+    stroke: #666;
+    stroke-width: 0.5px;
+    stroke-opacity: 0.5;
+  }
+  .simple-tooltip {
+    position: fixed;
+    background-color: #1a1a1a;
+    color: #fff;
+    padding: 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    pointer-events: none;
+    opacity: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    border-left: 3px solid #FFD700;
+    max-width: 200px;
+    z-index: 1000;
+    line-height: 1.4;
+  }
+  .tooltip-line {
+    position: fixed;
+    stroke: #FFD700;
+    stroke-width: 1;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 999;
+  }
+  .fever-data-panels {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    position:absolute;
+    left:5%;
+    bottom:20%;
+  }
+  .fever-data-box {
+    /* background: #0b3d91;
+    border: 1px solid #FFD700;
+    border-radius: 4px; */
+    padding: 8px;
+
+    flex: 1;
+    text-align: center;
+    z-index:6;
+  }
+  .fever-data-label {
+    color: #454545;
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+  .fever-data-value {
+    color: #FFD700;
+    font-weight: bold;
+    font-size: 13px;
+  }
+
+  #fever-prices {
+    color: #353535;
+    font-weight: bold;
+    font-size: 4em;
+    position:absolute;
+    left:5%;
+  }
+
+  .arrow-indicator {
+    font-size: 20px;
+    margin-left: 8px;
+  }
+  .fever-tooltip {
+    position: fixed;
+    background-color: #1a1a1a;
+    color: #fff;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 10px;
+    pointer-events: none;
+    opacity: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    border-left: 3px solid #FFD700;
+    z-index: 1001;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+<div class="header">Global Financial Centers Dashboard</div>
+
+<div class="dashboard">
+ 
+     <div class="globe-container">
+          <svg id="globe-svg" width="100%" height="100vh"></svg>
+          <div class="simple-tooltip" id="simple-tooltip"></div>
+          <div class="fever-tooltip" id="fever-tooltip"></div>
+      </div>
+    
+
+      <div class="chart-container" id="chart1">
+        <div class="chart-title">Market Cap (USD Trillion)</div>
+        <div id="market-cap-chart"></div>
+      </div>
+
+      <div class="textIntro">
+        <p>There are twenty one stock exchanges in the world that have a market capitalization of over US$1 trillion each. They are sometimes referred to as the "$1 Trillion Club". 
+          These exchanges accounted for 87% of global market capitalization in 2016.[1] Some exchanges do include companies from outside the country where the exchange is located.The beginnings of lending were in Italy in the late Middle Ages. In the 14th century, Venetian lenders would carry slates with information on the various issues for sale and meet with clients, much like a broker does today.[4] Venetian merchants introduced the principle of exchanging debts between moneylenders; a lender looking to unload a high-risk, high-interest loan might exchange it for a different loan with another lender. These lenders also bought government debt issues.[5] As the natural evolution of their business continued, the lenders began to sell debt issues to the first individual investors. 
+          The Venetians were the leaders in the field and the first to start trading securities from other governments, yet did not embark on private trade with India.  </p>
+      </div>
+
+      <div class="time-box">
+        <div class="time-label">Current Time</div>
+        <div class="time-display" id="current-time">00:00:00</div>
+      </div>
+
+      <div class="info-container">
+          <!-- <div class="info-title">Selected City</div> -->
+          <div id="detail-info" style=" font-size: 11px;">Click on a city to view details</div>
+      </div>
+
+     <div class="fever-container">
+          <div class="fever-title">Price Movement (USD)</div>
+          <svg id="fever-chart" class="fever-chart"></svg>
+      </div>
+
+       <div class="fever-data-panels">
+        <div class="fever-data-box">
+          <div class="fever-data-label">Volume</div>
+          <div class="fever-data-value" id="fever-volume"> </div>
+        </div>
+        <div class="fever-data-box" style="display: flex; align-items: center; justify-content: center;">
+          <div>
+            <div class="fever-data-label" id="openClose">Open / Close</div>
+            <div class="fever-data-value" id="fever-prices"> </div>
+          </div>
+          <div class="arrow-indicator" id="price-arrow"> </div>
+        </div>
+
+      <div class="chart-container" id="chart2">
+        <div class="chart-title">Monthly Trade Volume (USD Billion)</div>
+        <div id="volume-chart"></div>
+      </div>
+    </div>
+ 
+   <!-- <div class="left-section"> </div>
+   <div class="right-section">
+   <div style="display: flex; gap: 15px; flex: 1;">   -->
+    </div>
+  </div>
+</div>
+
+<script>
+  const priceData = {
+    "New York": [{ date: "Sep 14, 2022", close: 1.6055 }, { date: "Sep 15, 2022", close: 1.5241 }, { date: "Sep 16, 2022", close: 1.5212 }, { date: "Sep 17, 2022", close: 1.551 }, { date: "Sep 18, 2022", close: 1.4392 }, { date: "Sep 19, 2022", close: 1.4858 }, { date: "Sep 20, 2022", close: 1.4638 }, { date: "Sep 21, 2022", close: 1.4159 }, { date: "Sep 22, 2022", close: 1.5087 }, { date: "Sep 23, 2022", close: 1.5187 }, { date: "Sep 24, 2022", close: 1.4785 }, { date: "Sep 25, 2022", close: 1.4592 }, { date: "Sep 26, 2022", close: 1.4744 }, { date: "Sep 27, 2022", close: 1.4468 }, { date: "Sep 28, 2022", close: 1.4392 }, { date: "Sep 29, 2022", close: 1.4396 }, { date: "Sep 30, 2022", close: 1.4221 }, { date: "Oct 01, 2022", close: 1.4097 }, { date: "Oct 02, 2022", close: 1.3786 }, { date: "Oct 03, 2022", close: 1.4418 }, { date: "Oct 04, 2022", close: 1.4575 }, { date: "Oct 05, 2022", close: 1.4303 }, { date: "Oct 06, 2022", close: 1.427 }, { date: "Oct 07, 2022", close: 1.4097 }, { date: "Oct 08, 2022", close: 1.4078 }, { date: "Oct 09, 2022", close: 1.4273 }, { date: "Oct 10, 2022", close: 1.3715 }, { date: "Oct 11, 2022", close: 1.3434 }, { date: "Oct 12, 2022", close: 1.3531 }, { date: "Oct 13, 2022", close: 1.3847 }, { date: "Oct 14, 2022", close: 1.3674 }, { date: "Oct 15, 2022", close: 1.355 }, { date: "Oct 16, 2022", close: 1.3548 }, { date: "Oct 17, 2022", close: 1.3899 }, { date: "Oct 18, 2022", close: 1.3751 }, { date: "Oct 19, 2022", close: 1.3277 }, { date: "Oct 20, 2022", close: 1.3211 }, { date: "Oct 21, 2022", close: 1.3426 }, { date: "Oct 22, 2022", close: 1.3393 }, { date: "Oct 23, 2022", close: 1.3732 }, { date: "Oct 24, 2022", close: 1.3537 }, { date: "Oct 25, 2022", close: 1.3892 }, { date: "Oct 26, 2022", close: 1.4343 }, { date: "Oct 27, 2022", close: 1.4149 }, { date: "Oct 28, 2022", close: 1.4424 }, { date: "Oct 29, 2022", close: 1.4427 }, { date: "Oct 30, 2022", close: 1.423 }, { date: "Oct 31, 2022", close: 1.4275 }, { date: "Nov 01, 2022", close: 1.4151 }, { date: "Nov 02, 2022", close: 1.3819 }, { date: "Nov 03, 2022", close: 1.3694 }, { date: "Nov 04, 2022", close: 1.4444 }, { date: "Nov 05, 2022", close: 1.4453 }, { date: "Nov 06, 2022", close: 1.3742 }, { date: "Nov 07, 2022", close: 1.3619 }, { date: "Nov 08, 2022", close: 1.1726 }, { date: "Nov 09, 2022", close: 1.0206 }, { date: "Nov 10, 2022", close: 1.1536 }],
+    "Tokyo": [{ date: "Aug 26, 2022", close: 1.4795 }, { date: "Aug 27, 2022", close: 1.4637 }, { date: "Aug 28, 2022", close: 1.4268 }, { date: "Aug 29, 2022", close: 1.5312 }, { date: "Aug 30, 2022", close: 1.4959 }, { date: "Aug 31, 2022", close: 1.5133 }, { date: "Sep 01, 2022", close: 1.5387 }, { date: "Sep 02, 2022", close: 1.4895 }, { date: "Sep 03, 2022", close: 1.5212 }, { date: "Sep 04, 2022", close: 1.5557 }, { date: "Sep 05, 2022", close: 1.5454 }, { date: "Sep 06, 2022", close: 1.4311 }, { date: "Sep 07, 2022", close: 1.4906 }, { date: "Sep 08, 2022", close: 1.5908 }, { date: "Sep 14, 2022", close: 1.6055 }, { date: "Sep 15, 2022", close: 1.5241 }, { date: "Sep 16, 2022", close: 1.5212 }, { date: "Sep 17, 2022", close: 1.551 }, { date: "Sep 18, 2022", close: 1.4392 }, { date: "Sep 19, 2022", close: 1.4858 }, { date: "Sep 20, 2022", close: 1.4638 }, { date: "Sep 21, 2022", close: 1.4159 }, { date: "Sep 22, 2022", close: 1.5087 }, { date: "Sep 23, 2022", close: 1.5187 }, { date: "Sep 24, 2022", close: 1.4785 }, { date: "Sep 25, 2022", close: 1.4592 }, { date: "Sep 26, 2022", close: 1.4744 }, { date: "Sep 27, 2022", close: 1.4468 }, { date: "Sep 28, 2022", close: 1.4392 }, { date: "Sep 29, 2022", close: 1.4396 }, { date: "Sep 30, 2022", close: 1.4221 }, { date: "Oct 01, 2022", close: 1.4097 }, { date: "Oct 02, 2022", close: 1.3786 }, { date: "Oct 03, 2022", close: 1.4418 }, { date: "Oct 04, 2022", close: 1.4575 }, { date: "Oct 05, 2022", close: 1.4303 }, { date: "Oct 06, 2022", close: 1.427 }, { date: "Oct 07, 2022", close: 1.4097 }, { date: "Oct 08, 2022", close: 1.4078 }, { date: "Oct 09, 2022", close: 1.4273 }, { date: "Oct 10, 2022", close: 1.3715 }, { date: "Oct 11, 2022", close: 1.3434 }, { date: "Oct 12, 2022", close: 1.3531 }, { date: "Oct 13, 2022", close: 1.3847 }, { date: "Oct 14, 2022", close: 1.3674 }, { date: "Oct 15, 2022", close: 1.355 }, { date: "Oct 16, 2022", close: 1.3548 }, { date: "Oct 17, 2022", close: 1.3899 }, { date: "Oct 18, 2022", close: 1.3751 }, { date: "Oct 19, 2022", close: 1.3277 }, { date: "Oct 20, 2022", close: 1.3211 }, { date: "Oct 21, 2022", close: 1.3426 }, { date: "Oct 22, 2022", close: 1.3393 }, { date: "Oct 23, 2022", close: 1.3732 }, { date: "Oct 24, 2022", close: 1.3537 }, { date: "Oct 25, 2022", close: 1.3892 }, { date: "Oct 26, 2022", close: 1.4343 }, { date: "Oct 27, 2022", close: 1.4149 }, { date: "Oct 28, 2022", close: 1.4424 }, { date: "Oct 29, 2022", close: 1.4427 }, { date: "Oct 30, 2022", close: 1.423 }, { date: "Oct 31, 2022", close: 1.4275 }, { date: "Nov 01, 2022", close: 1.4151 }, { date: "Nov 02, 2022", close: 1.3819 }, { date: "Nov 03, 2022", close: 1.3694 }, { date: "Nov 04, 2022", close: 1.4444 }, { date: "Nov 05, 2022", close: 1.4453 }, { date: "Nov 06, 2022", close: 1.3742 }, { date: "Nov 07, 2022", close: 1.3619 }, { date: "Nov 08, 2022", close: 1.1726 }, { date: "Nov 09, 2022", close: 1.0206 }, { date: "Nov 10, 2022", close: 1.1536 }],
+    "Shanghai": [{ date: "Sep 09, 2022", close: 1.6442 }, { date: "Sep 10, 2022", close: 1.6656 }, { date: "Sep 11, 2022", close: 1.6827 }, { date: "Sep 12, 2022", close: 1.6539 }, { date: "Sep 13, 2022", close: 1.5389 }, { date: "Sep 14, 2022", close: 1.6055 }, { date: "Sep 15, 2022", close: 1.5241 }, { date: "Sep 16, 2022", close: 1.5212 }, { date: "Sep 17, 2022", close: 1.551 }, { date: "Sep 18, 2022", close: 1.4392 }, { date: "Sep 19, 2022", close: 1.4858 }, { date: "Sep 20, 2022", close: 1.4638 }, { date: "Sep 21, 2022", close: 1.4159 }, { date: "Sep 22, 2022", close: 1.5087 }, { date: "Sep 23, 2022", close: 1.5187 }, { date: "Sep 24, 2022", close: 1.4785 }, { date: "Sep 25, 2022", close: 1.4592 }, { date: "Sep 26, 2022", close: 1.4744 }, { date: "Sep 27, 2022", close: 1.4468 }, { date: "Sep 28, 2022", close: 1.4392 }, { date: "Sep 29, 2022", close: 1.4396 }, { date: "Sep 30, 2022", close: 1.4221 }, { date: "Oct 01, 2022", close: 1.4097 }, { date: "Oct 02, 2022", close: 1.3786 }, { date: "Oct 03, 2022", close: 1.4418 }, { date: "Oct 04, 2022", close: 1.4575 }, { date: "Oct 05, 2022", close: 1.4303 }, { date: "Oct 06, 2022", close: 1.427 }, { date: "Oct 07, 2022", close: 1.4097 }, { date: "Oct 08, 2022", close: 1.4078 }, { date: "Oct 09, 2022", close: 1.4273 }, { date: "Oct 10, 2022", close: 1.3715 }, { date: "Oct 11, 2022", close: 1.3434 }, { date: "Oct 12, 2022", close: 1.3531 }, { date: "Oct 13, 2022", close: 1.3847 }, { date: "Oct 14, 2022", close: 1.3674 }, { date: "Oct 15, 2022", close: 1.355 }, { date: "Oct 16, 2022", close: 1.3548 }, { date: "Oct 17, 2022", close: 1.3899 }, { date: "Oct 18, 2022", close: 1.3751 }, { date: "Oct 19, 2022", close: 1.3277 }, { date: "Oct 20, 2022", close: 1.3211 }, { date: "Oct 21, 2022", close: 1.3426 }, { date: "Oct 22, 2022", close: 1.3393 }, { date: "Oct 23, 2022", close: 1.3732 }, { date: "Oct 24, 2022", close: 1.3537 }, { date: "Oct 25, 2022", close: 1.3892 }, { date: "Oct 26, 2022", close: 1.4343 }, { date: "Oct 27, 2022", close: 1.4149 }, { date: "Oct 28, 2022", close: 1.4424 }, { date: "Oct 29, 2022", close: 1.4427 }, { date: "Oct 30, 2022", close: 1.423 }, { date: "Oct 31, 2022", close: 1.4275 }, { date: "Nov 01, 2022", close: 1.4151 }, { date: "Nov 02, 2022", close: 1.3819 }, { date: "Nov 03, 2022", close: 1.3694 }, { date: "Nov 04, 2022", close: 1.4444 }, { date: "Nov 05, 2022", close: 1.4453 }, { date: "Nov 06, 2022", close: 1.3742 }, { date: "Nov 07, 2022", close: 1.3619 }, { date: "Nov 08, 2022", close: 1.1726 }, { date: "Nov 09, 2022", close: 1.0206 }, { date: "Nov 10, 2022", close: 1.1536 }],
+    "London": [{ date: "Sep 08, 2022", close: 1.5908 }, { date: "Sep 14, 2022", close: 1.6055 }, { date: "Sep 15, 2022", close: 1.5241 }, { date: "Sep 16, 2022", close: 1.5212 }, { date: "Sep 17, 2022", close: 1.551 }, { date: "Sep 18, 2022", close: 1.4392 }, { date: "Sep 19, 2022", close: 1.4858 }, { date: "Sep 20, 2022", close: 1.4638 }, { date: "Sep 21, 2022", close: 1.4159 }, { date: "Sep 22, 2022", close: 1.5087 }, { date: "Sep 23, 2022", close: 1.5187 }, { date: "Sep 24, 2022", close: 1.4785 }, { date: "Sep 25, 2022", close: 1.4592 }, { date: "Sep 26, 2022", close: 1.4744 }, { date: "Sep 27, 2022", close: 1.4468 }, { date: "Sep 28, 2022", close: 1.4392 }, { date: "Sep 29, 2022", close: 1.4396 }, { date: "Sep 30, 2022", close: 1.4221 }, { date: "Oct 01, 2022", close: 1.4097 }, { date: "Oct 02, 2022", close: 1.3786 }, { date: "Oct 03, 2022", close: 1.4418 }, { date: "Oct 04, 2022", close: 1.4575 }, { date: "Oct 05, 2022", close: 1.4303 }, { date: "Oct 06, 2022", close: 1.427 }, { date: "Oct 07, 2022", close: 1.4097 }, { date: "Oct 08, 2022", close: 1.4078 }, { date: "Oct 09, 2022", close: 1.4273 }, { date: "Oct 10, 2022", close: 1.3715 }, { date: "Oct 11, 2022", close: 1.3434 }, { date: "Oct 12, 2022", close: 1.3531 }, { date: "Oct 13, 2022", close: 1.3847 }, { date: "Oct 14, 2022", close: 1.3674 }, { date: "Oct 15, 2022", close: 1.355 }, { date: "Oct 16, 2022", close: 1.3548 }, { date: "Oct 17, 2022", close: 1.3899 }, { date: "Oct 18, 2022", close: 1.3751 }, { date: "Oct 19, 2022", close: 1.3277 }, { date: "Oct 20, 2022", close: 1.3211 }, { date: "Oct 21, 2022", close: 1.3426 }, { date: "Oct 22, 2022", close: 1.3393 }, { date: "Oct 23, 2022", close: 1.3732 }, { date: "Oct 24, 2022", close: 1.3537 }, { date: "Oct 25, 2022", close: 1.3892 }, { date: "Oct 26, 2022", close: 1.4343 }, { date: "Oct 27, 2022", close: 1.4149 }, { date: "Oct 28, 2022", close: 1.4424 }, { date: "Oct 29, 2022", close: 1.4427 }, { date: "Oct 30, 2022", close: 1.423 }, { date: "Oct 31, 2022", close: 1.4275 }, { date: "Nov 01, 2022", close: 1.4151 }, { date: "Nov 02, 2022", close: 1.3819 }, { date: "Nov 03, 2022", close: 1.3694 }, { date: "Nov 04, 2022", close: 1.4444 }, { date: "Nov 05, 2022", close: 1.4453 }, { date: "Nov 06, 2022", close: 1.3742 }, { date: "Nov 07, 2022", close: 1.3619 }, { date: "Nov 08, 2022", close: 1.1726 }, { date: "Nov 09, 2022", close: 1.0206 }, { date: "Nov 10, 2022", close: 1.1536 }]
+  };
+
+  let selectedCity = "New York";
+
+  const financialCenters = [
+    { "city": "New York", "exchange": "NYSE", "latitude": 40.7069, "longitude": -74.0113, "timeZoneOffset": -5, "exchanges": [{ "name": "New York Stock Exchange", "mic": "XNYS", "region": "United States", "marketCap": 44.7, "monthlyTradeVolume": 2685, "timeZone": "EST/EDT" }, { "name": "Nasdaq (US)", "mic": "XNYS", "region": "United States", "marketCap": 42.2, "monthlyTradeVolume": 2727, "timeZone": "EST/EDT" }] },
+    { "city": "Tokyo", "exchange": "TSE", "latitude": 35.6812, "longitude": 139.7775, "timeZoneOffset": 9, "exchanges": [{ "name": "Japan Exchange Group", "mic": "XJPX", "region": "Japan", "marketCap": 7.95, "monthlyTradeVolume": 652, "timeZone": "JST" }] },
+    { "city": "Shanghai", "exchange": "SSE", "latitude": 31.2304, "longitude": 121.4737, "timeZoneOffset": 8, "exchanges": [{ "name": "Shanghai Stock Exchange", "mic": "XSHG", "region": "China", "marketCap": 9.72, "monthlyTradeVolume": 1906, "timeZone": "CST" }] },
+    { "city": "London", "exchange": "LSE", "latitude": 51.5151, "longitude": -0.0998, "timeZoneOffset": 0, "exchanges": [{ "name": "London Stock Exchange", "mic": "XLON", "region": "United Kingdom", "marketCap": 4.1, "monthlyTradeVolume": 219, "timeZone": "GMT/BST" }] },
+    { "city": "Frankfurt", "exchange": "Xetra", "latitude": 50.1153, "longitude": 8.6779, "timeZoneOffset": 1, "exchanges": [{ "name": "German Stock Exchange", "mic": "XFRA", "region": "Germany", "marketCap": 3.15, "monthlyTradeVolume": 77, "timeZone": "CET/CEST" }] },
+    { "city": "Zurich", "exchange": "SIX", "latitude": 47.3769, "longitude": 8.5417, "timeZoneOffset": 1, "exchanges": [{ "name": "SIX Swiss Exchange", "mic": "XSWX", "region": "Switzerland", "marketCap": 2.1, "monthlyTradeVolume": 45, "timeZone": "CET/CEST" }] },
+    { "city": "Paris", "exchange": "Euronext", "latitude": 48.8694, "longitude": 2.3417, "timeZoneOffset": 1, "exchanges": [{ "name": "Euronext Paris", "mic": "XPAR", "region": "France", "marketCap": 2.8, "monthlyTradeVolume": 62, "timeZone": "CET/CEST" }] },
+    { "city": "Mumbai", "exchange": "BSE", "latitude": 18.9300, "longitude": 72.8335, "timeZoneOffset": 5.5, "exchanges": [{ "name": "Bombay Stock Exchange", "mic": "XBOM", "region": "India", "marketCap": 5.25, "monthlyTradeVolume": 501, "timeZone": "IST" }, { "name": "National Stock Exchange", "mic": "XNSE", "region": "India", "marketCap": 5.32, "monthlyTradeVolume": 294, "timeZone": "IST" }] },
+    { "city": "Hong Kong", "exchange": "HKEX", "latitude": 22.2844, "longitude": 114.1595, "timeZoneOffset": 8, "exchanges": [{ "name": "Hong Kong Exchanges and Clearing", "mic": "XHKG", "region": "Hong Kong", "marketCap": 6.3, "monthlyTradeVolume": 380, "timeZone": "HKT" }] }
+  ];
+
+  function selectCity(city) {
+    selectedCity = city;
+    
+    const centerData = financialCenters.find(c => c.city === city);
+    if (centerData) {
+      const targetRotation = [-centerData.longitude, -centerData.latitude, 0];
+      const currentRotation = projection.rotate();
+      let t = 0;
+      const animationDuration = 1000;
+      
+      const animateRotation = () => {
+        t += 16;
+        const progress = Math.min(t / animationDuration, 1);
+        
+        const interpolatedRotation = [
+          currentRotation[0] + (targetRotation[0] - currentRotation[0]) * progress,
+          currentRotation[1] + (targetRotation[1] - currentRotation[1]) * progress,
+          0
+        ];
+        
+        rotation = interpolatedRotation;
+        projection.rotate(interpolatedRotation);
+        updateGlobeRender();
+        
+        if (progress < 1) {
+          requestAnimationFrame(animateRotation);
+        } else {
+          setTimeout(() => {
+            const coords = projection([centerData.longitude, centerData.latitude]);
+            const mics = centerData.exchanges.map(e => e.mic).join(" / ");
+            simpleTooltip
+              .style("opacity", 1)
+              .style("left", (coords[0] + 250) + "px")
+              .style("top", (coords[1] + 50) + "px")
+              .html(`${centerData.city} • ${mics}`);
+            
+            setTimeout(() => {
+              simpleTooltip.style("opacity", 0);
+            }, 3000);
+          }, 50);
+        }
+      };
+      
+      requestAnimationFrame(animateRotation);
+    }
+    
+    updateAllGraphics();
+  }
+
+  function updateAllGraphics() {
+    updateDetailPanel();
+    updateFeverChart();
+    updateChartHighlights();
+    updateGlobeHighlight();
+    
+    // Update arrow indicator based on first data point open/close comparison
+    const data = priceData[selectedCity] || [];
+    const arrow = document.getElementById("price-arrow");
+    if (data.length > 0 && data[0].open && data[0].close) {
+      if (data[0].open > data[0].close) {
+        arrow.textContent = "🔴 ↓";
+        arrow.style.color = "#FF6B6B";
+      } else {
+        arrow.textContent = "🟢 ↑";
+        arrow.style.color = "#52C41A";
+      }
+    } else {
+      arrow.textContent = "—";
+      arrow.style.color = "#FFD700";
+    }
+  }
+
+  function getLocalTime(offsetHours) {
+    const now = new Date();
+    const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const localTime = new Date(utcTime + (3600000 * offsetHours));
+    return localTime;
+  }
+
+  function formatTime(date) {
+    const h = String(date.getHours()).padStart(2, '0');
+    const m = String(date.getMinutes()).padStart(2, '0');
+    const s = String(date.getSeconds()).padStart(2, '0');
+    return `${h}:${m}:${s}`;
+  }
+
+  setInterval(() => {
+    const now = new Date();
+    document.getElementById("current-time").textContent = formatTime(now);
+  }, 1000);
+
+  function updateDetailPanel() {
+    const center = financialCenters.find(c => c.city === selectedCity);
+    if (!center) return;
+    
+    const ex = center.exchanges[0];
+    const localTime = getLocalTime(center.timeZoneOffset);
+    const timeStr = formatTime(localTime);
+    //info panel
+    let html = `<div class="detail-row"  style="font-size:1em; line-height:0.5 ;color:#254277;"> <span class="detail-label">City:</span> </div>`;
+    html += `<div class="detail-row" style="font-size:3em; line-height:1 ;color:#254277;">  ${center.city} </div>`;
+    html += `<div class="detail-row" style="font-size:1em; line-height:1" ><span class="detail-label"> MIC:</span> </div>`;
+    html += `<div class="detail-row" style="font-size:4em; line-height:1 ;color:#254277;" > ${ex.mic} </div>`;
+    html += `<div class="detail-row" style="font-size:1em; line-height:1" ><span class="detail-label"> Exchange:</div>`;
+    html += `<div class="detail-row" style="font-size:2em; font-weight:bold; line-height:1; color:#254277; width:20%;"> ${ex.name}</div>`;
+    html += `<div class="detail-row" style="font-size:2em; font-weight:bold; line-height:1; color:#254277;"> <br> <br> </div>`;
+    html += `<div class="detail-row"><span class="detail-label">Region:  ${ex.region}</div>`;
+    html += `<div class="detail-row"><span class="detail-label">Market Cap:  $${ex.marketCap} tn</div>`;
+    html += `<div class="detail-row"><span class="detail-label">Monthly Vol:  $${ex.monthlyTradeVolume} bn</div>`;
+    html += `<div class="detail-row"><span class="detail-label">Time Zone:  ${ex.timeZone}</div>`;
+    html += `<div class="detail-row"><span class="detail-label">UTC Offset:  ${center.timeZoneOffset}:00</div>`;
+    html += `<div class="detail-row"><span class="detail-label">Local Time:  ${timeStr}</div>`;
+    
+    document.getElementById("detail-info").innerHTML = html;
+  }
+
+  function updateFeverChart() {
+    const data = priceData[selectedCity] || [];
+    const chartWidth = document.getElementById("fever-chart").clientWidth || 320;
+    const chartHeight = 200;
+    const margin = { top: 10, right: 15, bottom: 15, left: 35 };
+    
+    const svg = d3.select("#fever-chart");
+    svg.selectAll("*").remove();
+
+    const xScale = d3.scaleLinear()
+      .domain([0, data.length - 1])
+      .range([margin.left, chartWidth - margin.right]);
+
+    const yScale = d3.scaleLinear()
+      .domain([d3.min(data, d => d.close) - 0.1, d3.max(data, d => d.close) + 0.1])
+      .range([chartHeight - margin.bottom, margin.top]);
+
+    const area = d3.area()
+      .x((d, i) => xScale(i))
+      .y0(chartHeight - margin.bottom)
+      .y1(d => yScale(d.close));
+
+    const line = d3.line()
+      .x((d, i) => xScale(i))
+      .y(d => yScale(d.close));
+
+    svg.attr("viewBox", `0 0 ${chartWidth} ${chartHeight}`).attr("preserveAspectRatio", "none").attr("width", "100%").attr("height", "100%");
+
+    const defs = svg.append("defs");
+    const gradient = defs.append("linearGradient")
+      .attr("id", "fever-gradient")
+      .attr("x1", "0%").attr("y1", "0%").attr("x2", "0%").attr("y2", "100%");
+    gradient.append("stop").attr("offset", "0%").attr("stop-color", "#FFD700").attr("stop-opacity", 0.6);
+    gradient.append("stop").attr("offset", "100%").attr("stop-color", "#FFD700").attr("stop-opacity", 0.1);
+
+    svg.append("path").datum(data).attr("fill", "url(#fever-gradient)").attr("d", area);
+    svg.append("path").datum(data).attr("fill", "none").attr("stroke", "#FFD700").attr("stroke-width", 2).attr("d", line);
+
+    // Calculate high and low prices
+    const closePrices = data.map(d => d.close);
+    const highPrice = Math.max(...closePrices);
+    const lowPrice = Math.min(...closePrices);
+
+    // Add interactive points
+    svg.selectAll(".fever-point")
+      .data(data)
+      .enter()
+      .append("circle")
+      .attr("class", "fever-point")
+      .attr("cx", (d, i) => xScale(i))
+      .attr("cy", d => yScale(d.close))
+      .attr("r", 2)
+      .attr("fill", "#FFD700")
+      .attr("opacity", 0)
+      .style("cursor", "pointer")
+      .on("mouseover", function(event, d) {
+        d3.select(this).attr("r", 5).attr("opacity", 1);
+        
+        let volumeText = "";
+        let priceText = "";
+        
+        if (d.volume) {
+          volumeText = d.volume.toLocaleString();
+        }
+        
+        if (d.open && d.close) {
+          priceText = `${d.open.toFixed(4)} / ${d.close.toFixed(4)}`;
+        } else if (d.close) {
+          priceText = d.close.toFixed(4);
+        }
+        
+        document.getElementById("fever-volume").textContent = volumeText || "—";
+        document.getElementById("fever-prices").textContent = priceText || "—";
+        
+        // Show fever tooltip with all data
+        const feverTooltip = d3.select("#fever-tooltip");
+        let tooltipHtml = `<strong>${d.date}</strong><br>`;
+        if (d.open) tooltipHtml += `Open: ${d.open.toFixed(4)}<br>`;
+        if (d.close) tooltipHtml += `Close: ${d.close.toFixed(4)}<br>`;
+        tooltipHtml += `High: ${highPrice.toFixed(4)}<br>`;
+        tooltipHtml += `Low: ${lowPrice.toFixed(4)}<br>`;
+        if (d.volume) tooltipHtml += `Volume: ${d.volume.toLocaleString()}`;
+        
+        feverTooltip
+          .style("opacity", 1)
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY - 10) + "px")
+          .html(tooltipHtml);
+      })
+      .on("mouseout", function() {
+        d3.select(this).attr("r", 2).attr("opacity", 0);
+        document.getElementById("fever-volume").textContent = "—";
+        document.getElementById("fever-prices").textContent = "—";
+        d3.select("#fever-tooltip").style("opacity", 0);
+      });
+
+    svg.append("g").attr("transform", `translate(0, ${chartHeight - margin.bottom})`).call(d3.axisBottom(xScale).tickFormat(d => "")).style("color", "#999").style("font-size", "10px");
+    svg.append("g").attr("transform", `translate(${margin.left}, 0)`).call(d3.axisLeft(yScale).ticks(3)).style("color", "#999").style("font-size", "10px");
+  }
+
+  function updateChartHighlights() {
+    d3.selectAll(".chart-item").classed("active", false);
+    d3.selectAll(".chart-item").filter(d => d.city === selectedCity).classed("active", true);
+  }
+
+  function updateGlobeHighlight() {
+    d3.selectAll(".city-dot").attr("r", d => d.city === selectedCity ? 6 : 4);
+    d3.selectAll(".city-circle").attr("stroke-width", d => d.city === selectedCity ? 2 : 1);
+  }
+
+  const width =  700, height = 800;
+  const data = { "India": 78, "France": 67, "China": 98 };
+  const countriesToColor = ["India", "France", "China"];
+  const colorScale = d3.scaleLinear().domain([60, 100]).range(["#959595", "#959595"]);
+
+  const projection = d3.geoOrthographic().scale(280).translate([width / 2, height / 2]).clipAngle(90);
+  const path = d3.geoPath(projection);
+  const graticule = d3.geoGraticule10();
+  const svg = d3.select("#globe-svg");
+  const simpleTooltip = d3.select("#simple-tooltip");
+
+  svg.append("path").datum(graticule).attr("class", "graticule").attr("d", path);
+
+  let rotation = [0, -20, 0];
+  let isDragging = false;
+  let dragStartX = 0;
+  let autoRotate = true;
+
+  svg.on("mousedown", function(event) {
+    isDragging = true;
+    dragStartX = event.clientX;
+    autoRotate = false;
+  });
+
+  document.addEventListener("mousemove", function(event) {
+    if (isDragging) {
+      const dragDelta = event.clientX - dragStartX;
+      rotation[0] += dragDelta * 0.5;
+      dragStartX = event.clientX;
+      projection.rotate(rotation);
+      updateGlobeRender();
+    }
+  });
+
+  document.addEventListener("mouseup", function() {
+    isDragging = false;
+    autoRotate = true;
+  });
+
+  function updateGlobeRender() {
+    svg.selectAll("path.land").attr("d", path);
+    svg.select(".graticule").attr("d", path(graticule));
+    
+    svg.selectAll(".volume-circle")
+      .attr("cx", d => { const coords = projection([d.longitude, d.latitude]); return coords ? coords[0] : 0; })
+      .attr("cy", d => { const coords = projection([d.longitude, d.latitude]); return coords ? coords[1] : 0; })
+      .attr("opacity", d => {
+        const currentRotation = projection.rotate();
+        const rotated = d3.geoRotation(currentRotation);
+        const point = rotated([d.longitude, d.latitude]);
+        const depth = Math.cos(point[1] * Math.PI / 180) * Math.cos(point[0] * Math.PI / 180);
+        return Math.max(0, depth * 0.25);
+      });
+
+    svg.selectAll(".city-circle")
+      .attr("cx", d => { const coords = projection([d.longitude, d.latitude]); return coords ? coords[0] : 0; })
+      .attr("cy", d => { const coords = projection([d.longitude, d.latitude]); return coords ? coords[1] : 0; })
+      .attr("opacity", d => {
+        const currentRotation = projection.rotate();
+        const rotated = d3.geoRotation(currentRotation);
+        const point = rotated([d.longitude, d.latitude]);
+        const depth = Math.cos(point[1] * Math.PI / 180) * Math.cos(point[0] * Math.PI / 180);
+        return Math.max(0, depth);
+      });
+
+    svg.selectAll(".city-dot")
+      .attr("cx", d => { const coords = projection([d.longitude, d.latitude]); return coords ? coords[0] : 0; })
+      .attr("cy", d => { const coords = projection([d.longitude, d.latitude]); return coords ? coords[1] : 0; })
+      .attr("opacity", d => {
+        const currentRotation = projection.rotate();
+        const rotated = d3.geoRotation(currentRotation);
+        const point = rotated([d.longitude, d.latitude]);
+        const depth = Math.cos(point[1] * Math.PI / 180) * Math.cos(point[0] * Math.PI / 180);
+        return Math.max(0, depth);
+      })
+      .style("pointer-events", d => {
+        const currentRotation = projection.rotate();
+        const rotated = d3.geoRotation(currentRotation);
+        const point = rotated([d.longitude, d.latitude]);
+        const depth = Math.cos(point[1] * Math.PI / 180) * Math.cos(point[0] * Math.PI / 180);
+        return depth < 0.05 ? "none" : "auto";
+      });
+  }
+
+  const chartData = [];
+  financialCenters.forEach(center => {
+    center.exchanges.forEach(ex => {
+      chartData.push({
+        city: center.city,
+        exchange: ex.name,
+        mic: ex.mic,
+        region: ex.region,
+        marketCap: ex.marketCap,
+        monthlyVolume: ex.monthlyTradeVolume,
+        timeZone: ex.timeZone,
+        name: ex.name,
+        timeZoneOffset: center.timeZoneOffset
+      });
+    });
+  });
+
+  const maxMarketCap = d3.max(chartData, d => d.marketCap);
+  const maxVolume = d3.max(chartData, d => d.monthlyVolume);
+  
+  d3.select("#market-cap-chart").selectAll(".chart-item")
+    .data(chartData.sort((a, b) => b.marketCap - a.marketCap))
+    .enter()
+    .append("div")
+    .attr("class", "chart-item")
+    .on("click", function(event, d) {
+      selectCity(d.city);
+    })
+    .html(d => `
+      <div class="chart-label">${d.city} $${d.marketCap.toFixed(2)}T</div>
+      <div style="position: relative; padding-right: 50px;">
+        <div class="chart-bar" style="width: ${(d.marketCap / maxMarketCap) * 280}px;"></div>
+      </div>
+    `);
+
+  d3.select("#volume-chart").selectAll(".chart-item")
+    .data(chartData.sort((a, b) => b.monthlyVolume - a.monthlyVolume))
+    .enter()
+    .append("div")
+    .attr("class", "chart-item")
+    .on("click", function(event, d) {
+      selectCity(d.city);
+    })
+    .html(d => `
+      <div class="chart-label">${d.city}  $${d.monthlyVolume.toLocaleString()}M</div>
+      <div style="position: relative; padding-right: 50px;">
+        <div class="chart-bar" style="width: ${(d.monthlyVolume / maxVolume) * 280}px;"></div>
+      </div>
+    `);
+
+  d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json").then(countriesTopo => {
+    const countries = topojson.feature(countriesTopo, countriesTopo.objects.countries).features;
+    
+    svg.selectAll("path.land")
+      .data(countries)
+      .join("path")
+      .attr("class", "land")
+      .attr("d", path)
+      .attr("fill", d => countriesToColor.includes(d.properties.name) ? colorScale(data[d.properties.name]) : "#999");
+
+//volume circle per city
+    svg.selectAll(".volume-circle")
+      .data(financialCenters)
+      .enter()
+      .append("circle")
+      .attr("class", "volume-circle")
+      .attr("cx", d => { const coords = projection([d.longitude, d.latitude]); return coords ? coords[0] : 0; })
+      .attr("cy", d => { const coords = projection([d.longitude, d.latitude]); return coords ? coords[1] : 0; })
+      .attr("r", d => { const maxVol = d3.max(financialCenters, c => d3.max(c.exchanges, e => e.monthlyTradeVolume)); const avgVol = d3.mean(d.exchanges, e => e.monthlyTradeVolume); return (avgVol / maxVol) * 125 + 4; })
+      .attr("fill", "#254277")
+      .attr("opacity", 0.25)
+      .attr("stroke", "none");
+
+    svg.selectAll(".city-circle")
+      .data(financialCenters)
+      .enter()
+      .append("circle")
+      .attr("class", "city-circle")
+      .attr("cx", d => { const coords = projection([d.longitude, d.latitude]); return coords ? coords[0] : 0; })
+      .attr("cy", d => { const coords = projection([d.longitude, d.latitude]); return coords ? coords[1] : 0; })
+      .attr("r", 8)
+      .attr("fill", "none")
+      .attr("stroke", "#FFD700")
+      .attr("stroke-width", 1)
+      .attr("opacity", 0.9);
+
+    svg.selectAll(".city-dot")
+      .data(financialCenters)
+      .enter()
+      .append("circle")
+      .attr("class", "city-dot")
+      .attr("cx", d => { const coords = projection([d.longitude, d.latitude]); return coords ? coords[0] : 0; })
+      .attr("cy", d => { const coords = projection([d.longitude, d.latitude]); return coords ? coords[1] : 0; })
+      .attr("r", 4)
+      .attr("fill", "#FFD700")
+      .attr("opacity", 0.9)
+      .attr("stroke", "white")
+      .attr("stroke-width", 1)
+      .on("mousemove", (event, d) => {
+        const ex = d.exchanges[0];
+        const localTime = getLocalTime(d.timeZoneOffset);
+        const timeStr = formatTime(localTime);
+        const mics = d.exchanges.map(e => e.mic).join(" / ");
+        
+        let tooltipHtml = `<strong>${d.city}</strong><br>`;
+        tooltipHtml += `${ex.name}<br>`;
+        tooltipHtml += `MIC: ${mics}<br>`;
+        tooltipHtml += `<span style="color: #FFD700;">Market Cap:</span> $${ex.marketCap}T<br>`;
+        tooltipHtml += `<span style="color: #FFD700;">Monthly Vol:</span> $${ex.monthlyTradeVolume.toLocaleString()}M<br>`;
+        tooltipHtml += `<span style="color: #FFD700;">Local Time:</span> ${timeStr}`;
+        
+        const coords = projection([d.longitude, d.latitude]);
+        const tooltipX = event.pageX + 10;
+        const tooltipY = event.pageY - 25;
+        
+        simpleTooltip
+          .style("opacity", 1)
+          .style("left", tooltipX + "px")
+          .style("top", tooltipY + "px")
+          .html(tooltipHtml);
+        
+        // Draw connecting line from city point to tooltip using canvas
+        const canvas = document.querySelector("canvas.tooltip-line-canvas");
+        if (!canvas) {
+          const newCanvas = document.createElement("canvas");
+          newCanvas.className = "tooltip-line-canvas";
+          newCanvas.width = window.innerWidth;
+          newCanvas.height = window.innerHeight;
+          newCanvas.style.position = "fixed";
+          newCanvas.style.top = "0";
+          newCanvas.style.left = "0";
+          newCanvas.style.pointerEvents = "none";
+          newCanvas.style.zIndex = "999";
+          document.body.appendChild(newCanvas);
+        }
+        
+        const ctx = document.querySelector("canvas.tooltip-line-canvas").getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Get SVG container position
+        const svgRect = svg.node().getBoundingClientRect();
+        const dotScreenX = svgRect.left + coords[0];
+        const dotScreenY = svgRect.top + coords[1];
+        
+        ctx.strokeStyle = "#FFD700";
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = 0.6;
+        ctx.beginPath();
+        ctx.moveTo(dotScreenX, dotScreenY);
+        ctx.lineTo(tooltipX, tooltipY);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      })
+      .on("mouseout", () => {
+        simpleTooltip.style("opacity", 0);
+        const canvas = document.querySelector("canvas.tooltip-line-canvas");
+        if (canvas) {
+          const ctx = canvas.getContext("2d");
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      })
+      .on("click", function(event, d) {
+        selectCity(d.city);
+      });
+
+    updateFeverChart();
+    updateDetailPanel();
+
+    d3.timer(() => {
+      if (autoRotate) {
+        rotation[0] += 0.3;
+      }
+      projection.rotate(rotation);
+      updateGlobeRender();
+    });
+  });
+</script>
+</body>
+</html>
