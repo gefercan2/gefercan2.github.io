@@ -179,18 +179,13 @@
       color: #666;
     }
 
-    .control-group select,
-    .control-group input {
+    .control-group select {
       padding: 6px 8px;
       border: 0.5px solid var(--color-border);
       border-radius: 4px;
       font-size: 13px;
       background: var(--color-bg-primary);
       color: var(--color-text);
-    }
-
-    .csv-input {
-      cursor: pointer;
     }
 
     #chart {
@@ -267,10 +262,7 @@
     .tooltip.active {
       opacity: 1;
     }
-    
-    #csv_upload{
-      display:none;
-    }
+
     .legend {
       max-width: 1400px;
       margin: 2rem auto 0;
@@ -347,11 +339,6 @@
 </div>
 
 <div class="controls">
-  <div class="control-group" id="csv_upload">
-    <label for="csvFileInput">Load CSV File:</label>
-    <input type="file" id="csvFileInput" class="csv-input" accept=".csv">
-  </div>
-
   <div class="control-group">
     <label for="yAxisSelect">Y-Axis Display:</label>
     <select id="yAxisSelect">
@@ -388,7 +375,7 @@ menuOverlay.addEventListener("click", () => {
   menuOverlay.classList.remove("active");
 });
 
-// Color mapping
+// Actual color values for use in JavaScript
 const confColorsActual = {
   "UEFA": "#378ADD",
   "CONMEBOL": "#D85A30",
@@ -421,130 +408,124 @@ const stageLabels = {
   5: "Winner"
 };
 
-// CSV Loader Function
-function loadAndProcessCSV(filePath) {
-  d3.csv("Fifa_Countries.csv").then(function(csvData) {
-    // Transform CSV data into JSON structure suitable for the plot
-    const transformedData = csvData.map(d => {
-      // Extract best result year from "Best result year" column (format: "Champions, (1966)")
-      const bestResultMatch = d["Best result year"] ? d["Best result year"].match(/\((\d{4})\)/) : null;
-      const bestYear = bestResultMatch ? parseInt(bestResultMatch[1]) : null;
-      
-      // Extract best result stage name
-      const bestResult = d["Best result"] ? d["Best result"].trim() : "Group stage";
-      
-      // Parse appearances (integer)
-      const appearances = parseInt(d["Appearances"]) || 0;
-      
-      // Parse debut year (integer)
-      const debutYear = parseInt(d["Debut"]) || null;
-      
-      // Count how many times the best result was achieved (simplified: based on provided data structure)
-      const timesAchieved = appearances > 0 ? 1 : 0;
-      
-      // Get confederation
-      const confederation = d["Confederation"] ? d["Confederation"].trim() : "Unknown";
-      
-      return {
-        team: d["Team"] ? d["Team"].trim() : "Unknown",
-        appearances: appearances,
-        bestResult: bestResult,
-        bestYear: bestYear,
-        debutYear: debutYear,
-        timesAchieved: timesAchieved,
-        confederation: confederation,
-        stageValue: stageMap[bestResult] || 1,
-        x: stageMap[bestResult] || 1,
-        y_best: bestYear,
-        y_debut: debutYear,
-        radius: Math.sqrt(appearances) * 3
-      };
-    });
-
-    console.log("Transformed Data:", transformedData);
+// Function to transform CSV data to JSON structure
+function transformCSVToJSON(csvData) {
+  return csvData.map(row => {
+    // Extract best result year from "Best result year" column
+    const bestResultYearStr = row["Best result year"] ? row["Best result year"].trim() : "";
+    const bestYear = bestResultYearStr ? parseInt(bestResultYearStr.replace(/[^\d]/g, "")) : new Date().getFullYear();
     
-    // Re-render the visualization with new data
-    renderVisualization(transformedData);
-  }).catch(function(error) {
+    // Extract best result from "Best result" column
+    const bestResult = row["Best result"] ? row["Best result"].trim() : "Group stage";
+    
+    // Parse debut year
+    const debutYear = row["Debut"] ? parseInt(row["Debut"]) : new Date().getFullYear();
+    
+    // Parse appearances
+    const appearances = row["Appearances"] ? parseInt(row["Appearances"]) : 1;
+    
+    // Parse confederation
+    const confederation = row["Confederation"] ? row["Confederation"].trim() : "Other";
+    
+    // Parse team name
+    const team = row["Team"] ? row["Team"].trim() : "";
+    
+    // Count times achieved - parse from "Record streak" and "Active streak"
+    const recordStreak = row["Record streak"] ? parseInt(row["Record streak"]) : 0;
+    const activeStreak = row["Active streak"] ? parseInt(row["Active streak"]) : 0;
+    const timesAchieved = Math.max(recordStreak, activeStreak, 1);
+    
+    return {
+      team: team,
+      appearances: appearances,
+      bestResult: bestResult,
+      bestYear: bestYear,
+      debutYear: debitYear,
+      timesAchieved: timesAchieved,
+      confederation: confederation,
+      stageValue: stageMap[bestResult] || 1,
+      x: stageMap[bestResult] || 1,
+      y_best: bestYear,
+      y_debut: debutYear,
+      radius: Math.sqrt(appearances) * 3
+    };
+  }).filter(d => d.team && d.team.length > 0);
+}
+
+// Load CSV file and initialize visualization
+function loadAndVisualize(csvFilePath) {
+  d3.csv(csvFilePath).then(csvData => {
+    const transformedData = transformCSVToJSON(csvData);
+    initializeVisualization(transformedData);
+  }).catch(error => {
     console.error("Error loading CSV file:", error);
-    alert("Error loading CSV file. Please check the file format and path.");
+    alert("Error loading CSV file. Please check the file path and format.");
   });
 }
 
-// Handle CSV file input
-document.getElementById("csvFileInput").addEventListener("change", function(event) {
-  const file = event.target.files[0];
-  if (file) {
-    // Create a FileReader to read the file
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const csvContent = e.target.result;
-      // Parse CSV using D3
-      const csvData = d3.csvParse(csvContent);
-      
-      // Transform CSV data into JSON structure
-      const transformedData = csvData.map(d => {
-        const bestResultMatch = d["Best result year"] ? d["Best result year"].match(/\((\d{4})\)/) : null;
-        const bestYear = bestResultMatch ? parseInt(bestResultMatch[1]) : null;
-        
-        const bestResult = d["Best result"] ? d["Best result"].trim() : "Group stage";
-        const appearances = parseInt(d["Appearances"]) || 0;
-        const debutYear = parseInt(d["Debut"]) || null;
-        const timesAchieved = appearances > 0 ? 1 : 0;
-        const confederation = d["Confederation"] ? d["Confederation"].trim() : "Unknown";
-        
-        return {
-          team: d["Team"] ? d["Team"].trim() : "Unknown",
-          appearances: appearances,
-          bestResult: bestResult,
-          bestYear: bestYear,
-          debutYear: debutYear,
-          timesAchieved: timesAchieved,
-          confederation: confederation,
-          stageValue: stageMap[bestResult] || 1,
-          x: stageMap[bestResult] || 1,
-          y_best: bestYear,
-          y_debut: debutYear,
-          radius: Math.sqrt(appearances) * 3
-        };
-      });
-
-      console.log("CSV Loaded and Transformed:", transformedData);
-      renderVisualization(transformedData);
-    };
-    reader.readAsText(file);
-  }
-});
-
-// Default data
-const defaultData = [
-  { team: "Switzerland", appearances: 13, bestResult: "Quarter-finals", bestYear: 1954, debutYear: 1934, timesAchieved: 1, confederation: "UEFA", stageValue: 3, x: 3, y_best: 1954, y_debut: 1934, radius: Math.sqrt(13) * 3 },
-  { team: "Algeria", appearances: 5, bestResult: "Round of 16", bestYear: 2014, debitYear: 1982, timesAchieved: 1, confederation: "CAF", stageValue: 2, x: 2, y_best: 2014, y_debut: 1982, radius: Math.sqrt(5) * 3 },
-  { team: "Angola", appearances: 1, bestResult: "Group stage", bestYear: 2006, debutYear: 2006, timesAchieved: 1, confederation: "CAF", stageValue: 1, x: 1, y_best: 2006, y_debut: 2006, radius: Math.sqrt(1) * 3 },
-  { team: "Argentina", appearances: 19, bestResult: "Champions", bestYear: 1978, debutYear: 1930, timesAchieved: 3, confederation: "CONMEBOL", stageValue: 5, x: 5, y_best: 1978, y_debut: 1930, radius: Math.sqrt(19) * 3 },
-  { team: "Australia", appearances: 7, bestResult: "Round of 16", bestYear: 2006, debutYear: 1974, timesAchieved: 2, confederation: "AFC", stageValue: 2, x: 2, y_best: 2006, y_debut: 1974, radius: Math.sqrt(7) * 3 },
-  { team: "Austria", appearances: 8, bestResult: "Third place", bestYear: 1954, debutYear: 1934, timesAchieved: 1, confederation: "UEFA", stageValue: 4.2, x: 4.2, y_best: 1954, y_debut: 1934, radius: Math.sqrt(8) * 3 },
-  { team: "Belgium", appearances: 15, bestResult: "Third place", bestYear: 2018, debutYear: 1930, timesAchieved: 2, confederation: "UEFA", stageValue: 4.2, x: 4.2, y_best: 2018, y_debut: 1930, radius: Math.sqrt(15) * 3 },
-  { team: "Bolivia", appearances: 3, bestResult: "Group stage", bestYear: 1994, debutYear: 1930, timesAchieved: 3, confederation: "CONMEBOL", stageValue: 1, x: 1, y_best: 1994, y_debut: 1930, radius: Math.sqrt(3) * 3 },
-  { team: "Bosnia and Herzegovina", appearances: 1, bestResult: "Group stage", bestYear: 2026, debutYear: 2026, timesAchieved: 1, confederation: "UEFA", stageValue: 1, x: 1, y_best: 2026, y_debut: 2026, radius: Math.sqrt(1) * 3 },
-  { team: "Brazil", appearances: 23, bestResult: "Champions", bestYear: 2002, debutYear: 1930, timesAchieved: 5, confederation: "CONMEBOL", stageValue: 5, x: 5, y_best: 2002, y_debut: 1930, radius: Math.sqrt(23) * 3 }
-];
-
-// Main visualization function
+// Global variables
+let transformedData = [];
 let currentYAxis = "best";
-let currentData = defaultData;
 
-function renderVisualization(data) {
-  currentData = data;
+// Overlap avoidance function
+function resolveOverlaps(data, xScale, yScale, minDistance = 40) {
+  const padding = 15;
+  const maxIterations = 100;
+  let iterations = 0;
+  let overlaps = true;
+
+  while (overlaps && iterations < maxIterations) {
+    overlaps = false;
+    iterations++;
+
+    for (let i = 0; i < data.length; i++) {
+      for (let j = i + 1; j < data.length; j++) {
+        const d1 = data[i];
+        const d2 = data[j];
+
+        if (d1.x === d2.x && d1.currentY === d2.currentY) {
+          const x1 = xScale(d1.x);
+          const y1 = yScale(d1.currentY);
+          const x2 = xScale(d2.x);
+          const y2 = yScale(d2.currentY);
+
+          const dx = x2 - x1;
+          const dy = y2 - y1;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const minDist = d1.radius + d2.radius + padding;
+
+          if (distance < minDist) {
+            overlaps = true;
+            const angle = Math.atan2(dy, dx);
+            const moveDistance = (minDist - distance) / 2;
+            
+            d1.offsetX = (d1.offsetX || 0) - Math.cos(angle) * moveDistance;
+            d1.offsetY = (d1.offsetY || 0) - Math.sin(angle) * moveDistance;
+            d2.offsetX = (d2.offsetX || 0) + Math.cos(angle) * moveDistance;
+            d2.offsetY = (d2.offsetY || 0) + Math.sin(angle) * moveDistance;
+          }
+        }
+      }
+    }
+  }
+
+  return data;
+}
+
+// Dimensions
+const margin = { top: 40, right: 60, bottom: 80, left: 80 };
+const width = Math.min(1400, window.innerWidth - 40) - margin.left - margin.right;
+const height = 600 - margin.top - margin.bottom;
+
+// Initialize visualization
+function initializeVisualization(data) {
+  transformedData = data;
   
-  // Clear previous chart
-  d3.select("#chart").selectAll("svg").remove();
+  // Remove existing chart
+  d3.select("#chart").selectAll("*").remove();
   d3.select("#legend").selectAll("*").remove();
 
-  const margin = { top: 40, right: 60, bottom: 80, left: 80 };
-  const width = Math.min(1400, window.innerWidth - 40) - margin.left - margin.right;
-  const height = 600 - margin.top - margin.bottom;
-
+  // Create SVG
   const svg = d3.select("#chart")
     .append("svg")
     .attr("viewBox", [0, 0, width + margin.left + margin.right, height + margin.top + margin.bottom])
@@ -554,6 +535,7 @@ function renderVisualization(data) {
   const g = svg.append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
+  // Scales
   const xScale = d3.scaleLinear()
     .domain([0.5, 5.5])
     .range([0, width]);
@@ -563,15 +545,15 @@ function renderVisualization(data) {
     .range([height, 0]);
 
   const radiusScale = d3.scaleSqrt()
-    .domain([1, 23])
+    .domain([1, d3.max(transformedData, d => d.appearances)])
     .range([4, 20]);
 
-  // Grid and stage lines
+  // Group containers
   const gridGroup = g.append("g").attr("class", "grid-group");
   const stageLineGroup = g.append("g").attr("class", "stage-line-group");
   const dotsGroup = g.append("g").attr("class", "dots-group");
 
-  // Grid lines
+  // Update grid lines
   gridGroup.selectAll(".grid-line-x")
     .data(xScale.ticks(8))
     .enter()
@@ -592,7 +574,7 @@ function renderVisualization(data) {
     .attr("y1", d => yScale(d))
     .attr("y2", d => yScale(d));
 
-  // Stage lines
+  // Update stage lines
   const stagePositions = [1, 2, 3, 3.8, 4, 4.2, 4.5, 5];
   stageLineGroup.selectAll(".stage-line")
     .data(stagePositions)
@@ -605,113 +587,72 @@ function renderVisualization(data) {
     .attr("y2", height)
     .attr("stroke-width", 2);
 
-  // Overlap avoidance
-  function resolveOverlaps(dataSet, xScale, yScale) {
-    const padding = 15;
-    const maxIterations = 100;
-    let iterations = 0;
-    let overlaps = true;
+  // Function to update visualization
+  function updateVisualization() {
+    const yValue = currentYAxis === "best" ? "y_best" : "y_debut";
 
-    while (overlaps && iterations < maxIterations) {
-      overlaps = false;
-      iterations++;
+    const dataWithY = transformedData.map(d => ({
+      ...d,
+      currentY: d[yValue],
+      offsetX: 0,
+      offsetY: 0
+    }));
 
-      for (let i = 0; i < dataSet.length; i++) {
-        for (let j = i + 1; j < dataSet.length; j++) {
-          const d1 = dataSet[i];
-          const d2 = dataSet[j];
+    resolveOverlaps(dataWithY, xScale, yScale);
 
-          if (d1.x === d2.x && d1.currentY === d2.currentY) {
-            const x1 = xScale(d1.x);
-            const y1 = yScale(d1.currentY);
-            const x2 = xScale(d2.x);
-            const y2 = yScale(d2.currentY);
+    dotsGroup.selectAll("*").remove();
 
-            const dx = x2 - x1;
-            const dy = y2 - y1;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            const minDist = d1.radius + d2.radius + padding;
+    const tooltip = d3.select("#tooltip");
 
-            if (distance < minDist) {
-              overlaps = true;
-              const angle = Math.atan2(dy, dx);
-              const moveDistance = (minDist - distance) / 2;
-              
-              d1.offsetX = (d1.offsetX || 0) - Math.cos(angle) * moveDistance;
-              d1.offsetY = (d1.offsetY || 0) - Math.sin(angle) * moveDistance;
-              d2.offsetX = (d2.offsetX || 0) + Math.cos(angle) * moveDistance;
-              d2.offsetY = (d2.offsetY || 0) + Math.sin(angle) * moveDistance;
-            }
-          }
+    const nodeGroups = dotsGroup.selectAll(".node-group")
+      .data(dataWithY)
+      .enter()
+      .append("g")
+      .attr("class", "node-group")
+      .attr("transform", d => `translate(${xScale(d.x) + d.offsetX},${yScale(d.currentY) + d.offsetY})`);
+
+    nodeGroups.append("circle")
+      .attr("class", "base-dot")
+      .attr("r", 2);
+
+    nodeGroups.append("circle")
+      .attr("class", "participation-circle")
+      .attr("r", d => radiusScale(d.appearances))
+      .attr("fill", d => confColorsActual[d.confederation] || "#999999")
+      .attr("stroke", d => confColorsActual[d.confederation] || "#999999");
+
+    nodeGroups.each(function(d) {
+      if (d.timesAchieved > 1) {
+        for (let i = 1; i < d.timesAchieved; i++) {
+          d3.select(this).append("circle")
+            .attr("class", "concentric-circle")
+            .attr("r", radiusScale(d.appearances) + (i * 5));
         }
       }
-    }
+    });
 
-    return dataSet;
+    nodeGroups.on("mouseover", function(event, d) {
+      const yearLabel = currentYAxis === "best" ? `Best Year: ${d.bestYear}` : `Debut Year: ${d.debutYear}`;
+      tooltip.classed("active", true)
+        .html(`<strong>${d.team}</strong><br/>
+               Stage: ${d.bestResult}<br/>
+               ${yearLabel}<br/>
+               Appearances: ${d.appearances}<br/>
+               Times Achieved: ${d.timesAchieved}<br/>
+               Confederation: ${d.confederation}`)
+        .style("left", (event.pageX + 10) + "px")
+        .style("top", (event.pageY - 10) + "px");
+    })
+    .on("mousemove", function(event) {
+      tooltip.style("left", (event.pageX + 10) + "px")
+        .style("top", (event.pageY - 10) + "px");
+    })
+    .on("mouseout", function() {
+      tooltip.classed("active", false);
+    });
   }
 
-  // Prepare data for visualization
-  const yValue = currentYAxis === "best" ? "y_best" : "y_debut";
-  const dataWithY = data.map(d => ({
-    ...d,
-    currentY: d[yValue],
-    offsetX: 0,
-    offsetY: 0
-  }));
-
-  resolveOverlaps(dataWithY, xScale, yScale);
-
-  const tooltip = d3.select("#tooltip");
-
-  // Draw nodes
-  const nodeGroups = dotsGroup.selectAll(".node-group")
-    .data(dataWithY)
-    .enter()
-    .append("g")
-    .attr("class", "node-group")
-    .attr("transform", d => `translate(${xScale(d.x) + d.offsetX},${yScale(d.currentY) + d.offsetY})`);
-
-  nodeGroups.append("circle")
-    .attr("class", "base-dot")
-    .attr("r", 2);
-
-  nodeGroups.append("circle")
-    .attr("class", "participation-circle")
-    .attr("r", d => radiusScale(d.appearances))
-    .attr("fill", d => confColorsActual[d.confederation] || "#999")
-    .attr("stroke", d => confColorsActual[d.confederation] || "#999");
-
-  nodeGroups.each(function(d) {
-    if (d.timesAchieved > 1) {
-      for (let i = 1; i < d.timesAchieved; i++) {
-        d3.select(this).append("circle")
-          .attr("class", "concentric-circle")
-          .attr("r", radiusScale(d.appearances) + (i * 5));
-      }
-    }
-  });
-
-  nodeGroups.on("mouseover", function(event, d) {
-    const yearLabel = currentYAxis === "best" ? `Best Year: ${d.bestYear}` : `Debut Year: ${d.debutYear}`;
-    tooltip.classed("active", true)
-      .html(`<strong>${d.team}</strong><br/>
-             Stage: ${d.bestResult}<br/>
-             ${yearLabel}<br/>
-             Appearances: ${d.appearances}<br/>
-             Times Achieved: ${d.timesAchieved}<br/>
-             Confederation: ${d.confederation}`)
-      .style("left", (event.pageX + 10) + "px")
-      .style("top", (event.pageY - 10) + "px");
-  })
-  .on("mousemove", function(event) {
-    tooltip.style("left", (event.pageX + 10) + "px")
-      .style("top", (event.pageY - 10) + "px");
-  })
-  .on("mouseout", function() {
-    tooltip.classed("active", false);
-  });
-
-  // Axes
+  // X-axis
   const xAxis = d3.axisBottom(xScale)
     .tickValues([1, 2, 3, 3.8, 4, 4.2, 4.5, 5])
     .tickFormat(d => stageLabels[d] || "");
@@ -721,14 +662,6 @@ function renderVisualization(data) {
     .call(xAxis)
     .attr("class", "axis");
 
-  const yAxis = d3.axisLeft(yScale)
-    .tickFormat(d3.format("d"));
-
-  g.append("g")
-    .attr("class", "axis axis-y")
-    .call(yAxis);
-
-  // Axis labels
   g.append("text")
     .attr("x", width / 2)
     .attr("y", height + 65)
@@ -736,14 +669,21 @@ function renderVisualization(data) {
     .style("text-anchor", "middle")
     .text("Best World Cup Stage Reached");
 
-  const yAxisLabel = currentYAxis === "best" ? "Year of Best Result" : "Debut Year";
+  // Y-axis
+  const yAxis = d3.axisLeft(yScale)
+    .tickFormat(d3.format("d"));
+
+  g.append("g")
+    .attr("class", "axis axis-y")
+    .call(yAxis);
+
   g.append("text")
     .attr("transform", "rotate(-90)")
     .attr("y", -65)
     .attr("x", -height / 2)
     .attr("class", "axis-label")
     .style("text-anchor", "middle")
-    .text(yAxisLabel);
+    .text("Year of Best Result");
 
   // Title
   svg.append("text")
@@ -753,8 +693,16 @@ function renderVisualization(data) {
     .attr("class", "title")
     .text("World Cup Performance: Best Results by Stage and Year");
 
-  // Legend
+  // Event listener for y-axis toggle
+  document.getElementById("yAxisSelect").addEventListener("change", function(e) {
+    currentYAxis = e.target.value;
+    updateVisualization();
+  });
+
+  // Create legend
   const legendContainer = d3.select("#legend");
+  const confArray = Object.keys(confColorsActual);
+
   legendContainer.append("div")
     .style("font-weight", "500")
     .style("margin-bottom", "0.5rem")
@@ -780,7 +728,7 @@ function renderVisualization(data) {
     .style("margin-bottom", "0.5rem")
     .text("Confederations:");
 
-  Object.keys(confColorsActual).forEach(conf => {
+  confArray.forEach(conf => {
     const item = legendContainer.append("div")
       .attr("class", "legend-item");
     
@@ -791,16 +739,13 @@ function renderVisualization(data) {
     item.append("span")
       .text(conf);
   });
+
+  // Initial visualization
+  updateVisualization();
 }
 
-// Y-axis toggle
-document.getElementById("yAxisSelect").addEventListener("change", function(e) {
-  currentYAxis = e.target.value;
-  renderVisualization(currentData);
-});
-
-// Initial render
-renderVisualization(defaultData);
+// Load CSV file - specify your CSV file path here
+loadAndVisualize("data.csv");
 
 </script>
 
