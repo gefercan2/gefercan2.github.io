@@ -412,11 +412,11 @@ const stageLabels = {
 function transformCSVToJSON(csvData) {
   return csvData.map(row => {
     // Extract best result year from "Best result year" column
-    const bestResultYearStr = row["Best result year"] ? row["Best result year"].trim() : "";
+    const bestResultYearStr = row["Best result year"] ? String(row["Best result year"]).trim() : "";
     const bestYear = bestResultYearStr ? parseInt(bestResultYearStr.replace(/[^\d]/g, "")) : new Date().getFullYear();
     
     // Extract best result from "Best result" column
-    const bestResult = row["Best result"] ? row["Best result"].trim() : "Group stage";
+    let bestResult = row["Best result"] ? String(row["Best result"]).trim() : "Group stage";
     
     // Parse debut year
     const debutYear = row["Debut"] ? parseInt(row["Debut"]) : new Date().getFullYear();
@@ -425,29 +425,32 @@ function transformCSVToJSON(csvData) {
     const appearances = row["Appearances"] ? parseInt(row["Appearances"]) : 1;
     
     // Parse confederation
-    const confederation = row["Confederation"] ? row["Confederation"].trim() : "Other";
+    const confederation = row["Confederation"] ? String(row["Confederation"]).trim() : "Other";
     
     // Parse team name
-    const team = row["Team"] ? row["Team"].trim() : "";
+    const team = row["Team"] ? String(row["Team"]).trim() : "";
     
     // Count times achieved - parse from "Record streak" and "Active streak"
     const recordStreak = row["Record streak"] ? parseInt(row["Record streak"]) : 0;
     const activeStreak = row["Active streak"] ? parseInt(row["Active streak"]) : 0;
     const timesAchieved = Math.max(recordStreak, activeStreak, 1);
     
+    // Get stage value from map, default to 1 if not found
+    const stageValue = stageMap[bestResult] || 1;
+    
     return {
       team: team,
-      appearances: appearances,
+      appearances: Math.max(appearances, 1),
       bestResult: bestResult,
-      bestYear: bestYear,
-      debutYear: debutYear,
-      timesAchieved: timesAchieved,
+      bestYear: isNaN(bestYear) ? new Date().getFullYear() : bestYear,
+      debutYear: isNaN(debutYear) ? new Date().getFullYear() : debutYear,
+      timesAchieved: Math.max(timesAchieved, 1),
       confederation: confederation,
-      stageValue: stageMap[bestResult] || 1,
-      x: stageMap[bestResult] || 1,
-      y_best: bestYear,
-      y_debut: debutYear,
-      radius: Math.sqrt(appearances) * 3
+      stageValue: stageValue,
+      x: stageValue,
+      y_best: isNaN(bestYear) ? new Date().getFullYear() : bestYear,
+      y_debut: isNaN(debutYear) ? new Date().getFullYear() : debutYear,
+      radius: Math.sqrt(Math.max(appearances, 1)) * 3
     };
   }).filter(d => d.team && d.team.length > 0);
 }
@@ -455,8 +458,14 @@ function transformCSVToJSON(csvData) {
 // Load CSV file and initialize visualization
 function loadAndVisualize(csvFilePath) {
   d3.csv(csvFilePath).then(csvData => {
+    console.log("CSV loaded:", csvData.length, "rows");
     const transformedData = transformCSVToJSON(csvData);
-    initializeVisualization(transformedData);
+    console.log("Transformed data:", transformedData);
+    if (transformedData.length > 0) {
+      initializeVisualization(transformedData);
+    } else {
+      console.error("No valid data after transformation");
+    }
   }).catch(error => {
     console.error("Error loading CSV file:", error);
     alert("Error loading CSV file. Please check the file path and format.");
@@ -544,8 +553,9 @@ function initializeVisualization(data) {
     .domain([1930, 2030])
     .range([height, 0]);
 
+  const maxAppearances = d3.max(transformedData, d => d.appearances) || 1;
   const radiusScale = d3.scaleSqrt()
-    .domain([1, d3.max(transformedData, d => d.appearances)])
+    .domain([1, maxAppearances])
     .range([4, 20]);
 
   // Group containers
@@ -694,15 +704,19 @@ function initializeVisualization(data) {
     .text("World Cup Performance: Best Results by Stage and Year");
 
   // Event listener for y-axis toggle
-  document.getElementById("yAxisSelect").addEventListener("change", function(e) {
+  const yAxisSelect = document.getElementById("yAxisSelect");
+  yAxisSelect.removeEventListener("change", handleYAxisChange);
+  yAxisSelect.addEventListener("change", handleYAxisChange);
+
+  function handleYAxisChange(e) {
     currentYAxis = e.target.value;
     updateVisualization();
-  });
+  }
 
   // Create legend
   const legendContainer = d3.select("#legend");
-  const confArray = Object.keys(confColorsActual);
-
+  legendContainer.selectAll("*").remove();
+  
   legendContainer.append("div")
     .style("font-weight", "500")
     .style("margin-bottom", "0.5rem")
@@ -728,6 +742,7 @@ function initializeVisualization(data) {
     .style("margin-bottom", "0.5rem")
     .text("Confederations:");
 
+  const confArray = Object.keys(confColorsActual);
   confArray.forEach(conf => {
     const item = legendContainer.append("div")
       .attr("class", "legend-item");
@@ -745,7 +760,7 @@ function initializeVisualization(data) {
 }
 
 // Load CSV file - specify your CSV file path here
-loadAndVisualize("FIFA_Countries.csv");
+loadAndVisualize("data.csv");
 
 </script>
 
