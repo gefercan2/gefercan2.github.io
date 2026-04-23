@@ -453,7 +453,7 @@ function transformCSVToJSON(csvData) {
 }
 
 // Load CSV file and initialize visualization
-function loadAndVisualize("/FIFA_Countries.csv") {
+function loadAndVisualize("FIFA_Countries.csv") {
   d3.csv(csvFilePath).then(csvData => {
     const transformedData = transformCSVToJSON(csvData);
     initializeVisualization(transformedData);
