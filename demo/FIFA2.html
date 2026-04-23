@@ -267,7 +267,10 @@
     .tooltip.active {
       opacity: 1;
     }
-
+    
+    #csv_upload{
+      display:none;
+    }
     .legend {
       max-width: 1400px;
       margin: 2rem auto 0;
@@ -344,7 +347,7 @@
 </div>
 
 <div class="controls">
-  <div class="control-group">
+  <div class="control-group" id="csv_upload">
     <label for="csvFileInput">Load CSV File:</label>
     <input type="file" id="csvFileInput" class="csv-input" accept=".csv">
   </div>
@@ -420,7 +423,7 @@ const stageLabels = {
 
 // CSV Loader Function
 function loadAndProcessCSV(filePath) {
-  d3.csv(filePath).then(function(csvData) {
+  d3.csv('Fifa_Countries.csv').then(function(csvData) {
     // Transform CSV data into JSON structure suitable for the plot
     const transformedData = csvData.map(d => {
       // Extract best result year from "Best result year" column (format: "Champions, (1966)")
