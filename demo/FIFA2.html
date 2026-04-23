@@ -1,307 +1,805 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>FIFA World Cup winners</title>
-
-<style>
-
-body {
-    margin: 0;
-    font-family: Georgia, "Times New Roman", serif;
-    background: #f6f6f6;
-    color: #121212;
-}
-
-/* HERO */
-
-.hero {
-    height: 100vh;
-    background: url("https://upload.wikimedia.org/wikipedia/commons/f/ff/Brazil_and_Croatia_match_at_the_FIFA_World_Cup_2014-06-12_%2847%29.jpg") center/cover no-repeat;
-    display: flex;
-    align-items: flex-end;    
-    opacity:0.5;
-}
-
-.hero-overlay {
-    width: 100%;
-    background: linear-gradient(to top, rgba(0,0,0,0.75), transparent);
-    padding: 80px 20px;
-    color: #ffffff;
-}
-
-.hero-inner {
-    max-width: 640px;
-    margin: 0 auto;    
-}
-
-.kicker {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #ffcc00;
-    margin-bottom: 10px;
-}
-
-.title {
-    font-size: 52px;
-    line-height: 1.1;
-    margin-bottom: 12px;
-}
-
-.standfirst {
-    font-size: 20px;
-    color: #dddddd;
-}
-
-/* LAYOUT */
-
-.wrapper {
-    display: grid;
-    grid-template-columns: 1fr 640px 260px 1fr;
-    gap: 20px;
-    margin-top: 40px;
-}
-
-.article {
-    grid-column: 2;
-}
-
-.sidebar {
-    grid-column: 3;
-    position: sticky;
-    top: 40px;
-}
-
-/* BYLINE */
-
-.byline {
-    font-size: 14px;
-    color: #555555;
-    border-top: 1px solid #dddddd;
-    border-bottom: 1px solid #dddddd;
-    padding: 12px 0;
-    margin-bottom: 30px;
-}
-
-/* PARAGRAPHS */
-
-.article p {
-    font-size: 18px;
-    line-height: 1.85;
-    margin-bottom: 26px;
-}
-
-/* DROP CAPS ON MULTIPLE PARAGRAPHS */
-
-.dropcap::first-letter {
-    float: left;
-    font-size: 64px;
-    line-height: 0.85;
-    padding-right: 8px;
-    font-weight: bold;
-}
-
-/* IMAGE */
-
-.image {
-    width: 100%;
-    height: 380px;
-    background: url("https://upload.wikimedia.org/wikipedia/commons/f/ff/Brazil_and_Croatia_match_at_the_FIFA_World_Cup_2014-06-12_%2847%29.jpg") center/cover no-repeat;
-    margin: 30px 0;
-}
-
-/* DIVIDER */
-
-.divider {
-    height: 1px;
-    background: #dddddd;
-    margin: 40px 0;
-}
-
-/* INSET BOX (IN-ARTICLE) */
-
-.inset {
-    border-left: 4px solid #c70000;
-    padding: 15px 18px;
-    margin: 30px 0;
-    background: #fafafa;
-}
-
-.inset-title {
-    font-size: 13px;
-    font-weight: bold;
-    margin-bottom: 6px;
-}
-
-.inset-text {
-    font-size: 15px;
-    color: #444444;
-}
-
-/* SIDEBAR CARDS */
-
-.card {
-    border-top: 3px solid #c70000;
-    padding-top: 10px;
-    margin-bottom: 25px;
-}
-
-.card-title {
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.card-text {
-    font-size: 13px;
-    color: #555555;
-}
-
-/* RESPONSIVE */
-
-@media (max-width: 1000px) {
-    .wrapper {
-        grid-template-columns: 1fr 90% 1fr;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>World Cup Best Results Scatter Plot</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <style>
+    :root {
+      --color-uefa: #378ADD;
+      --color-conmebol: #D85A30;
+      --color-afc: #639922;
+      --color-caf: #BA7517;
+      --color-concacaf: #7F77DD;
+      --color-base-dot: #999999;
+      --color-stage-line: #b0b0b0;
+      --color-grid-line: #e0e0e0;
+      --color-concentric: #000000;
+      --color-text: #2c2c2a;
+      --color-text-muted: #888780;
+      --color-bg-primary: #ffffff;
+      --color-bg-secondary: #f8f8f8;
+      --color-border: #ddd;
     }
 
-    .article {
-        grid-column: 2;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    .sidebar {
-        grid-column: 2;
-        position: relative;
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 2rem;
+      background: var(--color-bg-primary);
+      color: var(--color-text);
     }
-}
 
-</style>
+    .menu-button {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      width: 50px;
+      height: 50px;
+      background: var(--color-bg-secondary);
+      border: 0.5px solid var(--color-border);
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
+      z-index: 100;
+      transition: background-color 0.2s;
+    }
+
+    .menu-button:hover {
+      background: var(--color-border);
+    }
+
+    .menu-button span {
+      width: 24px;
+      height: 2px;
+      background: var(--color-text);
+      display: block;
+    }
+
+    .side-menu {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 50%;
+      height: 100vh;
+      background: var(--color-bg-primary);
+      border-left: 0.5px solid var(--color-border);
+      box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 99;
+      overflow-y: auto;
+    }
+
+    .side-menu.active {
+      transform: translateX(0);
+    }
+
+    .menu-close {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 30px;
+      height: 30px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--color-text);
+    }
+
+    .menu-content {
+      padding: 4rem 2rem 2rem;
+    }
+
+    .menu-title {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 2rem;
+      color: var(--color-text);
+    }
+
+    .article-option {
+      padding: 1.5rem;
+      border: 0.5px solid var(--color-border);
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .article-option:hover {
+      background: var(--color-bg-secondary);
+      border-color: var(--color-text-muted);
+    }
+
+    .article-option h3 {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: var(--color-text);
+    }
+
+    .article-option p {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 98;
+    }
+
+    .menu-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .controls {
+      max-width: 1400px;
+      margin: 0 auto 1.5rem;
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      align-items: center;
+      padding: 1rem;
+      background: var(--color-bg-secondary);
+      border-radius: 4px;
+      border: 0.5px solid var(--color-border);
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .control-group label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #666;
+    }
+
+    .control-group select,
+    .control-group input {
+      padding: 6px 8px;
+      border: 0.5px solid var(--color-border);
+      border-radius: 4px;
+      font-size: 13px;
+      background: var(--color-bg-primary);
+      color: var(--color-text);
+    }
+
+    .csv-input {
+      cursor: pointer;
+    }
+
+    #chart {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .axis {
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+
+    .axis-label {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      font-weight: 500;
+    }
+
+    .axis path,
+    .axis line {
+      stroke: none;
+    }
+
+    .grid-line {
+      stroke: var(--color-grid-line);
+      stroke-width: 0.5;
+      stroke-dasharray: 2;
+    }
+
+    .stage-line {
+      stroke: var(--color-stage-line);
+      stroke-width: 2;
+      opacity: 0.6;
+    }
+
+    .base-dot {
+      fill: var(--color-base-dot);
+      opacity: 1;
+    }
+
+    .participation-circle {
+      fill-opacity: 0.5;
+      stroke-width: 1.5;
+    }
+
+    .concentric-circle {
+      fill: none;
+      stroke: var(--color-concentric);
+      stroke-width: 1;
+      opacity: 0.6;
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 500;
+      fill: var(--color-text);
+    }
+
+    .tooltip {
+      position: absolute;
+      background: var(--color-bg-secondary);
+      border: 0.5px solid var(--color-border);
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 12px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .tooltip.active {
+      opacity: 1;
+    }
+
+    .legend {
+      max-width: 1400px;
+      margin: 2rem auto 0;
+      padding: 1rem;
+      background: var(--color-bg-secondary);
+      border-radius: 4px;
+      border: 0.5px solid var(--color-border);
+      font-size: 12px;
+    }
+
+    .legend-item {
+      display: inline-block;
+      margin-right: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .legend-color {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-base-dot: #666666;
+        --color-stage-line: #666666;
+        --color-grid-line: #404040;
+        --color-concentric: #ffffff;
+        --color-text: #f0f0f0;
+        --color-text-muted: #a0a0a0;
+        --color-bg-primary: #1a1a1a;
+        --color-bg-secondary: #2a2a2a;
+        --color-border: #444;
+      }
+
+      body {
+        background: var(--color-bg-primary);
+      }
+
+      .menu-button:hover {
+        background: #333;
+      }
+    }
+  </style>
 </head>
-
-
-
-
-
 <body>
 
-<div class="hero">
-    <div class="hero-overlay">
-        <div class="hero-inner">
-            <div class="kicker">FIFA World Cupt</div>
-            <div class="title">Who has won it most?</div>
-            <div class="standfirst">
-                In a quiet world defined by repetition and refinement, mastery emerges through precision, patience, and time.
-            </div>
-        </div>
+<button class="menu-button" id="menuButton">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<div class="side-menu" id="sideMenu">
+  <button class="menu-close" id="menuClose">&times;</button>
+  <div class="menu-content">
+    <div class="menu-title">Articles</div>
+    
+    <div class="article-option" onclick="window.open('#article1')">
+      <h3>Understanding D3 Violin Plots</h3>
+      <p>A comprehensive guide to the code structure and logic behind interactive data visualizations using D3.js. Explore how hierarchical data is transformed and rendered into meaningful visual patterns.</p>
     </div>
+
+    <div class="article-option" onclick="window.open('#article2')">
+      <h3>World Cup Performance Analysis</h3>
+      <p>Deep dive into the statistical patterns of World Cup tournament results. Learn how confederation performance, historical trends, and country rankings reveal insights about international football competition.</p>
+    </div>
+  </div>
 </div>
 
-<div class="wrapper">
+<div class="controls">
+  <div class="control-group">
+    <label for="csvFileInput">Load CSV File:</label>
+    <input type="file" id="csvFileInput" class="csv-input" accept=".csv">
+  </div>
 
-    <div class="article">
+  <div class="control-group">
+    <label for="yAxisSelect">Y-Axis Display:</label>
+    <select id="yAxisSelect">
+      <option value="best">Best Result Year</option>
+      <option value="debut">Debut Year</option>
+    </select>
+  </div>
+</div>
 
-        <div class="byline">
-            By Editorial Studio • 
-<br>
-Photography by Placeholder • April 2026
-        </div>
+<div id="chart"></div>
+<div class="tooltip" id="tooltip"></div>
 
-       <p class="dropcap">The FIFA World Cup has long stood as the most prestigious stage in global football, a tournament where history, identity, and athletic excellence converge every four years. From the early dominance of Brazil national football team, whose five titles established a golden standard of expressive, attacking play, to the tactical rigor and institutional strength of European powers like Germany national football team, Italy national football team, and France national football team, the tournament has historically oscillated between South American flair and European efficiency. The late twentieth and early twenty-first centuries saw Europe consolidate its dominance, with multiple consecutive victories reinforcing the depth of its leagues and development systems. Yet, each World Cup also carries the promise of disruption, where emerging teams challenge established hierarchies. As the football world now looks toward the next edition, nations such as France, Argentina, Brazil, and England are once again considered favorites, supported by deep squads and global talent pipelines. At the same time, rising teams from Africa and Asia continue to narrow the gap, hinting at a more plural future. Against this historical and anticipatory backdrop, the 2022 FIFA World Cup stands out as one of the most dramatic and symbolically charged editions in recent memory, combining sporting excellence with narrative intensity from the group stages to one of the most extraordinary finals ever played.
-</p>
+<div class="legend" id="legend"></div>
 
-      <p>The group stage of the 2022 tournament immediately signaled that this World Cup would defy expectations. Hosted in Qatar under unprecedented climatic and logistical conditions, the compact nature of the आयोजन created a rhythm of continuous high-stakes matches. Early shocks disrupted conventional predictions, most notably when Saudi Arabia national football team defeated Argentina in one of the greatest upsets in World Cup history. This result not only destabilized Group C but also injected a sense of unpredictability across the tournament. Similarly, Japan’s victories over both Germany and Spain demonstrated tactical discipline and resilience, highlighting the growing competitiveness of Asian football. African teams also made a strong impression, with Morocco and Senegal advancing to the knockout stages. Meanwhile, traditional powers such as France and Brazil navigated the group phase with relative confidence, showcasing their depth even when rotating squads. The group stage thus became a space of narrative proliferation, where underdogs asserted themselves and favorites were forced to adapt quickly. The density of matches and the absence of long travel distances contributed to a high tempo, intensifying both physical demands and emotional stakes. By the end of this phase, the tournament had already established a tone of volatility, setting the stage for a knockout round defined by both expected excellence and surprising breakthroughs.
-</p>
+<script>
+// Menu functionality
+const menuButton = document.getElementById("menuButton");
+const sideMenu = document.getElementById("sideMenu");
+const menuOverlay = document.getElementById("menuOverlay");
+const menuClose = document.getElementById("menuClose");
 
-<iframe title="World Cup: host countries
-(1930-2022)" aria-label="Symbol map" id="datawrapper-chart-kaZsl" src="https://datawrapper.dwcdn.net/kaZsl/7/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="427" data-external="1"></iframe><script type="text/javascript">window.addEventListener("message",function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r,i=0;r=e[i];i++)if(r.contentWindow===a.source){var d=a.data["datawrapper-height"][t]+"px";r.style.height=d}}});</script>
+menuButton.addEventListener("click", () => {
+  sideMenu.classList.add("active");
+  menuOverlay.classList.add("active");
+});
 
-  <div class="divider"></div>
+menuClose.addEventListener("click", () => {
+  sideMenu.classList.remove("active");
+  menuOverlay.classList.remove("active");
+});
 
+menuOverlay.addEventListener("click", () => {
+  sideMenu.classList.remove("active");
+  menuOverlay.classList.remove("active");
+});
 
+// Color mapping
+const confColorsActual = {
+  "UEFA": "#378ADD",
+  "CONMEBOL": "#D85A30",
+  "AFC": "#639922",
+  "CAF": "#BA7517",
+  "CONCACAF": "#7F77DD"
+};
 
+// Map stage names to numeric values for x-axis
+const stageMap = {
+  "Champions": 5,
+  "Runners-up": 4.5,
+  "Third place": 4.2,
+  "Fourth place": 4,
+  "Semi-finals": 3.8,
+  "Quarter-finals": 3,
+  "Round of 16": 2,
+  "Group stage": 1
+};
 
-      <p class="dropcap">As the tournament progressed into the round of sixteen, the tension between established القوة and emergent challengers became more pronounced. France demonstrated their attacking prowess with a commanding victory over Poland, led by the brilliance of Kylian Mbappé, whose pace and precision made him one of the standout players of the tournament. Argentina, recovering from their initial setback, began to build momentum, with Lionel Messi orchestrating play with a blend of vision and determination that suggested a deeper narrative arc. England displayed tactical coherence and squad depth, while Brazil reaffirmed their status as favorites with fluid attacking football. Yet, the round of sixteen also preserved the tournament’s unpredictability. Morocco’s disciplined defensive structure and strategic adaptability allowed them to overcome Spain in a dramatic penalty shootout, signaling the emergence of a new contender. Similarly, Croatia’s resilience once again carried them through a tightly contested match, reinforcing their reputation as a الفريق capable of thriving under pressure. This phase of the tournament thus functioned as a filtration process, where the balance between technical quality and मानसिक strength became निर्णायक. The teams that advanced were not only those with superior talent but also those capable of navigating the psychological intensity of knockout football.
-</p>
+// Stage labels for x-axis
+const stageLabels = {
+  1: "Group",
+  2: "R16",
+  3: "QF",
+  3.8: "SF",
+  4: "4th",
+  4.2: "3rd",
+  4.5: "Final",
+  5: "Winner"
+};
 
+// CSV Loader Function
+function loadAndProcessCSV(filePath) {
+  d3.csv(filePath).then(function(csvData) {
+    // Transform CSV data into JSON structure suitable for the plot
+    const transformedData = csvData.map(d => {
+      // Extract best result year from "Best result year" column (format: "Champions, (1966)")
+      const bestResultMatch = d["Best result year"] ? d["Best result year"].match(/\((\d{4})\)/) : null;
+      const bestYear = bestResultMatch ? parseInt(bestResultMatch[1]) : null;
+      
+      // Extract best result stage name
+      const bestResult = d["Best result"] ? d["Best result"].trim() : "Group stage";
+      
+      // Parse appearances (integer)
+      const appearances = parseInt(d["Appearances"]) || 0;
+      
+      // Parse debut year (integer)
+      const debutYear = parseInt(d["Debut"]) || null;
+      
+      // Count how many times the best result was achieved (simplified: based on provided data structure)
+      const timesAchieved = appearances > 0 ? 1 : 0;
+      
+      // Get confederation
+      const confederation = d["Confederation"] ? d["Confederation"].trim() : "Unknown";
+      
+      return {
+        team: d["Team"] ? d["Team"].trim() : "Unknown",
+        appearances: appearances,
+        bestResult: bestResult,
+        bestYear: bestYear,
+        debutYear: debutYear,
+        timesAchieved: timesAchieved,
+        confederation: confederation,
+        stageValue: stageMap[bestResult] || 1,
+        x: stageMap[bestResult] || 1,
+        y_best: bestYear,
+        y_debut: debutYear,
+        radius: Math.sqrt(appearances) * 3
+      };
+    });
 
+    console.log("Transformed Data:", transformedData);
+    
+    // Re-render the visualization with new data
+    renderVisualization(transformedData);
+  }).catch(function(error) {
+    console.error("Error loading CSV file:", error);
+    alert("Error loading CSV file. Please check the file format and path.");
+  });
+}
 
-      <p>The quarterfinals of the 2022 World Cup marked a decisive escalation in drama and quality, producing matches that will be remembered for their intensity and narrative richness. One of the most striking outcomes was Morocco’s victory over Portugal, making them the first African nation to reach the semifinals of the tournament. This achievement resonated far beyond the pitch, symbolizing a تاریخی breakthrough for African and Arab football. Morocco’s success was built on a combination of defensive solidity, collective discipline, and moments of attacking precision, challenging the assumption that tactical sophistication is the exclusive domain of traditional powers. In another quarterfinal, Argentina faced the Netherlands in a match that oscillated between control and chaos, ultimately culminating in a penalty shootout victory for the South Americans. This game encapsulated the emotional volatility of the tournament, with moments of brilliance interspersed with tension and confrontation. Croatia continued their remarkable run by defeating Brazil, once again relying on their composure in निर्णायक moments. France, meanwhile, overcame England in a high-quality encounter that highlighted both teams’ attacking capabilities and strategic depth. The quarterfinals thus crystallized the tournament’s central themes: the coexistence of tradition and disruption, the महत्व of mental resilience, and the capacity of football to generate narratives that transcend the boundaries of sport.
-</p>
+// Handle CSV file input
+document.getElementById("csvFileInput").addEventListener("change", function(event) {
+  const file = event.target.files[0];
+  if (file) {
+    // Create a FileReader to read the file
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const csvContent = e.target.result;
+      // Parse CSV using D3
+      const csvData = d3.csvParse(csvContent);
+      
+      // Transform CSV data into JSON structure
+      const transformedData = csvData.map(d => {
+        const bestResultMatch = d["Best result year"] ? d["Best result year"].match(/\((\d{4})\)/) : null;
+        const bestYear = bestResultMatch ? parseInt(bestResultMatch[1]) : null;
+        
+        const bestResult = d["Best result"] ? d["Best result"].trim() : "Group stage";
+        const appearances = parseInt(d["Appearances"]) || 0;
+        const debutYear = parseInt(d["Debut"]) || null;
+        const timesAchieved = appearances > 0 ? 1 : 0;
+        const confederation = d["Confederation"] ? d["Confederation"].trim() : "Unknown";
+        
+        return {
+          team: d["Team"] ? d["Team"].trim() : "Unknown",
+          appearances: appearances,
+          bestResult: bestResult,
+          bestYear: bestYear,
+          debutYear: debutYear,
+          timesAchieved: timesAchieved,
+          confederation: confederation,
+          stageValue: stageMap[bestResult] || 1,
+          x: stageMap[bestResult] || 1,
+          y_best: bestYear,
+          y_debut: debutYear,
+          radius: Math.sqrt(appearances) * 3
+        };
+      });
 
-<div class="flourish-embed flourish-chart" data-src="visualisation/11799036"><script src="https://public.flourish.studio/resources/embed.js"></script><noscript><img src="https://public.flourish.studio/visualisation/11799036/thumbnail" width="100%" alt="visualization" /></noscript></div>
+      console.log("CSV Loaded and Transformed:", transformedData);
+      renderVisualization(transformedData);
+    };
+    reader.readAsText(file);
+  }
+});
 
+// Default data
+const defaultData = [
+  { team: "Switzerland", appearances: 13, bestResult: "Quarter-finals", bestYear: 1954, debutYear: 1934, timesAchieved: 1, confederation: "UEFA", stageValue: 3, x: 3, y_best: 1954, y_debut: 1934, radius: Math.sqrt(13) * 3 },
+  { team: "Algeria", appearances: 5, bestResult: "Round of 16", bestYear: 2014, debitYear: 1982, timesAchieved: 1, confederation: "CAF", stageValue: 2, x: 2, y_best: 2014, y_debut: 1982, radius: Math.sqrt(5) * 3 },
+  { team: "Angola", appearances: 1, bestResult: "Group stage", bestYear: 2006, debutYear: 2006, timesAchieved: 1, confederation: "CAF", stageValue: 1, x: 1, y_best: 2006, y_debut: 2006, radius: Math.sqrt(1) * 3 },
+  { team: "Argentina", appearances: 19, bestResult: "Champions", bestYear: 1978, debutYear: 1930, timesAchieved: 3, confederation: "CONMEBOL", stageValue: 5, x: 5, y_best: 1978, y_debut: 1930, radius: Math.sqrt(19) * 3 },
+  { team: "Australia", appearances: 7, bestResult: "Round of 16", bestYear: 2006, debutYear: 1974, timesAchieved: 2, confederation: "AFC", stageValue: 2, x: 2, y_best: 2006, y_debut: 1974, radius: Math.sqrt(7) * 3 },
+  { team: "Austria", appearances: 8, bestResult: "Third place", bestYear: 1954, debutYear: 1934, timesAchieved: 1, confederation: "UEFA", stageValue: 4.2, x: 4.2, y_best: 1954, y_debut: 1934, radius: Math.sqrt(8) * 3 },
+  { team: "Belgium", appearances: 15, bestResult: "Third place", bestYear: 2018, debutYear: 1930, timesAchieved: 2, confederation: "UEFA", stageValue: 4.2, x: 4.2, y_best: 2018, y_debut: 1930, radius: Math.sqrt(15) * 3 },
+  { team: "Bolivia", appearances: 3, bestResult: "Group stage", bestYear: 1994, debutYear: 1930, timesAchieved: 3, confederation: "CONMEBOL", stageValue: 1, x: 1, y_best: 1994, y_debut: 1930, radius: Math.sqrt(3) * 3 },
+  { team: "Bosnia and Herzegovina", appearances: 1, bestResult: "Group stage", bestYear: 2026, debutYear: 2026, timesAchieved: 1, confederation: "UEFA", stageValue: 1, x: 1, y_best: 2026, y_debut: 2026, radius: Math.sqrt(1) * 3 },
+  { team: "Brazil", appearances: 23, bestResult: "Champions", bestYear: 2002, debutYear: 1930, timesAchieved: 5, confederation: "CONMEBOL", stageValue: 5, x: 5, y_best: 2002, y_debut: 1930, radius: Math.sqrt(23) * 3 }
+];
 
-         <p>The semifinals further intensified these dynamics, narrowing the field to four teams whose journeys reflected different pathways to success. Argentina’s victory over Croatia was marked by a commanding performance that combined tactical discipline with individual brilliance, particularly from Lionel Messi, whose influence permeated every phase of play. This match underscored Argentina’s transformation from a թիմ shaken by an early defeat into a cohesive and confident contender. On the other side of the bracket, France faced Morocco in a match that juxtaposed the defending champions’ अनुभव with the underdogs’ historic momentum. France ultimately prevailed, but Morocco’s performance reinforced their status as one of the tournament’s defining stories, demonstrating that strategic organization and collective belief can challenge even the most formidable opponents. The semifinals thus set the stage for a final that carried profound narrative weight: a confrontation between two footballing traditions, embodied by Argentina and France, and two generational talents, Lionel Messi and Kylian Mbappé. This convergence of individual and collective narratives transformed the final into more than a मैच; it became a symbolic event, representing the continuity and evolution of the sport.
-</p>
+// Main visualization function
+let currentYAxis = "best";
+let currentData = defaultData;
 
-
-<iframe title="FIFA men rankings" aria-label="Dot Plot" id="datawrapper-chart-40Yr2" src="https://datawrapper.dwcdn.net/40Yr2/4/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="580" data-external="1"></iframe><script type="text/javascript">window.addEventListener("message",function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r,i=0;r=e[i];i++)if(r.contentWindow===a.source){var d=a.data["datawrapper-height"][t]+"px";r.style.height=d}}});</script>
-
-
-        <p class="dropcap">The final of the 2022 World Cup between Argentina and France is widely regarded as one of the greatest matches in the history of football. From the opening minutes, Argentina asserted control, executing a tactical plan that combined defensive solidity with incisive attacking transitions. Lionel Messi opened the scoring with a penalty, setting the tone for a performance that blended composure and creativity. Argentina extended their lead through a beautifully orchestrated team goal, seemingly placing them on the path to a comfortable victory. However, the match took a dramatic turn in the closing stages, as Kylian Mbappé scored twice in quick succession to bring France level, demonstrating extraordinary الفردي brilliance under الضغط. The game proceeded into extra time, where Messi once again appeared to निर्णायक, scoring to give Argentina the lead. Yet Mbappé responded with a third goal, completing a remarkable hat-trick and forcing the match into a penalty shootout. In this ultimate test of nerve, Argentina emerged victorious, securing their third World Cup title. The final encapsulated the essence of the tournament: unpredictability, emotional intensity, and the interplay between individual genius and collective effort. It also solidified Messi’s legacy as one of the greatest players in history, while affirming Mbappé’s status as a leading figure of the next generation.
-</p>
-
-<div class="flourish-embed flourish-chart" data-src="visualisation/11795323"><script src="https://public.flourish.studio/resources/embed.js"></script><noscript><img src="https://public.flourish.studio/visualisation/11795323/thumbnail" width="100%" alt="visualization" /></noscript></div>
-
-  <div class="divider"></div>
-
-      <p>Beyond the final, the 2022 World Cup will be remembered for its broader cultural and symbolic significance. Hosted in Qatar, it marked the first World Cup held in the Arab world, introducing new audiences and contexts to the global football narrative. The tournament’s आयोजन raised important discussions about infrastructure, labor, and the राजनीति of global sporting events, highlighting the complex العلاقة between sport and society. At the same time, the البطولة showcased football’s capacity to unite diverse communities, creating moments of shared emotion and collective memory. The success of teams like Morocco demonstrated the potential for كرة القدم to transcend traditional केंद्र-periphery dynamics, offering new representations of excellence. The tournament also emphasized the role of diaspora players and transnational identities, reflecting the increasingly interconnected nature of the sport. In this sense, the 2022 World Cup was not only a competition but also a cultural event, where questions of identity, शक्ति, and representation were negotiated on a global stage.
-</p>
-
-
-<iframe title="World Cup prize money, 2022" aria-label="Donut Chart" id="datawrapper-chart-3FbQu" src="https://datawrapper.dwcdn.net/3FbQu/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="488" data-external="1"></iframe><script type="text/javascript">window.addEventListener("message",function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r,i=0;r=e[i];i++)if(r.contentWindow===a.source){var d=a.data["datawrapper-height"][t]+"px";r.style.height=d}}});</script>
-
-
-          <p>As attention turns to the next World Cup, the legacies of 2022 continue to shape expectations and रणनीतियाँ. France remains a formidable contender, with a युवा yet experienced squad capable of sustaining high مستويات of performance. Argentina, buoyed by their victory, will seek to build on their success while navigating the transition to a post-Messi era. Brazil, consistently among the favorites, will aim to convert their abundant talent into a cohesive and decisive campaign. European teams such as England, Spain, and Germany are also expected to compete strongly, supported by robust domestic leagues and developmental प्रणालियाँ. Meanwhile, the progress of African and Asian teams suggests that future tournaments may feature a more diverse مجموعة of contenders. The expansion of the World Cup format is likely to further enhance this diversity, providing additional opportunities for emerging teams to gain experience and visibility. However, the structural advantages of established footballing nations remain significant, ensuring that the balance between continuity and परिवर्तन will continue to define the tournament.
-</p>
-
-      <p>In reflecting on the 2022 World Cup, it becomes clear that its significance lies not only in its نتائج but also in its narratives. From the shocks of the group stage to the historic achievements of underdog teams, and culminating in a final of extraordinary drama, the tournament exemplified the unpredictability and emotional शक्ति of football. It reaffirmed the enduring appeal of the World Cup as a global spectacle, capable of generating moments that resonate far beyond the میدان. At the same time, it highlighted the evolving nature of the sport, where नए actors and narratives continually reshape the landscape. The proportion of success may still be concentrated among traditional powers, but the pathways to that success are becoming more varied and contested. As the world anticipates the next edition, the memory of 2022 serves as both a benchmark and a प्रेरणा, reminding us that in football, as in life, the outcome is never predetermined, and the possibility of the unexpected remains ever present.
-</p>
-
-
-
-
-
-
-     
-
-
-<div class="divider"></div>
-
-
-   <div class="inset">
-            <div class="inset-title">Related insight</div>
-            <div class="inset-text">
-                Mastery often appears invisible to outsiders, but it is built on thousands of small, deliberate decisions.<br><br>
-            </div>
-   	    <div class="inset-title">Related insight</div>
-            <div class="inset-text">
-                Mastery often appears invisible to outsiders, but it is built on thousands of small, deliberate decisions.<br><br>
-            </div>
-        </div>
-
+function renderVisualization(data) {
+  currentData = data;
   
-    </div>
+  // Clear previous chart
+  d3.select("#chart").selectAll("svg").remove();
+  d3.select("#legend").selectAll("*").remove();
 
-    <div class="sidebar">
+  const margin = { top: 40, right: 60, bottom: 80, left: 80 };
+  const width = Math.min(1400, window.innerWidth - 40) - margin.left - margin.right;
+  const height = 600 - margin.top - margin.bottom;
 
-        <div class="card">
-            <div class="card-title">Related story</div>
-            <div class="card-text">Exploring the quiet rituals of traditional craftsmanship.</div>
-        </div>
+  const svg = d3.select("#chart")
+    .append("svg")
+    .attr("viewBox", [0, 0, width + margin.left + margin.right, height + margin.top + margin.bottom])
+    .attr("preserveAspectRatio", "xMinYMin meet")
+    .style("background-color", "var(--color-bg-primary)");
 
-        <div class="card">
-            <div class="card-title">More features</div>
-            <div class="card-text">Inside the discipline of world-class artisans.</div>
-        </div>
+  const g = svg.append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
 
-        <div class="card">
-            <div class="card-title">Read next</div>
-            <div class="card-text">How mastery evolves over decades of repetition.</div>
-        </div>
+  const xScale = d3.scaleLinear()
+    .domain([0.5, 5.5])
+    .range([0, width]);
 
-    </div>
+  const yScale = d3.scaleLinear()
+    .domain([1930, 2030])
+    .range([height, 0]);
 
-</div>
+  const radiusScale = d3.scaleSqrt()
+    .domain([1, 23])
+    .range([4, 20]);
+
+  // Grid and stage lines
+  const gridGroup = g.append("g").attr("class", "grid-group");
+  const stageLineGroup = g.append("g").attr("class", "stage-line-group");
+  const dotsGroup = g.append("g").attr("class", "dots-group");
+
+  // Grid lines
+  gridGroup.selectAll(".grid-line-x")
+    .data(xScale.ticks(8))
+    .enter()
+    .append("line")
+    .attr("class", "grid-line")
+    .attr("x1", d => xScale(d))
+    .attr("x2", d => xScale(d))
+    .attr("y1", 0)
+    .attr("y2", height);
+
+  gridGroup.selectAll(".grid-line-y")
+    .data(yScale.ticks(10))
+    .enter()
+    .append("line")
+    .attr("class", "grid-line")
+    .attr("x1", 0)
+    .attr("x2", width)
+    .attr("y1", d => yScale(d))
+    .attr("y2", d => yScale(d));
+
+  // Stage lines
+  const stagePositions = [1, 2, 3, 3.8, 4, 4.2, 4.5, 5];
+  stageLineGroup.selectAll(".stage-line")
+    .data(stagePositions)
+    .enter()
+    .append("line")
+    .attr("class", "stage-line")
+    .attr("x1", d => xScale(d) + 80)
+    .attr("x2", d => xScale(d) + 80)
+    .attr("y1", 110)
+    .attr("y2", height)
+    .attr("stroke-width", 2);
+
+  // Overlap avoidance
+  function resolveOverlaps(dataSet, xScale, yScale) {
+    const padding = 15;
+    const maxIterations = 100;
+    let iterations = 0;
+    let overlaps = true;
+
+    while (overlaps && iterations < maxIterations) {
+      overlaps = false;
+      iterations++;
+
+      for (let i = 0; i < dataSet.length; i++) {
+        for (let j = i + 1; j < dataSet.length; j++) {
+          const d1 = dataSet[i];
+          const d2 = dataSet[j];
+
+          if (d1.x === d2.x && d1.currentY === d2.currentY) {
+            const x1 = xScale(d1.x);
+            const y1 = yScale(d1.currentY);
+            const x2 = xScale(d2.x);
+            const y2 = yScale(d2.currentY);
+
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const minDist = d1.radius + d2.radius + padding;
+
+            if (distance < minDist) {
+              overlaps = true;
+              const angle = Math.atan2(dy, dx);
+              const moveDistance = (minDist - distance) / 2;
+              
+              d1.offsetX = (d1.offsetX || 0) - Math.cos(angle) * moveDistance;
+              d1.offsetY = (d1.offsetY || 0) - Math.sin(angle) * moveDistance;
+              d2.offsetX = (d2.offsetX || 0) + Math.cos(angle) * moveDistance;
+              d2.offsetY = (d2.offsetY || 0) + Math.sin(angle) * moveDistance;
+            }
+          }
+        }
+      }
+    }
+
+    return dataSet;
+  }
+
+  // Prepare data for visualization
+  const yValue = currentYAxis === "best" ? "y_best" : "y_debut";
+  const dataWithY = data.map(d => ({
+    ...d,
+    currentY: d[yValue],
+    offsetX: 0,
+    offsetY: 0
+  }));
+
+  resolveOverlaps(dataWithY, xScale, yScale);
+
+  const tooltip = d3.select("#tooltip");
+
+  // Draw nodes
+  const nodeGroups = dotsGroup.selectAll(".node-group")
+    .data(dataWithY)
+    .enter()
+    .append("g")
+    .attr("class", "node-group")
+    .attr("transform", d => `translate(${xScale(d.x) + d.offsetX},${yScale(d.currentY) + d.offsetY})`);
+
+  nodeGroups.append("circle")
+    .attr("class", "base-dot")
+    .attr("r", 2);
+
+  nodeGroups.append("circle")
+    .attr("class", "participation-circle")
+    .attr("r", d => radiusScale(d.appearances))
+    .attr("fill", d => confColorsActual[d.confederation] || "#999")
+    .attr("stroke", d => confColorsActual[d.confederation] || "#999");
+
+  nodeGroups.each(function(d) {
+    if (d.timesAchieved > 1) {
+      for (let i = 1; i < d.timesAchieved; i++) {
+        d3.select(this).append("circle")
+          .attr("class", "concentric-circle")
+          .attr("r", radiusScale(d.appearances) + (i * 5));
+      }
+    }
+  });
+
+  nodeGroups.on("mouseover", function(event, d) {
+    const yearLabel = currentYAxis === "best" ? `Best Year: ${d.bestYear}` : `Debut Year: ${d.debutYear}`;
+    tooltip.classed("active", true)
+      .html(`<strong>${d.team}</strong><br/>
+             Stage: ${d.bestResult}<br/>
+             ${yearLabel}<br/>
+             Appearances: ${d.appearances}<br/>
+             Times Achieved: ${d.timesAchieved}<br/>
+             Confederation: ${d.confederation}`)
+      .style("left", (event.pageX + 10) + "px")
+      .style("top", (event.pageY - 10) + "px");
+  })
+  .on("mousemove", function(event) {
+    tooltip.style("left", (event.pageX + 10) + "px")
+      .style("top", (event.pageY - 10) + "px");
+  })
+  .on("mouseout", function() {
+    tooltip.classed("active", false);
+  });
+
+  // Axes
+  const xAxis = d3.axisBottom(xScale)
+    .tickValues([1, 2, 3, 3.8, 4, 4.2, 4.5, 5])
+    .tickFormat(d => stageLabels[d] || "");
+
+  g.append("g")
+    .attr("transform", `translate(0,${height})`)
+    .call(xAxis)
+    .attr("class", "axis");
+
+  const yAxis = d3.axisLeft(yScale)
+    .tickFormat(d3.format("d"));
+
+  g.append("g")
+    .attr("class", "axis axis-y")
+    .call(yAxis);
+
+  // Axis labels
+  g.append("text")
+    .attr("x", width / 2)
+    .attr("y", height + 65)
+    .attr("class", "axis-label")
+    .style("text-anchor", "middle")
+    .text("Best World Cup Stage Reached");
+
+  const yAxisLabel = currentYAxis === "best" ? "Year of Best Result" : "Debut Year";
+  g.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", -65)
+    .attr("x", -height / 2)
+    .attr("class", "axis-label")
+    .style("text-anchor", "middle")
+    .text(yAxisLabel);
+
+  // Title
+  svg.append("text")
+    .attr("x", (width + margin.left + margin.right) / 2)
+    .attr("y", 25)
+    .attr("text-anchor", "middle")
+    .attr("class", "title")
+    .text("World Cup Performance: Best Results by Stage and Year");
+
+  // Legend
+  const legendContainer = d3.select("#legend");
+  legendContainer.append("div")
+    .style("font-weight", "500")
+    .style("margin-bottom", "0.5rem")
+    .text("Visual Structure:");
+
+  const legendItems = [
+    "Gray dot = country coordinate point",
+    "Colored circle = participation count (size proportional to appearances)",
+    "Concentric rings = multiple achievements at same best stage"
+  ];
+
+  legendItems.forEach(item => {
+    legendContainer.append("div")
+      .attr("class", "legend-item")
+      .style("display", "block")
+      .style("margin-bottom", "0.3rem")
+      .text(item);
+  });
+
+  legendContainer.append("div")
+    .style("margin-top", "1rem")
+    .style("font-weight", "500")
+    .style("margin-bottom", "0.5rem")
+    .text("Confederations:");
+
+  Object.keys(confColorsActual).forEach(conf => {
+    const item = legendContainer.append("div")
+      .attr("class", "legend-item");
+    
+    item.append("span")
+      .attr("class", "legend-color")
+      .style("background", confColorsActual[conf]);
+    
+    item.append("span")
+      .text(conf);
+  });
+}
+
+// Y-axis toggle
+document.getElementById("yAxisSelect").addEventListener("change", function(e) {
+  currentYAxis = e.target.value;
+  renderVisualization(currentData);
+});
+
+// Initial render
+renderVisualization(defaultData);
+
+</script>
 
 </body>
 </html>
