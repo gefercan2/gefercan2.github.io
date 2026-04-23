@@ -1,0 +1,330 @@
+/* ============================================================
+   DESIGN STUDIO — DESIGN TOKENS
+   Bauhaus / Dada inspired. Bold, minimal, structural.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+
+/* ============================================================
+   COLOR TOKENS
+   ============================================================ */
+
+:root {
+
+  /* --- Absolute --- */
+  --c-black:        #000000;
+  --c-white:        #FFFFFF;
+
+  /* --- Accent (Bauhaus Primaries) --- */
+  --c-red:          #D72B2B;
+  --c-red-dark:     #A01E1E;
+  --c-red-light:    #F04040;
+
+  --c-yellow:       #F0C000;
+  --c-yellow-dark:  #C49900;
+  --c-yellow-light: #FFD740;
+
+  --c-blue:         #1533C0;
+  --c-blue-dark:    #0E228A;
+  --c-blue-light:   #2B4EE0;
+
+  /* --- Toned Greys --- */
+  --c-grey-100:     #F2F2F0;
+  --c-grey-200:     #E0E0DC;
+  --c-grey-300:     #CCCCCA;
+  --c-grey-400:     #AAAAAA;
+  --c-grey-500:     #888884;
+  --c-grey-600:     #666662;
+  --c-grey-700:     #444442;
+  --c-grey-800:     #2C2C2A;
+  --c-grey-900:     #1A1A18;
+
+  /* --- Semantic Colors --- */
+  --color-bg:             var(--c-white);
+  --color-bg-inverse:     var(--c-black);
+  --color-bg-muted:       var(--c-grey-100);
+  --color-bg-subtle:      var(--c-grey-200);
+
+  --color-fg:             var(--c-black);
+  --color-fg-inverse:     var(--c-white);
+  --color-fg-muted:       var(--c-grey-500);
+  --color-fg-subtle:      var(--c-grey-700);
+
+  --color-border:         var(--c-black);
+  --color-border-muted:   var(--c-grey-300);
+  --color-border-subtle:  var(--c-grey-200);
+
+  --color-accent:         var(--c-red);
+  --color-accent-2:       var(--c-yellow);
+  --color-accent-3:       var(--c-blue);
+
+  --color-link:           var(--c-black);
+  --color-link-hover:     var(--c-red);
+
+
+  /* ============================================================
+     TYPOGRAPHY TOKENS
+     ============================================================ */
+
+  --font-display:   'Bebas Neue', 'Arial Narrow', sans-serif;
+  --font-body:      'Space Grotesk', 'Helvetica Neue', sans-serif;
+  --font-mono:      'Space Mono', 'Courier New', monospace;
+
+  /* --- Type Scale (px base 16) --- */
+  --text-xs:    0.75rem;    /* 12px */
+  --text-sm:    0.875rem;   /* 14px */
+  --text-base:  1rem;       /* 16px */
+  --text-md:    1.125rem;   /* 18px */
+  --text-lg:    1.375rem;   /* 22px */
+  --text-xl:    1.75rem;    /* 28px */
+  --text-2xl:   2.25rem;    /* 36px */
+  --text-3xl:   3rem;       /* 48px */
+  --text-4xl:   4.5rem;     /* 72px */
+  --text-5xl:   7rem;       /* 112px */
+  --text-6xl:   10rem;      /* 160px */
+
+  /* --- Type Weights --- */
+  --weight-light:   300;
+  --weight-regular: 400;
+  --weight-medium:  500;
+  --weight-semibold:600;
+  --weight-bold:    700;
+
+  /* --- Line Heights --- */
+  --leading-none:   1;
+  --leading-tight:  1.05;
+  --leading-snug:   1.2;
+  --leading-normal: 1.5;
+  --leading-loose:  1.75;
+
+  /* --- Letter Spacing --- */
+  --tracking-tight:   -0.03em;
+  --tracking-normal:   0em;
+  --tracking-wide:     0.05em;
+  --tracking-wider:    0.1em;
+  --tracking-widest:   0.2em;
+
+
+  /* ============================================================
+     SEMANTIC TYPE ROLES
+     ============================================================ */
+
+  /* Display / Hero */
+  --type-display-font:     var(--font-display);
+  --type-display-size:     var(--text-5xl);
+  --type-display-leading:  var(--leading-none);
+  --type-display-tracking: var(--tracking-tight);
+  --type-display-weight:   var(--weight-regular); /* Bebas is inherently bold */
+  --type-display-transform:uppercase;
+
+  /* H1 */
+  --type-h1-font:     var(--font-display);
+  --type-h1-size:     var(--text-4xl);
+  --type-h1-leading:  var(--leading-none);
+  --type-h1-tracking: var(--tracking-tight);
+  --type-h1-weight:   var(--weight-regular);
+  --type-h1-transform:uppercase;
+
+  /* H2 */
+  --type-h2-font:     var(--font-body);
+  --type-h2-size:     var(--text-2xl);
+  --type-h2-leading:  var(--leading-snug);
+  --type-h2-tracking: var(--tracking-tight);
+  --type-h2-weight:   var(--weight-bold);
+  --type-h2-transform:none;
+
+  /* H3 */
+  --type-h3-font:     var(--font-body);
+  --type-h3-size:     var(--text-xl);
+  --type-h3-leading:  var(--leading-snug);
+  --type-h3-tracking: var(--tracking-normal);
+  --type-h3-weight:   var(--weight-semibold);
+  --type-h3-transform:none;
+
+  /* Body */
+  --type-body-font:     var(--font-body);
+  --type-body-size:     var(--text-base);
+  --type-body-leading:  var(--leading-normal);
+  --type-body-tracking: var(--tracking-normal);
+  --type-body-weight:   var(--weight-regular);
+
+  /* Body Small */
+  --type-small-font:     var(--font-body);
+  --type-small-size:     var(--text-sm);
+  --type-small-leading:  var(--leading-normal);
+  --type-small-tracking: var(--tracking-normal);
+  --type-small-weight:   var(--weight-regular);
+
+  /* Label / Tag */
+  --type-label-font:     var(--font-body);
+  --type-label-size:     var(--text-xs);
+  --type-label-leading:  var(--leading-none);
+  --type-label-tracking: var(--tracking-widest);
+  --type-label-weight:   var(--weight-semibold);
+  --type-label-transform:uppercase;
+
+  /* Mono */
+  --type-mono-font:     var(--font-mono);
+  --type-mono-size:     var(--text-sm);
+  --type-mono-leading:  var(--leading-normal);
+  --type-mono-tracking: var(--tracking-normal);
+  --type-mono-weight:   var(--weight-regular);
+
+
+  /* ============================================================
+     SPACING TOKENS
+     ============================================================ */
+
+  --space-0:    0;
+  --space-1:    0.25rem;   /* 4px  */
+  --space-2:    0.5rem;    /* 8px  */
+  --space-3:    0.75rem;   /* 12px */
+  --space-4:    1rem;      /* 16px */
+  --space-5:    1.25rem;   /* 20px */
+  --space-6:    1.5rem;    /* 24px */
+  --space-8:    2rem;      /* 32px */
+  --space-10:   2.5rem;    /* 40px */
+  --space-12:   3rem;      /* 48px */
+  --space-16:   4rem;      /* 64px */
+  --space-20:   5rem;      /* 80px */
+  --space-24:   6rem;      /* 96px */
+  --space-32:   8rem;      /* 128px */
+  --space-48:   12rem;     /* 192px */
+
+  /* --- Border Widths --- */
+  --border-1:   1px;
+  --border-2:   2px;
+  --border-3:   3px;
+  --border-4:   4px;
+  --border-6:   6px;
+  --border-8:   8px;
+
+  /* --- Corner Radii --- */
+  --radius-none:   0;       /* Default — everything is orthogonal */
+  --radius-full:   9999px; /* Only for pill/circle use cases */
+
+  /* --- Z-index --- */
+  --z-base:     0;
+  --z-raised:   10;
+  --z-overlay:  100;
+  --z-modal:    1000;
+  --z-top:      9999;
+
+  /* --- Animation --- */
+  --ease-out:       cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:        cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-inout:     cubic-bezier(0.45, 0, 0.55, 1);
+  --duration-fast:  120ms;
+  --duration-base:  200ms;
+  --duration-slow:  350ms;
+
+}
+
+/* ============================================================
+   BASE RESET + GLOBAL STYLES
+   ============================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--type-body-size);
+  line-height: var(--leading-normal);
+  color: var(--color-fg);
+  background-color: var(--color-bg);
+}
+
+/* --- Semantic HTML defaults --- */
+
+h1 {
+  font-family: var(--type-h1-font);
+  font-size: var(--type-h1-size);
+  line-height: var(--type-h1-leading);
+  letter-spacing: var(--type-h1-tracking);
+  font-weight: var(--type-h1-weight);
+  text-transform: var(--type-h1-transform);
+}
+
+h2 {
+  font-family: var(--type-h2-font);
+  font-size: var(--type-h2-size);
+  line-height: var(--type-h2-leading);
+  letter-spacing: var(--type-h2-tracking);
+  font-weight: var(--type-h2-weight);
+}
+
+h3 {
+  font-family: var(--type-h3-font);
+  font-size: var(--type-h3-size);
+  line-height: var(--type-h3-leading);
+  font-weight: var(--type-h3-weight);
+}
+
+p {
+  font-family: var(--font-body);
+  font-size: var(--type-body-size);
+  line-height: var(--leading-normal);
+  max-width: 65ch;
+}
+
+a {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+a:hover {
+  color: var(--color-link-hover);
+}
+
+code, pre {
+  font-family: var(--font-mono);
+  font-size: var(--type-mono-size);
+}
+
+/* --- Utility classes --- */
+
+.display {
+  font-family: var(--font-display);
+  font-size: var(--type-display-size);
+  line-height: var(--leading-none);
+  letter-spacing: var(--tracking-tight);
+  text-transform: uppercase;
+}
+
+.label {
+  font-family: var(--font-body);
+  font-size: var(--type-label-size);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.rule {
+  border: none;
+  border-top: var(--border-4) solid var(--c-black);
+  margin: var(--space-8) 0;
+}
+
+.rule--thin {
+  border-top-width: var(--border-1);
+  border-color: var(--c-grey-300);
+}
+
+.rule--accent {
+  border-color: var(--c-red);
+}

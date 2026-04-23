@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style data-omelette-injected>html,body{background:transparent}</style><script data-omelette-injected>(()=>{var $=["https://claude.ai","https://preview.claude.ai","https://eap-omelette.claude.ai"];var F=30000;var A=3000;document.addEventListener("DOMContentLoaded",()=>{const Q="transform-react-jsx-source";document.querySelectorAll('script[type="text/babel"],script[type="text/jsx"]').forEach((J,V)=>{const X=J.getAttribute("data-plugins")||"";if(X.indexOf(Q)<0){J.setAttribute("data-plugins",X?`${X},${Q}`:Q)}if(!J.hasAttribute("data-filename")){J.setAttribute("data-filename",J.getAttribute("src")||`inline-${V}`)}})});var W=window.parent;if(W&&W!==window){const Q=(z,k)=>{try{W.postMessage({__omelette_log:true,type:z,data:k},"*")}catch{}};["log","warn","error"].forEach((z)=>{const k=console[z];console[z]=(...C)=>{const D=C.map((w)=>{try{return typeof w==="object"?JSON.stringify(w):String(w)}catch{try{return String(w)}catch{return"[unstringifiable]"}}}).join(" ");Q(z,D);k.apply(console,C)}});window.addEventListener("error",(z)=>{const k=z.target;if(k&&k!==window&&k.tagName){const C=k.src||k.href||"";Q("resource_error",`${k.tagName} failed to load: ${C}`)}else{Q("error",`${z.message||"Unknown error"} at ${z.filename||"?"}:${z.lineno||0}:${z.colno||0}`)}},true);window.addEventListener("unhandledrejection",(z)=>{const k=z.reason;const C=k instanceof Error?`${k.message} ${k.stack}`:String(k);Q("error",`Unhandled rejection: ${C}`)});const J=()=>{try{W.postMessage({type:"omelette:height",height:document.documentElement.scrollHeight},"*")}catch{}};if(document.readyState==="complete")J();else window.addEventListener("load",J);if(window.ResizeObserver)new ResizeObserver(J).observe(document.documentElement);const V={};let X=0;window.claude={complete(z){return new Promise((k,C)=>{if(!$.length){C(new Error("claude.complete: no parent origin"));return}const D=`c${++X}`;const w=()=>setTimeout(()=>{delete V[D];C(new Error(`claude.complete: no data for ${F/1000}s`))},F);const K=w();V[D]={resolve:k,reject:C,text:"",t:K,arm:w};try{for(const Z of $){W.postMessage({__om_api:true,id:D,body:z},Z)}}catch(Z){clearTimeout(K);delete V[D];C(Z)}})}};const Y={};let h=0;window.omelette={writeFile:(z,k)=>new Promise((C,D)=>{if(!$.length){C();return}const w=`f${++h}`;const K=setTimeout(()=>{delete Y[w];C()},A);Y[w]={resolve:C,reject:D,t:K};try{for(const Z of $){W.postMessage({__om_file:true,id:w,op:"write",path:z,content:k},Z)}}catch{clearTimeout(K);delete Y[w];C()}})};const b=(z)=>{try{return JSON.stringify(z)}catch{return JSON.stringify(String(z))}};window.addEventListener("message",(z)=>{if($.indexOf(z.origin)<0)return;if(z.source!==W)return;const k=z.data;if(!k)return;if(k.__om_file_r){const w=Y[k.id];if(!w)return;clearTimeout(w.t);delete Y[k.id];if(k.ok)w.resolve();else w.reject(new Error(k.error||"write failed"));return}if(k.__om_api_r){const w=V[k.id];if(!w)return;if(k.error!=null){clearTimeout(w.t);delete V[k.id];w.reject(new Error(k.error));return}if(k.chunk!=null){clearTimeout(w.t);w.t=w.arm();w.text+=k.chunk;return}if(k.done){clearTimeout(w.t);delete V[k.id];w.resolve(k.text!=null?k.text:w.text);return}return}if(!k.__om_eval)return;const C=k;const D=(w)=>{z.source.postMessage({...w,__om_eval_r:1,id:C.id},z.origin)};try{const w=(0,eval)(C.code);if(w&&typeof w.then==="function"){w.then((K)=>D({ok:1,v:b(K)}),(K)=>D({ok:0,e:String(K)}))}else{D({ok:1,v:b(w)})}}catch(w){D({ok:0,e:String(w)})}})}})();
+</script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>herman fernandez.design</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<template id="__bundler_thumbnail" data-bg-color="#EBEBEA">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <!-- nav pill -->
+    <rect x="60" y="30" width="1080" height="52" rx="14" fill="#2C2C2A"/>
+    <rect x="90" y="48" width="180" height="14" rx="4" fill="#666662"/>
+    <rect x="800" y="48" width="80" height="14" rx="4" fill="#444442"/>
+    <rect x="900" y="48" width="80" height="14" rx="4" fill="#444442"/>
+    <rect x="1000" y="48" width="80" height="14" rx="4" fill="#444442"/>
+    <!-- hero card -->
+    <rect x="60" y="100" width="1080" height="420" rx="16" fill="#2C2C2A"/>
+    <text x="90" y="230" font-family="sans-serif" font-size="72" fill="white" opacity="0.9">illustration.</text>
+    <text x="90" y="315" font-family="sans-serif" font-size="72" fill="white" opacity="0.9">information.</text>
+    <text x="90" y="400" font-family="sans-serif" font-size="72" fill="white" opacity="0.9">design.</text>
+    <!-- service cards -->
+    <rect x="60" y="540" width="340" height="220" rx="16" fill="white"/>
+    <rect x="60" y="540" width="340" height="5" rx="2" fill="#D72B2B"/>
+    <rect x="80" y="565" width="60" height="10" rx="3" fill="#AAAAAA"/>
+    <rect x="80" y="590" width="180" height="28" rx="4" fill="#1A1A18"/>
+    <rect x="420" y="540" width="340" height="220" rx="16" fill="white"/>
+    <rect x="420" y="540" width="340" height="5" rx="2" fill="#1533C0"/>
+    <rect x="440" y="565" width="60" height="10" rx="3" fill="#AAAAAA"/>
+    <rect x="440" y="590" width="180" height="28" rx="4" fill="#1A1A18"/>
+    <rect x="780" y="540" width="340" height="220" rx="16" fill="white"/>
+    <rect x="780" y="540" width="340" height="5" rx="2" fill="#F0C000"/>
+    <rect x="800" y="565" width="60" height="10" rx="3" fill="#AAAAAA"/>
+    <rect x="800" y="590" width="180" height="28" rx="4" fill="#1A1A18"/>
+  </svg>
+</template>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: #EBEBEA;
+    color: var(--c-black);
+    overflow-x: hidden;
+    font-family: var(--font-body);
+  }
+
+  /* ─── LAYOUT SHELL ─── */
+  .page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 clamp(1.5rem, 5vw, 4rem);
+  }
+
+  /* ─── BENTO CARD ─── */
+  .card {
+    background: var(--c-white);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .card--dark {
+    background: var(--c-grey-900);
+    color: var(--c-white);
+  }
+  .card--black {
+    background: var(--c-black);
+    color: var(--c-white);
+  }
+
+  /* ─── NAV ─── */
+  .nav-wrap {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 9999;
+    padding: 14px clamp(1.5rem, 5vw, 4rem);
+    pointer-events: none;
+  }
+  .nav {
+    pointer-events: auto;
+    background: var(--c-grey-800);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 var(--space-6);
+    height: 52px;
+    transition: box-shadow 200ms ease;
+  }
+  .nav.scrolled {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  }
+  .nav-logo {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    letter-spacing: 0.04em;
+    color: var(--c-white);
+    text-decoration: none;
+    line-height: 1;
+    text-transform: lowercase;
+  }
+  .nav-links {
+    display: flex; gap: var(--space-6); list-style: none;
+  }
+  .nav-links a {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-decoration: none;
+    color: var(--c-grey-400);
+    text-transform: lowercase;
+    transition: color 120ms ease;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--c-white); }
+  .nav-burger {
+    display: none; background: none; border: none; cursor: pointer;
+    flex-direction: column; gap: 5px; padding: 4px;
+  }
+  .nav-burger span {
+    display: block; width: 22px; height: 2px;
+    background: var(--c-grey-400);
+    transition: transform 200ms ease, opacity 200ms ease;
+  }
+  .nav-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-burger.open span:nth-child(2) { opacity: 0; }
+  .nav-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* ─── SIDE MENU ─── */
+  .side-menu {
+    position: fixed; inset: 0; z-index: 9998;
+    background: var(--c-grey-900);
+    transform: translateX(100%);
+    transition: transform 350ms cubic-bezier(0.16,1,0.3,1);
+    display: flex; flex-direction: column;
+    padding: 90px var(--space-6) var(--space-8);
+  }
+  .side-menu.open { transform: translateX(0); }
+  .side-menu-brand {
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    color: var(--c-grey-600); letter-spacing: var(--tracking-wider);
+    margin-bottom: var(--space-8); text-transform: lowercase;
+  }
+  .side-menu-links { list-style: none; display: flex; flex-direction: column; gap: 0; }
+  .side-menu-links a {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 12vw, 4rem);
+    color: var(--c-white); text-decoration: none;
+    line-height: 1.15; display: block;
+    padding: var(--space-4) 0;
+    border-bottom: 1px solid var(--c-grey-800);
+    transition: color 120ms ease;
+  }
+  .side-menu-links a:hover { color: var(--c-yellow); }
+
+  /* ─── HERO ─── */
+  .hero-wrap {
+    padding-top: 80px;
+    padding-bottom: var(--space-4);
+  }
+  .hero {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    min-height: 88vh;
+    display: flex; align-items: flex-end;
+    background: var(--c-grey-800);
+  }
+  .hero-video-bg {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hero-video-label {
+    font-family: var(--font-mono); font-size: var(--text-sm);
+    color: var(--c-grey-600); letter-spacing: var(--tracking-wide);
+    text-transform: lowercase;
+  }
+  .hero-content {
+    position: relative; z-index: 2;
+    padding: var(--space-12) var(--space-10);
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: var(--space-8); width: 100%; align-items: end;
+  }
+  .hero-headline {
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 7.5vw, 7rem);
+    line-height: 0.93; letter-spacing: -0.02em;
+    text-transform: lowercase; color: var(--c-white);
+  }
+  .hero-right { align-self: end; }
+  .hero-body {
+    color: var(--c-grey-400); font-size: var(--text-sm);
+    line-height: var(--leading-normal); max-width: 36ch;
+    text-transform: lowercase;
+  }
+  .hero-scroll {
+    margin-top: var(--space-6);
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    color: var(--c-grey-600); letter-spacing: var(--tracking-wider);
+    text-transform: lowercase;
+    display: flex; align-items: center; gap: var(--space-3);
+  }
+  .hero-scroll::before {
+    content: ''; display: block; width: 28px; height: 1px;
+    background: var(--c-grey-600);
+  }
+
+  /* ─── SERVICES GRID ─── */
+  .services-wrap { padding-bottom: var(--space-4); }
+  .services-grid {
+    display: flex; flex-direction: column; gap: var(--space-4);
+  }
+
+  .service-card {
+    border-radius: 16px; overflow: hidden; background: var(--c-white);
+    display: grid; grid-template-columns: 320px 1fr;
+    min-height: 520px;
+  }
+
+  /* accent top bar per section */
+  .service-card--red .service-info { border-top: 5px solid var(--c-red); }
+  .service-card--blue .service-info { border-top: 5px solid var(--c-blue); }
+  .service-card--yellow .service-info { border-top: 5px solid var(--c-yellow); }
+  .service-card--red .carousel-wrap { background: #fdf5f5; }
+  .service-card--blue .carousel-wrap { background: #f3f5fd; }
+  .service-card--yellow .carousel-wrap { background: #fdfaf0; }
+
+  /* dot active colors */
+  .service-card--red .carousel-dot.active { background: var(--c-red); }
+  .service-card--blue .carousel-dot.active { background: var(--c-blue); }
+  .service-card--yellow .carousel-dot.active { background: var(--c-yellow); }
+  .service-card--red .carousel-btn:hover { background: var(--c-red); }
+  .service-card--blue .carousel-btn:hover { background: var(--c-blue); }
+  .service-card--yellow .carousel-btn:hover { background: var(--c-yellow); }
+
+  .service-info {
+    padding: var(--space-10) var(--space-8);
+    display: flex; flex-direction: column; gap: var(--space-5);
+    position: sticky; top: 80px; height: calc(100vh - 80px);
+    justify-content: flex-start;
+    background: var(--c-white);
+  }
+  .service-number {
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-widest); color: var(--c-grey-400);
+    text-transform: lowercase;
+  }
+  .service-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    line-height: 1; letter-spacing: -0.01em;
+    text-transform: lowercase;
+  }
+  .service-body {
+    font-size: var(--text-sm); line-height: var(--leading-normal);
+    color: var(--c-grey-600); max-width: 34ch;
+  }
+  .service-tag {
+    display: inline-block; margin-top: auto;
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); text-transform: lowercase;
+    background: var(--c-black); color: var(--c-white);
+    padding: 8px 16px; border-radius: 40px;
+    text-decoration: none; align-self: flex-start;
+    transition: background 120ms ease, color 120ms ease;
+  }
+  .service-card--red .service-tag:hover { background: var(--c-red); }
+  .service-card--blue .service-tag:hover { background: var(--c-blue); }
+  .service-card--yellow .service-tag:hover { background: var(--c-yellow); color: var(--c-black); }
+
+  /* ─── CAROUSEL ─── */
+  .carousel-wrap {
+    padding: var(--space-8);
+    display: flex; flex-direction: column; gap: var(--space-4);
+    background: var(--c-grey-100);
+  }
+  .carousel {
+    position: relative; border-radius: 10px; overflow: hidden;
+    aspect-ratio: 16/10; background: var(--c-grey-200);
+  }
+  .carousel-slides {
+    display: flex; width: 100%; height: 100%;
+    transition: transform 400ms cubic-bezier(0.16,1,0.3,1);
+  }
+  .carousel-slide {
+    flex: 0 0 100%; height: 100%;
+  }
+  .carousel-slide-inner {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: var(--text-sm);
+    color: var(--c-grey-500); flex-direction: column; gap: var(--space-2);
+  }
+  .carousel-slide:nth-child(1) .carousel-slide-inner { background: #d5d5d0; }
+  .carousel-slide:nth-child(2) .carousel-slide-inner { background: #e0e0db; }
+  .carousel-slide:nth-child(3) .carousel-slide-inner { background: #c8c8c4; }
+  .carousel-slide:nth-child(4) .carousel-slide-inner { background: #dcdcda; }
+
+  .carousel-btn {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: var(--c-black); color: var(--c-white);
+    border: none; cursor: pointer;
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; line-height: 1;
+    transition: background 120ms ease;
+    z-index: 2;
+  }
+  .carousel-btn--prev { left: var(--space-3); }
+  .carousel-btn--next { right: var(--space-3); }
+
+  .carousel-meta {
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    color: var(--c-grey-500); letter-spacing: var(--tracking-wide);
+    text-transform: lowercase;
+  }
+  .carousel-dots { display: flex; gap: 6px; }
+  .carousel-dot {
+    width: 24px; height: 3px; border-radius: 2px;
+    background: var(--c-grey-300); cursor: pointer;
+    transition: background 120ms ease;
+  }
+
+  /* ─── FOOTER AREA ─── */
+  .footer-wrap {
+    padding-bottom: var(--space-6);
+    display: flex; flex-direction: column; gap: var(--space-4);
+  }
+
+  /* subscription */
+  .subscribe-card {
+    background: var(--c-black); border-radius: 16px;
+    padding: var(--space-12) var(--space-10);
+    display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-10);
+    align-items: center;
+  }
+  .subscribe-heading {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    line-height: 0.95; letter-spacing: -0.01em;
+    text-transform: lowercase; color: var(--c-white);
+  }
+  .subscribe-heading em {
+    font-style: normal; color: var(--c-yellow);
+  }
+  .subscribe-sub {
+    font-size: var(--text-sm); color: var(--c-grey-500);
+    margin-top: var(--space-4); line-height: var(--leading-normal);
+    text-transform: lowercase;
+  }
+  .subscribe-form {
+    display: flex; flex-direction: column; gap: var(--space-3);
+  }
+  .subscribe-form input {
+    background: var(--c-grey-900); border: none; border-radius: 8px;
+    padding: 14px var(--space-5);
+    font-family: var(--font-body); font-size: var(--text-sm);
+    color: var(--c-white); outline: none;
+    transition: background 120ms ease;
+  }
+  .subscribe-form input::placeholder { color: var(--c-grey-600); text-transform: lowercase; }
+  .subscribe-form input:focus { background: var(--c-grey-800); }
+  .subscribe-form button {
+    background: var(--c-yellow); color: var(--c-black);
+    border: none; border-radius: 8px; cursor: pointer;
+    padding: 14px var(--space-6);
+    font-family: var(--font-mono); font-size: var(--text-sm);
+    font-weight: var(--weight-bold); letter-spacing: var(--tracking-wide);
+    text-transform: lowercase;
+    transition: background 120ms ease, transform 120ms ease;
+  }
+  .subscribe-form button:hover { background: var(--c-yellow-light); }
+  .subscribe-form button:active { transform: scale(0.97); }
+  .subscribe-note {
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    color: var(--c-grey-700); text-transform: lowercase;
+    margin-top: var(--space-1);
+  }
+  .subscribe-success {
+    display: none; background: var(--c-grey-900); border-radius: 8px;
+    padding: var(--space-5); text-align: center;
+    font-family: var(--font-mono); font-size: var(--text-sm);
+    color: var(--c-yellow); letter-spacing: var(--tracking-wide);
+    text-transform: lowercase;
+  }
+
+  /* footer grid */
+  .footer-grid {
+    display: grid; grid-template-columns: 2fr 1fr 1fr; gap: var(--space-4);
+  }
+  .footer-cell {
+    background: var(--c-grey-900); border-radius: 16px;
+    padding: var(--space-8); color: var(--c-white);
+  }
+  .footer-cell-label {
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    color: var(--c-grey-600); letter-spacing: var(--tracking-widest);
+    text-transform: lowercase; margin-bottom: var(--space-5);
+  }
+  .footer-headline {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 3.5vw, 3.5rem);
+    line-height: 0.95; text-transform: lowercase;
+    letter-spacing: -0.01em; margin-bottom: var(--space-4);
+  }
+  .footer-cell p {
+    font-size: var(--text-sm); color: var(--c-grey-500);
+    line-height: var(--leading-normal); max-width: 38ch;
+  }
+  .footer-cell a {
+    color: var(--c-grey-400); font-size: var(--text-sm);
+    text-decoration: none; display: block;
+    margin-bottom: var(--space-3); letter-spacing: var(--tracking-normal);
+    text-transform: lowercase;
+    transition: color 120ms ease;
+  }
+  .footer-cell a:hover { color: var(--c-white); }
+  .footer-bottom-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: var(--space-2) var(--space-2);
+  }
+  .footer-bottom-row span {
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    color: var(--c-grey-700); letter-spacing: var(--tracking-wide);
+    text-transform: lowercase;
+  }
+
+  /* accent dots in footer */
+  .accent-dots { display: flex; gap: var(--space-2); margin-top: var(--space-6); }
+  .accent-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .accent-dot--red { background: var(--c-red); }
+  .accent-dot--blue { background: var(--c-blue); }
+  .accent-dot--yellow { background: var(--c-yellow); }
+
+  /* ─── SCROLL TOP ─── */
+  .scroll-top {
+    position: fixed; bottom: var(--space-6); right: var(--space-6);
+    width: 44px; height: 44px;
+    background: var(--c-grey-800); color: var(--c-white);
+    border: none; border-radius: 50%; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; z-index: 999;
+    opacity: 0; pointer-events: none;
+    transition: opacity 200ms ease, background 120ms ease;
+  }
+  .scroll-top.visible { opacity: 1; pointer-events: auto; }
+  .scroll-top:hover { background: var(--c-black); }
+
+  /* ─── MOBILE ─── */
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .nav-burger { display: flex; }
+    .hero-content { grid-template-columns: 1fr; padding: var(--space-8) var(--space-6); }
+    .hero-right { display: none; }
+    .hero-headline { font-size: clamp(3rem, 13vw, 5rem); }
+    .service-card { grid-template-columns: 1fr; }
+    .service-info { position: static; height: auto; }
+    .subscribe-card { grid-template-columns: 1fr; gap: var(--space-6); }
+    .footer-grid { grid-template-columns: 1fr; }
+    .footer-bottom-row { flex-direction: column; gap: var(--space-2); }
+  }
+  @media (min-width: 769px) and (max-width: 1100px) {
+    .service-card { grid-template-columns: 260px 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .footer-grid .footer-cell:first-child { grid-column: 1 / -1; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<div class="nav-wrap">
+  <div class="page" style="padding-top:0;padding-bottom:0;">
+    <nav class="nav" id="main-nav">
+      <a href="#" class="nav-logo">herman fernandez.design</a>
+      <ul class="nav-links">
+        <li><a href="#infographics" class="nav-link">001. infographics</a></li>
+        <li><a href="#illustration" class="nav-link">002. illustration</a></li>
+        <li><a href="#uxui" class="nav-link">003. ux/ui</a></li>
+        <li><a href="#editorial" class="nav-link">004. editorial</a></li>
+      </ul>
+      <button class="nav-burger" id="burger" aria-label="menu">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+  </div>
+</div>
+
+<!-- ─── SIDE MENU ─── -->
+<div class="side-menu" id="side-menu">
+  <p class="side-menu-brand">herman fernandez.design</p>
+  <ul class="side-menu-links">
+    <li><a href="#infographics" class="menu-link">001. infographics</a></li>
+    <li><a href="#illustration" class="menu-link">002. illustration</a></li>
+    <li><a href="#uxui" class="menu-link">003. ux/ui</a></li>
+    <li><a href="#editorial" class="menu-link">004. editorial</a></li>
+  </ul>
+</div>
+
+<!-- ─── HERO ─── -->
+<div class="page hero-wrap">
+  <div class="hero" id="hero">
+    <div class="hero-video-bg">
+      <span class="hero-video-label">video full screen background</span>
+    </div>
+    <div class="hero-content">
+      <h1 class="hero-headline">illustration.<br>information.<br>design.</h1>
+      <div class="hero-right">
+        <p class="hero-body">i make things that communicate — infographics, illustrations, interfaces, and editorial design. work that cuts through noise.</p>
+        <div class="hero-scroll"><span>scroll to explore</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SERVICES ─── -->
+<div class="page services-wrap">
+  <div class="services-grid">
+
+    <!-- 001 infographics → red -->
+    <div class="service-card service-card--red" id="infographics" data-screen-label="01 Infographics">
+      <div class="service-info">
+        <span class="service-number">001</span>
+        <h2 class="service-title">infographic</h2>
+        <p class="service-body">we transform complex data into visually engaging infographics. from captivating visual stories to precise statistical charts, we tailor solutions that clarify and communicate your message with precision.</p>
+        <a href="#" class="service-tag">view work →</a>
+      </div>
+      <div class="carousel-wrap">
+        <div class="carousel" id="carousel-1">
+          <div class="carousel-slides" id="slides-1">
+            <div class="carousel-slide"><div class="carousel-slide-inner"><span>image 01</span><span>gallery carousel</span></div></div>
+            <div class="carousel-slide"><div class="carousel-slide-inner"><span>image 02</span><span>gallery carousel</span></div></div>
+            <div class="carousel-slide"><div class="carousel-slide-inner"><span>image 03</span><span>gallery carousel</span></div></div>
+            <div class="carousel-slide"><div class="carousel-slide-inner"><span>image 04</span><span>gallery carousel</span></div></div>
+          </div>
+          <button class="carousel-btn carousel-btn--prev" data-carousel="1">‹</button>
+          <button class="carousel-btn carousel-btn--next" data-carousel="1">›</button>
+        </div>
+        <div class="carousel-meta">
+          <span class="carousel-count" id="count-1">01 / 04</span>
+          <div class="carousel-dots" id="dots-1">
+            <div class="carousel-dot active" data-carousel="1" data-index="0"></div>
+            <div class="carousel-dot" data-carousel="1" data-index="1"></div>
+            <div class="carousel-dot" data-carousel="1" data-index="2"></div>
+            <div class="carousel-dot" data-carousel="1" data-index="3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 002 illustration → blue -->
+    <div class="service-card service-card--blue" id="illustration" data-screen-label="02 Illustration">
+      <div class="service-info">
+        <span class="service-number">002</span>
+        <h2 class="service-title">illustration</h2>
+        <p class="service-body">a visual vocabulary built from scratch — or rebuilt from yours. editorial illustration, character work, brand imagery. each piece made to exist on its own terms.</p>
+        <a href="#" class="service-tag">view work →</a>
+      </div>
+      <div class="carousel-wrap">
+        <div class="carousel" id="carousel-2">
+          <div class="carousel-slides" id="slides-2">
+            <div class="carousel-slide"><div class="carousel-slide-inner"><span>image 01</span><span>gallery carousel</span></div></div>
+            <div class="carousel-slide"><div class="carousel-slide-inner"><span>image 02</span><span>gallery carousel</span></div></div>
+            <div class="carousel-slide"><div class="carousel-slide-inner"><span>image 03</span><span>gallery carousel</span></div></div>
+            <div class="carousel-slide"><div class="carousel-slide-inner"><span>image 04</span><span>gallery carousel</span></div></div>
+          </div>
+          <button class="carousel-btn carousel-btn--prev" data-carousel="2">‹</button>
+          <button class="carousel-btn carousel-btn--next" data-carousel="2">›</button>
+        </div>
+        <div class="carousel-meta">
+          <span class="carousel-count" id="count-2">01 / 04</span>
+          <div class="carousel-dots" id="dots-2">
+            <div class="carousel-dot active" data-carousel="2" data-index="0"></div>
+            <div class="carousel-dot" data-carousel="2" data-index="1"></div>
+            <div class="carousel-dot" data-carousel="2" data-index="2"></div>
+            <div class="carousel-dot" data-carousel="2" data-index="3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 003 ux/ui → yellow -->
+    <div class="service-card service-card--yellow" id="uxui" data-screen-label="03 UX/UI">
+      <div class="service-info">
+        <span class="service-number">003</span>
+        <h2 class="service-title">ux/ui</h2>
+        <p class="service-body">interfaces that earn attention. structured around how people actually move through information — then made rigorous, then made beautiful. no cargo-cult patterns.</p>
+        <a href="#" class="service-tag">view work →</a>
+      </div>
+      <div class="carousel-wrap">
+        <div class="carousel" id="carousel-3">
+          <div class="carousel-slides" id="slides-3">
+            <div class="carousel-slide"><div class="carousel-slide-inner"><span>image 01</span><span>gallery carousel</span></div></div>
+            <div class="carousel-slide"><div class="carousel-slide-inner"><span>image 02</span><span>gallery carousel</span></div></div>
+            <div class="carousel-slide"><div class="carousel-slide-inner"><span>image 03</span><span>gallery carousel</span></div></div>
+            <div class="carousel-slide"><div class="carousel-slide-inner"><span>image 04</span><span>gallery carousel</span></div></div>
+          </div>
+          <button class="carousel-btn carousel-btn--prev" data-carousel="3">‹</button>
+          <button class="carousel-btn carousel-btn--next" data-carousel="3">›</button>
+        </div>
+        <div class="carousel-meta">
+          <span class="carousel-count" id="count-3">01 / 04</span>
+          <div class="carousel-dots" id="dots-3">
+            <div class="carousel-dot active" data-carousel="3" data-index="0"></div>
+            <div class="carousel-dot" data-carousel="3" data-index="1"></div>
+            <div class="carousel-dot" data-carousel="3" data-index="2"></div>
+            <div class="carousel-dot" data-carousel="3" data-index="3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 004 editorial → red -->
+    <div class="service-card service-card--red" id="editorial" data-screen-label="04 Editorial">
+      <div class="service-info">
+        <span class="service-number">004</span>
+        <h2 class="service-title">editorial</h2>
+        <p class="service-body">typography is governance. editorial design controls the pace of reading, the weight of ideas, the feel of a publication. magazines, books, reports — we make them work as objects.</p>
+        <a href="#" class="service-tag">view work →</a>
+      </div>
+      <div class="carousel-wrap">
+        <div class="carousel" id="carousel-4">
+          <div class="carousel-slides" id="slides-4">
+            <div class="carousel-slide"><div class="carousel-slide-inner"><span>image 01</span><span>gallery carousel</span></div></div>
+            <div class="carousel-slide"><div class="carousel-slide-inner"><span>image 02</span><span>gallery carousel</span></div></div>
+            <div class="carousel-slide"><div class="carousel-slide-inner"><span>image 03</span><span>gallery carousel</span></div></div>
+            <div class="carousel-slide"><div class="carousel-slide-inner"><span>image 04</span><span>gallery carousel</span></div></div>
+          </div>
+          <button class="carousel-btn carousel-btn--prev" data-carousel="4">‹</button>
+          <button class="carousel-btn carousel-btn--next" data-carousel="4">›</button>
+        </div>
+        <div class="carousel-meta">
+          <span class="carousel-count" id="count-4">01 / 04</span>
+          <div class="carousel-dots" id="dots-4">
+            <div class="carousel-dot active" data-carousel="4" data-index="0"></div>
+            <div class="carousel-dot" data-carousel="4" data-index="1"></div>
+            <div class="carousel-dot" data-carousel="4" data-index="2"></div>
+            <div class="carousel-dot" data-carousel="4" data-index="3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<div class="page footer-wrap">
+
+  <!-- subscription card -->
+  <div class="subscribe-card">
+    <div>
+      <p style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--c-grey-600);letter-spacing:var(--tracking-widest);text-transform:lowercase;margin-bottom:var(--space-4);">stay in the loop</p>
+      <p class="subscribe-heading">get work<br>in your <em>inbox.</em></p>
+      <p class="subscribe-sub">new projects, process notes, and occasional thoughts on design. no noise.</p>
+    </div>
+    <div>
+      <form class="subscribe-form" id="subscribe-form">
+        <input type="text" placeholder="your name" autocomplete="name" required>
+        <input type="email" placeholder="your email" autocomplete="email" required>
+        <button type="submit">subscribe →</button>
+        <p class="subscribe-note">no spam. unsubscribe any time.</p>
+      </form>
+      <div class="subscribe-success" id="subscribe-success">
+        ✓ you're in. talk soon.
+      </div>
+    </div>
+  </div>
+
+  <!-- footer bento grid -->
+  <div class="footer-grid">
+    <div class="footer-cell">
+      <p class="footer-cell-label">studio</p>
+      <p class="footer-headline">let's<br>talk.</p>
+      <p>available for freelance and collaborative projects. based in mexico — working globally.</p>
+      <div class="accent-dots">
+        <div class="accent-dot accent-dot--red"></div>
+        <div class="accent-dot accent-dot--blue"></div>
+        <div class="accent-dot accent-dot--yellow"></div>
+      </div>
+    </div>
+    <div class="footer-cell">
+      <p class="footer-cell-label">contact</p>
+      <a href="/cdn-cgi/l/email-protection#e8808d848487a8808d9a8589868e8d9a8689868c8d92c68c8d9b818f86"><span class="__cf_email__" data-cfemail="4e262b2222210e262b3c232f20282b3c202f202a2b34602a2b3d272920">[email&#160;protected]</span></a>
+      <a href="#">instagram</a>
+      <a href="#">behance</a>
+      <a href="#">linkedin</a>
+    </div>
+    <div class="footer-cell">
+      <p class="footer-cell-label">services</p>
+      <a href="#infographics">infographics</a>
+      <a href="#illustration">illustration</a>
+      <a href="#uxui">ux/ui</a>
+      <a href="#editorial">editorial</a>
+    </div>
+  </div>
+
+  <div class="footer-bottom-row">
+    <span>© 2026 herman fernandez.design</span>
+    <span>form follows function. always.</span>
+  </div>
+
+</div>
+
+<!-- scroll top -->
+<button class="scroll-top" id="scroll-top" aria-label="scroll to top">↑</button>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // ─── Carousel ───
+  const carouselState = { 1: 0, 2: 0, 3: 0, 4: 0 };
+  const totalSlides = 4;
+
+  function goToSlide(id, index) {
+    if (index < 0) index = totalSlides - 1;
+    if (index >= totalSlides) index = 0;
+    carouselState[id] = index;
+    document.getElementById(`slides-${id}`).style.transform = `translateX(-${index * 100}%)`;
+    document.getElementById(`count-${id}`).textContent = `0${index + 1} / 0${totalSlides}`;
+    document.querySelectorAll(`#dots-${id} .carousel-dot`).forEach((d, i) => d.classList.toggle('active', i === index));
+  }
+
+  document.querySelectorAll('.carousel-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = parseInt(btn.dataset.carousel);
+      goToSlide(id, carouselState[id] + (btn.classList.contains('carousel-btn--prev') ? -1 : 1));
+    });
+  });
+
+  document.querySelectorAll('.carousel-dot').forEach(dot => {
+    dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.carousel), parseInt(dot.dataset.index)));
+  });
+
+  document.querySelectorAll('.carousel').forEach(el => {
+    let sx = 0;
+    el.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
+    el.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - sx;
+      if (Math.abs(dx) > 40) goToSlide(parseInt(el.id.split('-')[1]), carouselState[parseInt(el.id.split('-')[1])] + (dx < 0 ? 1 : -1));
+    });
+  });
+
+  // ─── Nav scroll ───
+  const nav = document.getElementById('main-nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  }, { passive: true });
+
+  // Active nav link
+  const sections = document.querySelectorAll('[data-screen-label]');
+  const navLinks = document.querySelectorAll('.nav-link');
+  new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const id = e.target.id;
+        navLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === `#${id}`));
+      }
+    });
+  }, { threshold: 0.35 }).observe && sections.forEach(s => {
+    new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          navLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === `#${e.target.id}`));
+        }
+      });
+    }, { threshold: 0.35 }).observe(s);
+  });
+
+  // ─── Mobile menu ───
+  const burger = document.getElementById('burger');
+  const sideMenu = document.getElementById('side-menu');
+  burger.addEventListener('click', () => {
+    const open = sideMenu.classList.toggle('open');
+    burger.classList.toggle('open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  });
+  document.querySelectorAll('.menu-link').forEach(l => l.addEventListener('click', () => {
+    sideMenu.classList.remove('open');
+    burger.classList.remove('open');
+    document.body.style.overflow = '';
+  }));
+
+  // ─── Scroll top ───
+  const st = document.getElementById('scroll-top');
+  window.addEventListener('scroll', () => st.classList.toggle('visible', window.scrollY > 400), { passive: true });
+  st.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+  // ─── Subscribe form ───
+  document.getElementById('subscribe-form').addEventListener('submit', e => {
+    e.preventDefault();
+    document.getElementById('subscribe-form').style.display = 'none';
+    document.getElementById('subscribe-success').style.display = 'block';
+  });
+</script>
+</body>
+</html>
+
