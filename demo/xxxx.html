@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bento Layout</title>
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: #ffffff;
+  color: #111;
+  scroll-behavior: smooth;
+}
+
+/* NAV - centered Apple style */
+.nav {
+  position: fixed;
+  top:0;
+  width:100%;
+  display:flex;
+  justify-content:center;
+  z-index:1000;
+}
+
+.nav-inner {
+  margin-top:14px;
+  display:flex;
+  padding:10px 40px;
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(20px);
+  border-radius:999px;
+  border:1px solid rgba(0,0,0,0.06);
+}
+
+.nav-links {
+  display:flex;
+  gap:50px;
+  list-style:none;
+}
+
+.nav-links a {
+  text-decoration:none;
+  color:#1d1d1f;
+  font-size:14px;
+}
+
+/* HERO IMAGE */
+.hero {
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+}
+
+.hero img {
+  position:absolute;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.hero-content {
+  position:relative;
+  text-align:center;
+  color:white;
+}
+
+.hero-title { font-size:3.5rem; }
+.hero-sub { opacity:0.8; margin-top:10px; }
+
+/* SECTIONS */
+.section {
+  padding:140px 40px 120px 40px;
+}
+
+.section-header {
+  max-width:760px;
+  margin:0 auto 60px auto;
+  text-align:center;
+}
+
+.section-title {
+  font-size:2rem;
+  margin-bottom:12px;
+}
+
+.section-text {
+  opacity:0.65;
+  line-height:1.6;
+}
+
+/* BENTO GRID BASE */
+.bento {
+  display:grid;
+  gap:20px;
+  max-width:1000px;
+  margin:auto;
+}
+
+.bento-box {
+  border:1px solid #e6e6e6;
+  border-radius:24px;
+  overflow:hidden;
+  background:#fafafa;
+  height:300px;
+}
+
+/* SECTION-SPECIFIC LAYOUTS */
+.bento.one { grid-template-columns: 1fr; }
+.bento.two { grid-template-columns: repeat(2, 1fr); }
+.bento.three { grid-template-columns: repeat(3, 1fr); }
+
+/* CAROUSEL */
+.carousel {
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  position:relative;
+}
+
+.carousel-track {
+  display:flex;
+  height:100%;
+  transition: transform 0.6s ease;
+}
+
+.carousel-track img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  flex-shrink:0;
+}
+
+.prev, .next {
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  background:rgba(255,255,255,0.85);
+  border:none;
+  padding:6px 10px;
+  cursor:pointer;
+  border-radius:8px;
+}
+
+.prev { left:10px; }
+.next { right:10px; }
+
+.counter {
+  position:absolute;
+  bottom:10px;
+  right:10px;
+  font-size:12px;
+}
+
+/* SCROLL */
+.fade { opacity:0; transform:translateY(40px); transition: all 0.8s ease; }
+.fade.visible { opacity:1; transform:translateY(0); }
+
+</style>
+</head>
+
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <ul class="nav-links">
+      <li><a href="#section-a">Section A</a></li>
+      <li><a href="#section-b">Section B</a></li>
+      <li><a href="#section-c">Section C</a></li>
+    </ul>
+  </div>
+</nav>
+
+<section class="hero">
+  <img src="https://picsum.photos/id/1005/1600/900" />
+  <div class="hero-content fade">
+    <h1 class="hero-title">Bento Visual System</h1>
+    <p class="hero-sub">Modular / Grid / Narrative</p>
+  </div>
+</section>
+
+<!-- SECTION A (1 box carousel) -->
+<section id="section-a" class="section fade">
+  <div class="section-header">
+    <h2 class="section-title">Section A</h2>
+    <p class="section-text">Single container focused on sequential imagery.</p>
+  </div>
+
+  <div class="bento one">
+    <div class="bento-box">
+      <div class="carousel">
+        <div class="carousel-track" id="track-1">
+          <img src="https://picsum.photos/id/1015/800/600">
+          <img src="https://picsum.photos/id/1016/800/600">
+          <img src="https://picsum.photos/id/1018/800/600">
+        </div>
+        <button class="prev" onclick="move(1,-1)">←</button>
+        <button class="next" onclick="move(1,1)">→</button>
+        <div class="counter" id="count-1">1 / 3</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION B (2 boxes) -->
+<section id="section-b" class="section fade">
+  <div class="section-header">
+    <h2 class="section-title">Section B</h2>
+    <p class="section-text">Dual compositions balancing symmetry.</p>
+  </div>
+
+  <div class="bento two">
+    <div class="bento-box"></div>
+    <div class="bento-box"></div>
+  </div>
+</section>
+
+<!-- SECTION C (3 boxes) -->
+<section id="section-c" class="section fade">
+  <div class="section-header">
+    <h2 class="section-title">Section C</h2>
+    <p class="section-text">Triptych-like arrangement across equal modules.</p>
+  </div>
+
+  <div class="bento three">
+    <div class="bento-box"></div>
+    <div class="bento-box"></div>
+    <div class="bento-box"></div>
+  </div>
+</section>
+
+<script>
+const state = {1:0};
+const totals = {1:3};
+
+function move(id, step){
+  let i = state[id] + step;
+  if(i < 0) i = totals[id]-1;
+  if(i >= totals[id]) i = 0;
+
+  state[id] = i;
+
+  document.getElementById(`track-${id}`).style.transform =
+    `translateX(-${i*100}%)`;
+
+  document.getElementById(`count-${id}`).innerText =
+    `${i+1} / ${totals[id]}`;
+}
+
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting) e.target.classList.add('visible');
+  });
+},{ threshold:0.2 });
+
+ document.querySelectorAll('.fade').forEach(el => obs.observe(el));
+</script>
+
+</body>
+</html>
+
