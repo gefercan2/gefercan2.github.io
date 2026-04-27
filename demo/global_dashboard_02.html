@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Global Financial Centers Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <script src="https://unpkg.com/topojson@3"></script>
+
+
+
+
+
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Times New Roman, Baskerville, Garamond',  serif; }
+    body {
+      background: #f1d4b6;
+      padding:0px;
+      margin:0px;
+      overflow-x: hidden;
+    }
+    .dashboard {
+      width:90%;
+      height: 90vh;
+ 
+      padding: 1%;
+      margin:5%;
+    }
+    .header{
+      font-size:3em;
+      width:20%;
+      color:#454545;
+      text-align:right;
+      line-height:1.2;
+    }
+    .globe-container {
+      background: none;
+      /* border: 1px solid #444;
+      border-radius: 4px; */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      position:absolute;
+      width:60%;
+      left:-6%;
+      top:2%;
+    }
+    
+    .chart-container {
+      background: none;
+      padding: 5px;  
+      position:absolute;
+      right:2%;
+    }
+
+    #scatterplot{
+      position:absolute;width:70%;
+      right: 2%;
+      top:10%;
+      /* border: 1px solid #454545;
+      border-radius: 4px; */
+    }
+
+    .time-display{
+      font-size:1em;
+      color:#454545;
+
+    }
+
+    #current-time{
+      font-size:1em;
+      color:#454545;text-align:left;
+    }
+
+    #titlebox{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+      position:absolute;
+      color:#464646;
+      right:3%;
+      top:5%;
+      width:72%;
+      padding:0.5% 0% 0.5% 0%;
+      border-left:0px solid #454545;
+      border-right:0px solid #454545;
+      border-top: 1px solid #454545;
+      border-bottom: 1px solid #454545;
+    }
+
+    #bars{
+      position:absolute; 
+      width:30%;
+      right: 2%;
+      bottom:7%;
+      /* border: 1px solid #454545;
+      border-radius: 4px; */
+    }
+
+    .chart-title {
+      color: #454545;
+      font-size: 1.2em;
+      font-weight: bold;
+      line-height:1;
+      text-align:right;
+      margin-bottom: 10px;
+    }
+    .chart-subtitle {
+    color: #686868;
+    font-size: 1em;
+    font-weight:light;
+    line-height:1;
+    text-align:right;
+    margin-bottom: 12px;
+    
+  }
+
+    #mainbox1{
+      /* border: 1px solid #444;
+      border-radius: 4px; */
+      width:20%;
+      position:absolute;
+      left:25%;
+      top:10%;
+    }
+
+    #mainbox2{
+      /* border: 1px solid #444;
+      border-radius: 4px; */
+      position:absolute; 
+      width:25%;
+      right:5%;
+      top:45%;
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr 1fr;
+    
+    }
+
+    #mainbox3{
+      /* border: 1px solid #444;
+      border-radius: 4px; */
+      position:absolute; 
+      width:15%;
+      text-align:right;
+      right: 3%;
+      bottom:15%;
+    
+    }
+
+    svg {
+      cursor: grab;
+       background: none;
+      border-radius: 4px;
+    }
+
+    svg:active { 
+      cursor: grabbing;
+    }
+
+    .land {
+      stroke: #1a1a1a;
+      stroke-width: 0.3px;
+    }
+    .graticule {
+      fill: none;
+      stroke: #0a0a0a;
+      stroke-width: 0.3px;
+      stroke-opacity: 0.2;
+    }
+    .simple-tooltip {
+      position: absolute;
+      background: #1a1a1a;
+      color: #FFD700;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 11px;
+      pointer-events: none;
+      border: 1px solid #FFD700;
+      opacity: 0;
+      z-index: 1000;
+      transition: opacity 0.2s;
+    }
+
+
+    .info-box {
+      background: none;
+      padding: 15px;
+
+    }
+    .info-title {
+      color: #454545;
+      font-weight: bold;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    .info-content {
+      color: #454545;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    #intro_text{
+      font-size: 0.8em; 
+      color:#666;
+    }
+
+    #minitext1{
+      font-size:0.8em;
+      color:#666;
+    }
+
+    #minitext2{
+      font-size:0.8em;
+      color:#666;
+    }
+     #textBox{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr ;
+    width:72%;
+    gap:25px;
+    position:absolute;
+    bottom:10%;
+    left:25%;
+    border-top: 5px solid #454545; 
+    padding-top:1%;
+
+    }
+
+    .filter-container {
+      position: fixed;
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      top: 18%;
+      right:-10%;
+      z-index: 2000; width:25%;  
+      background: none;
+      padding: 12px 15px;
+      /* border-radius: 4px;
+      border: 2px solid #FFD700; */
+      min-width: 180px;
+    }
+
+  .filter-container2{
+      position: absolute;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      bottom: 55%;
+      left: 21%;
+      z-index: 2000; width:25%;
+      background: none;
+      padding: 12px 15px;
+     width:20%;
+     /* border-radius: 4px;
+      border: 2px solid #555;   */
+    }
+
+    .filter-label {
+      color: #454545;
+      font-size: 3em;
+      font-weight: bold;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .filter-container2 select {
+      width: 90%;
+      padding: 5px;
+      background: none;
+      color: #454545;
+      border: 1px solid  #454545 ;
+      border-radius: 3px;
+      cursor: pointer;
+      margin-bottom: 3px;
+    }
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .checkbox-row input {
+      cursor: pointer;
+      margin-right: 8px; accent-color:#3344;
+      background-color:#100d0b;
+    }
+    
+    .checkbox-row label {
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+
+
+
+
+
+
+
+
+
+
+<body>
+  <div class="simple-tooltip" id="simple-tooltip"></div>
+  
+  <div class="dashboard">
+
+       <div id="title_header">
+
+    <div class="header"> Global Financial  Centers  </div>
+
+    <!-- Info Box at Top -->
+   <div id="titlebox">
+    <!-- <div id="currentTime" class="time-box">      </div>  <div id="localTime" class="time-box city-time-box">    </div> -->
+       <div class="time-label"> this is your time</div>
+       <div class="time-display">00:00:00</div>
+       <div class="time-label"> the time in <span id="city-name"> </span> </div>
+       <div class="time-display" id="city-time">00:00:00</div>
+
+  </div>
+
+     
+      <!-- Globe -->
+      <div class="globe-container">
+        <svg id="globe-svg" width="80%" height="90vh"></svg>
+      </div>
+      
+      <!-- Info Box -->
+      <div id="mainbox1" class="info-box">
+
+        <div class="info-title"> selected city </div>
+        <div class="info-content" id="city-info1">Select a city to view details</div>
+
+
+    </div>
+      </div>
+
+      <div id="mainbox2" class="info-box">
+        <div class="info-content" id="city-info2">Select a city to view details</div>
+        <div class="info-content" id="city-info2b">Select a city to view details</div>
+        <div class="info-content" id="city-info2c">Select a city to view details</div>
+        <div class="info-content" id="city-info2d">Select a city to view details</div>
+      </div>
+
+      <div id="mainbox3" class="info-box">
+        <div class="info-title"> Market Cap </div>
+        <div class="info-content" id="city-info3">Select a city to view details</div>
+      </div>
+ 
+      <!-- Market Cap Arc Diagram -->
+      <div id="bars" class="chart-container">      
+        <svg id="arc-chart" width="100%" height="300"></svg>
+      </div>
+      
+      <!-- Scatter Plot -->
+      <div id="scatterplot"class="chart-container">
+        <div class="chart-subtitle">Main factors: </div>
+         <div class="chart-title"> P/E vs P/B, volume and YTD </div>
+        <svg id="scatter-plot" width="100%" height="450"></svg>
+      </div>
+
+      <div id="textBox">
+             <div id="intro_text"><p>A Market Identifier Code (MIC) is a unique 4-alpha-numeric code (ISO 10383) that identifies 
+              specific trading venues, exchanges, and regulated/non-regulated markets. Common examples include XNYS
+              (NYSE), XNAS (Nasdaq), and XLON (London Stock Exchange). Synonyms include exchange codes, trading venue
+              identifiers, or ISO 10383 codes, used for regulatory reporting, clearing, and settling trades. </p></div>
+
+              <div id="minitext1"><p>Market capitalization (market cap) is the total dollar value of a company’s 
+                outstanding shares, representing its size and market valuation. Market volume measures the number of shares 
+                or tokens traded within a specific timeframe [5.6]. Together, they are essential for determining company risk 
+                and asset liquidity. </p></div>
+
+             <div id="minitext2"><p>P/E (Price-to-Earnings), P/B (Price-to-Book), and EPS (Earnings Per Share) are core fundamental metrics 
+              used to evaluate stock value and company profitability. P/E and P/B indicate if a stock is overvalued/undervalued
+              relative to earnings or assets, while EPS calculates profit per share. They are heavily used to compare companies
+               within the same industry</p></div>
+      </div>
+
+  </div>
+
+
+
+
+
+
+<script>
+// ========================================
+// DATA
+// ========================================
+const financialCenters = [
+  { city: "New York", latitude: 40.7128, longitude: -74.0060, timeZoneOffset: -5,
+    exchanges: [{ name: "NYSE", mic: "XNYS", region: "Americas", marketCap: 44.7, monthlyTradeVolume: 2685, timeZone: "EST", benchmarkIndex: "S&P 500", ytd: "+16.2%", peRatio: "24.5x", pbRatio: "4.8x", eps: "$185" }]
+  },
+  { city: "Shanghai", latitude: 31.2304, longitude: 121.4737, timeZoneOffset: 8,
+    exchanges: [{ name: "SSE", mic: "XSHG", region: "Asia", marketCap: 9.72, monthlyTradeVolume: 1906, timeZone: "CST", benchmarkIndex: "SSE Composite", ytd: "-1.2%", peRatio: "13.8x", pbRatio: "1.6x", eps: "$45" }]
+  },
+  { city: "Tokyo", latitude: 35.6762, longitude: 139.6503, timeZoneOffset: 9,
+    exchanges: [{ name: "JPX", mic: "XJPX", region: "Asia", marketCap: 7.95, monthlyTradeVolume: 652, timeZone: "JST", benchmarkIndex: "Nikkei 225", ytd: "+12.5%", peRatio: "15.2x", pbRatio: "1.4x", eps: "$92" }]
+  },
+  { city: "Hong Kong", latitude: 22.3193, longitude: 114.1694, timeZoneOffset: 8,
+    exchanges: [{ name: "HKEX", mic: "XHKG", region: "Asia", marketCap: 6.2, monthlyTradeVolume: 762, timeZone: "HKT", benchmarkIndex: "Hang Seng", ytd: "+5.3%", peRatio: "11.2x", pbRatio: "1.1x", eps: "$68" }]
+  },
+  { city: "London", latitude: 51.5074, longitude: -0.1278, timeZoneOffset: 0,
+    exchanges: [{ name: "LSE", mic: "XLON", region: "Europe", marketCap: 4.1, monthlyTradeVolume: 219, timeZone: "GMT", benchmarkIndex: "FTSE 100", ytd: "+8.7%", peRatio: "14.3x", pbRatio: "1.8x", eps: "$72" }]
+  },
+  { city: "Shenzhen", latitude: 22.5431, longitude: 114.0579, timeZoneOffset: 8,
+    exchanges: [{ name: "SZSE", mic: "XSHE", region: "Asia", marketCap: 6.66, monthlyTradeVolume: 2888, timeZone: "CST", benchmarkIndex: "SZSE Component", ytd: "+2.1%", peRatio: "31.5x", pbRatio: "4.2x", eps: "$38" }]
+  },
+  { city: "Paris", latitude: 48.8566, longitude: 2.3522, timeZoneOffset: 1,
+    exchanges: [{ name: "Euronext", mic: "XPAR", region: "Europe", marketCap: 7.45, monthlyTradeVolume: 186, timeZone: "CET", benchmarkIndex: "CAC 40", ytd: "+10.2%", peRatio: "16.8x", pbRatio: "1.9x", eps: "$88" }]
+  },
+  { city: "Mumbai", latitude: 19.0760, longitude: 72.8777, timeZoneOffset: 5.5,
+    exchanges: [{ name: "NSE", mic: "XNSE", region: "Asia", marketCap: 5.32, monthlyTradeVolume: 294, timeZone: "IST", benchmarkIndex: "Nifty 50", ytd: "+14.8%", peRatio: "22.1x", pbRatio: "3.5x", eps: "$52" }]
+  },
+  { city: "Toronto", latitude: 43.6629, longitude: -79.3957, timeZoneOffset: -5,
+    exchanges: [{ name: "TSX", mic: "XTSE", region: "Americas", marketCap: 4.6, monthlyTradeVolume: 206, timeZone: "EST", benchmarkIndex: "S&P/TSX", ytd: "+9.4%", peRatio: "18.2x", pbRatio: "2.1x", eps: "$95" }]
+  },
+  { city: "Frankfurt", latitude: 50.1109, longitude: 8.6821, timeZoneOffset: 1,
+    exchanges: [{ name: "Deutsche Börse", mic: "XFRA", region: "Europe", marketCap: 3.15,
+     monthlyTradeVolume: 77, timeZone: "CET", benchmarkIndex: "DAX", ytd: "+11.3%", peRatio: "13.5x", pbRatio: "1.6x", eps: "$78" }]
+  },
+  { city: "Seoul", latitude: 37.5665, longitude: 126.9780, timeZoneOffset: 9,
+    exchanges: [{ name: "KRX", mic: "XKOS", region: "Asia", marketCap: 3.7, monthlyTradeVolume: 204, timeZone: "KST", benchmarkIndex: "KOSPI", ytd: "+6.2%", peRatio: "12.8x", pbRatio: "1.0x", eps: "$65" }]
+  },
+  { city: "Sydney", latitude: -33.8688, longitude: 151.2093, timeZoneOffset: 10,
+    exchanges: [{ name: "ASX", mic: "XASX", region: "Oceania", marketCap: 1.89, monthlyTradeVolume: 91, timeZone: "AEST", benchmarkIndex: "ASX 200", ytd: "+7.8%", peRatio: "17.2x", pbRatio: "2.3x", eps: "$82" }]
+  },
+    { city: "Taipei", latitude: -33.8688, longitude: 151.2093, timeZoneOffset: 10,
+    exchanges: [{ name: "ASX", mic: "XASX", region: "Oceania", marketCap: 1.89, 
+    monthlyTradeVolume: 91, timeZone: "AEST", benchmarkIndex: "ASX 200", ytd: "+7.8%", peRatio: "17.2x", pbRatio: "2.3x", eps: "$82" }]
+  },
+  { city: "Johannesburg", latitude: -26.2041, longitude: 28.0473, timeZoneOffset: 10,
+    exchanges: [{ name: "JSE", mic: "XJSE", region: "Africa", marketCap: 1.15, 
+    monthlyTradeVolume: 60, timeZone: "SAST", benchmarkIndex: "JSE Top 40", ytd: "+1.8%", 
+    peRatio: "12.6x", pbRatio: "1.7x", eps: "ZAR" }]
+  },
+  { city: "Sao Paulo", latitude: -23.5629, longitude:-46.6547, timeZoneOffset: -3,
+    exchanges: [{ name: "B3 (stock exchange)", mic: "BVMF", region: "South America", marketCap: 1.01, 
+    monthlyTradeVolume: 30, timeZone: "BRT", benchmarkIndex: "Bovespa (IBOV)", ytd: "+16.6%", 
+    peRatio: "9.4x", pbRatio: "1.5x", eps: "R$ 19,850" }]
+  },
+  { city: "Riyadh", latitude:  24.6389, longitude:46.7172, timeZoneOffset: 3,
+    exchanges: [{ name: "Saudi Exchange", mic: "XSAU", region: "Gulf", marketCap: 2.55, 
+    monthlyTradeVolume: 32, timeZone: "AST", benchmarkIndex: "TASI", ytd: "+4.2%", 
+    peRatio: "17.7x", pbRatio: "2.3x", eps: "SAR 645" }]
+  },
+  { city: "Abu Dhabi", latitude: 24.47, longitude: 54.37, timeZoneOffset: 3,
+    exchanges: [{ name: "Abu Dhabi Securities Exchange", mic: "ADX", region: "Gulf", marketCap: 0.83, 
+    monthlyTradeVolume: 20, timeZone: "AST", benchmarkIndex: "ADFX", ytd: "+0.6%", 
+    peRatio: "15.8x", pbRatio: "2.1x", eps: "AED 652" }]
+  },
+  { city: "Dubai", latitude: 25.26, longitude: 55.29, timeZoneOffset: 10,
+    exchanges: [{ name: "Dubai Financial Market", mic: "DFX", region: "Gulf", marketCap: 0.2, 
+    monthlyTradeVolume: 15, timeZone: "AST", benchmarkIndex: "DFMGI", ytd: "+1.2%", 
+    peRatio: "10.4x", pbRatio: "1.3x", eps: "AED" }]
+  },
+  { city: "Doha", latitude: 25.28, longitude: 51.52, timeZoneOffset: 3,
+    exchanges: [{ name: "Qatar Stock Exchange", mic: "QSE", region: "Gulf", marketCap: 0.2, 
+    monthlyTradeVolume: 4, timeZone: "AST", benchmarkIndex: "QE Index", ytd: "+4.8%", 
+    peRatio: "12.5x", pbRatio: "1.4x", eps: "895 QAR" }]
+  },
+  { city: "Stockholm", latitude: 59.3293, longitude: 18.0686, timeZoneOffset: 10,
+    exchanges: [{ name: "Nasdaq Nordic and Baltic", mic: "XSTO", region: "Oceania", marketCap: 1.79, 
+    monthlyTradeVolume: 47, timeZone: "EET/EEST", benchmarkIndex: "OMXS30", ytd: "+5.1%", 
+    peRatio: "18.4x", pbRatio: "2.3x", eps: "kr 168.00" }]
+  },
+];
+
+let selectedCity = "New York";
+let showVolume = true;
+let showYtd = true;
+let selectedFilterCity = "all";
+
+
+
+
+  function getLocalTime(offsetHours) {
+    const now = new Date();
+    const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const localTime = new Date(utcTime + (3600000 * offsetHours));
+    return localTime;
+  }
+
+  function formatTime(date) {
+    const h = String(date.getHours()).padStart(2, '0');
+    const m = String(date.getMinutes()).padStart(2, '0');
+    const s = String(date.getSeconds()).padStart(2, '0');
+    return `${h}:${m}:${s}`;
+  }
+  setInterval(() => {
+    const now = new Date();
+    document.getElementById("current-time").textContent = formatTime(now);
+  }, 1000);
+
+  function updateMetricsBoxes() {
+    const center = financialCenters.find(c => c.city === selectedCity);
+    if (!center) return;
+    
+    const ex = center.exchanges[0];
+    document.getElementById("pe-ratio").textContent = ex.peRatio || "—";
+    document.getElementById("pb-ratio").textContent = ex.pbRatio || "—";
+    document.getElementById("eps-value").textContent = ex.eps || "—";
+  }
+
+  function updateCityTime() {
+    const center = financialCenters.find(c => c.city === selectedCity);
+    if (!center) return;
+    
+    document.getElementById("city-name").textContent = center.city;
+    
+    const localTime = getLocalTime(center.timeZoneOffset);
+    const timeStr = formatTime(localTime);
+    document.getElementById("city-time").textContent = timeStr;
+  }
+
+  // Update city time every second
+  setInterval(() => {
+    updateCityTime();
+  }, 1000);
+
+
+
+// ========================================
+// GLOBE
+// ========================================
+const width = 260, height = 880;
+const projection = d3.geoOrthographic().scale(300).translate([width/2, height/2]).clipAngle(90);
+const path = d3.geoPath(projection);
+const graticule = d3.geoGraticule10();
+const svg = d3.select("#globe-svg");
+const tooltip = d3.select("#simple-tooltip");
+
+const data = { "India": 78, "France": 67, "China": 98 };
+const countriesToColor = ["India", "France", "China"];
+const colorScale = d3.scaleLinear().domain([60, 100]).range(["#998989", "#998989"]);
+
+// Background circle
+svg.append("circle")
+  .attr("cx", width/2)
+  .attr("cy", height/2)
+  .attr("r", 300)
+  .attr("fill", "#929f9f")
+  .attr("stroke", "none")
+  .attr("stroke-width", 0.5)
+  .attr("opacity", 0.6);
+
+// Graticule
+svg.append("path")
+  .datum(graticule)
+  .attr("class", "graticule")
+  .attr("d", path);
+
+let rotation = [10, -20, 0];
+
+// Load world map
+d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json").then(worldData => {
+  const countries = topojson.feature(worldData, worldData.objects.countries).features;
+  
+  svg.selectAll(".land")
+    .data(countries)
+    .enter()
+    .append("path")
+    .attr("class", "land")
+    .attr("d", path)
+    .attr("fill", d => {
+      const name = d.properties.name;
+      return countriesToColor.includes(name) ? colorScale(data[name]) : "#998989";
+    });
+
+  // Add city markers
+  const maxVol = d3.max(financialCenters, d => d.exchanges[0].monthlyTradeVolume);
+
+  // Volume circles
+  svg.selectAll(".vol-circle")
+    .data(financialCenters)
+    .enter()
+    .append("circle")
+    .attr("class", "vol-circle")
+    .attr("r", d => Math.sqrt(d.exchanges[0].monthlyTradeVolume / maxVol) * 25)
+    .attr("fill", "none")
+    .attr("stroke", "#FF6B6B")
+    .attr("stroke-width", 1.5)
+    .attr("opacity", 0.5);
+
+  // City rings
+  svg.selectAll(".city-ring")
+    .data(financialCenters)
+    .enter()
+    .append("circle")
+    .attr("class", "city-ring")
+    .attr("r", 8)
+    .attr("fill", "none")
+    .attr("stroke", "#FFD700")
+    .attr("stroke-width", 1)
+    .style("cursor", "pointer")
+    .on("click", (e, d) => selectCity(d.city));
+
+  // City dots
+  svg.selectAll(".city-dot")
+    .data(financialCenters)
+    .enter()
+    .append("circle")
+    .attr("class", "city-dot")
+    .attr("r", 4)
+    .attr("fill", "#FFD700")
+    .style("cursor", "pointer")
+    .on("mousemove", (e, d) => {
+      tooltip.style("opacity", 1)
+        .style("left", (e.pageX + 10) + "px")
+        .style("top", (e.pageY - 25) + "px")
+        .html(`<strong>${d.city}</strong><br>${d.exchanges[0].mic}<br>EPS: ${d.exchanges[0].eps}`);
+    })
+    .on("mouseout", () => tooltip.style("opacity", 0))
+    .on("click", (e, d) => selectCity(d.city));
+
+  updateGlobe();
+});
+
+// Drag
+let isDragging = false, dragX = 0;
+svg.on("mousedown", e => { isDragging = true; dragX = e.clientX; });
+document.addEventListener("mousemove", e => {
+  if (isDragging) {
+    rotation[0] += (e.clientX - dragX) * 0.5;
+    dragX = e.clientX;
+    projection.rotate(rotation);
+    updateGlobe();
+  }
+});
+document.addEventListener("mouseup", () => isDragging = false);
+
+function updateGlobe() {
+  svg.selectAll(".land").attr("d", path);
+  svg.select(".graticule").attr("d", path(graticule));
+  
+  financialCenters.forEach(d => {
+    const coords = projection([d.longitude, d.latitude]);
+    const rotated = d3.geoRotation(projection.rotate());
+    const pt = rotated([d.longitude, d.latitude]);
+    const depth = Math.cos(pt[1] * Math.PI/180) * Math.cos(pt[0] * Math.PI/180);
+    
+    svg.selectAll(".vol-circle, .city-ring, .city-dot")
+      .filter(dd => dd.city === d.city)
+      .attr("cx", coords ? coords[0] : 0)
+      .attr("cy", coords ? coords[1] : 0)
+      .attr("opacity", Math.max(0, depth));
+  });
+}
+
+function selectCity(city) {
+  selectedCity = city;
+  const center = financialCenters.find(c => c.city === city);
+  if (center) {
+    const target = [-center.longitude, -center.latitude, 0];
+    const current = projection.rotate();
+    let t = 0;
+    
+    const animate = () => {
+      t += 16;
+      const p = Math.min(t / 80, 1);
+      rotation = [
+        current[0] + (target[0] - current[0]) * p,
+        current[1] + (target[1] - current[1]) * p,
+        0
+      ];
+      projection.rotate(rotation);
+      updateGlobe();
+      if (p < 1) requestAnimationFrame(animate);
+      else updateInfo();
+    };
+    animate();
+  }
+  highlightCity();
+}
+
+function updateInfo() {
+  const center = financialCenters.find(c => c.city === selectedCity);
+  if (center) {
+    const ex = center.exchanges[0];
+    document.getElementById("city-info1").innerHTML = `
+      <span style="font-size:4em;"> ${center.city} </span> <br>
+      <span style="font-size:1em;"> Exchange MIC </span> <br>
+      <span style="font-size:9em; font-weight:light; line-height:1;"> (${ex.mic}) </span> <br><br>
+
+    `;
+
+        document.getElementById("city-info2").innerHTML = `
+     <span style="font-size:1em;">   P/E: <br>  </span>
+     <span style="font-size:3em;">   ${ex.peRatio}  </span>
+
+    `;
+        document.getElementById("city-info2b").innerHTML = `
+     <span style="font-size:1em;">   P/B: <br>  </span>
+     <span style="font-size:3em;">  ${ex.pbRatio}  </span>
+
+    `;
+        document.getElementById("city-info2c").innerHTML = `
+     <span style="font-size:1em;">   Volume:<br>  </span>
+     <span style="font-size:3em; color:#012199;">   ${ex.monthlyTradeVolume} </span>
+    `;
+        document.getElementById("city-info2d").innerHTML = `
+       <span style="font-size:1em;">  YTD: <br>  </span>
+       <span style="font-size:3em; color:#991616;">  ${ex.ytd} </span>
+    `;
+    document.getElementById("city-info3").innerHTML = `
+      <span style="font-size:2em;"> ${center.city} (${ex.mic})<br></span>
+      <span style="font-size:4em;font-weight:bold">  $${ex.marketCap}T<br> </span>
+ 
+    `;
+  }
+}
+
+function highlightCity() {
+  // Update globe city dots
+  svg.selectAll(".city-dot")
+    .attr("r", d => d.city === selectedCity ? 6 : 4)
+    .attr("opacity", d => d.city === selectedCity ? 1 : 0.8);
+  
+  // Update globe city rings
+  svg.selectAll(".city-ring")
+    .attr("stroke-width", d => d.city === selectedCity ? 2 : 1);
+  
+  // Update arc diagram paths
+  d3.selectAll(".arc-path")
+    .attr("opacity", d => d.name === selectedCity ? 1 : 0.7)
+    .attr("stroke-width", d => {
+      if (d.name === selectedCity) {
+        return Math.max(4, Math.sqrt(d.marketCap) * 2);
+      }
+      return Math.max(2, Math.sqrt(d.marketCap) * 1.5);
+    })
+    .style("filter", d => d.name === selectedCity ? "drop-shadow(0 0 8px rgba(255, 215, 0, 0.8))" : "none");
+  
+  // Update arc nodes
+  d3.selectAll(".arc-node")
+    .attr("r", d => d.name === selectedCity ? 7 : 5)
+    .attr("opacity", d => d.name === selectedCity ? 1 : 0.8);
+  
+  // Update scatter plot volume circles
+  d3.selectAll(".scatter-vol")
+    .attr("opacity", d => d.city === selectedCity ? 0.95 : 0.5)
+    .attr("stroke-width", d => d.city === selectedCity ? 2.5 : 1)
+    .style("filter", d => d.city === selectedCity ? "drop-shadow(0 0 8px rgba(255, 215, 0, 0.8))" : "none");
+  
+  // Update scatter plot YTD circles
+  d3.selectAll(".scatter-ytd")
+    .attr("opacity", d => d.city === selectedCity ? 1 : 0.5)
+    .attr("stroke-width", d => d.city === selectedCity ? 2.5 : 1.5)
+    .style("filter", d => d.city === selectedCity ? "drop-shadow(0 0 8px rgba(255, 68, 68, 0.8))" : "none");
+}
+
+// ========================================
+// ARC DIAGRAM
+// ========================================
+const arcSvg = d3.select("#arc-chart");
+const arcW = arcSvg.node().clientWidth || 800;
+const arcH = 400;
+const arcMargin = {top: 5, right:20, bottom: 60, left: 20};
+
+arcSvg.attr("viewBox", `0 0 ${arcW} ${arcH}`);
+arcSvg.append("rect").attr("width", arcW).attr("height", arcH).attr("fill", "none");
+
+const uniqueCities = [];
+const seen = new Set();
+financialCenters.forEach(c => {
+  if (!seen.has(c.city)) {
+    uniqueCities.push({name: c.city, marketCap: c.exchanges[0].marketCap});
+    seen.add(c.city);
+  }
+});
+uniqueCities.sort((a, b) => b.marketCap - a.marketCap);
+
+const xArc = d3.scalePoint()
+  .range([arcMargin.left, arcW - arcMargin.right])
+  .domain(uniqueCities.map(d => d.name));
+
+const hArc = d3.scaleSqrt()
+  .domain([0, d3.max(uniqueCities, d => d.marketCap)])
+  .range([0, arcH - arcMargin.top - arcMargin.bottom - 10]);
+
+const cArc = d3.scaleLinear()
+  .domain([0, d3.max(uniqueCities, d => d.marketCap)])
+  .range(["#254277", "#254277"]);
+
+const arcGroup = arcSvg.append("g");
+
+// Baseline
+arcGroup.append("line")
+  .attr("x1", arcMargin.left)
+  .attr("x2", arcW - arcMargin.right)
+  .attr("y1", arcH - arcMargin.bottom)
+  .attr("y2", arcH - arcMargin.bottom)
+  .attr("stroke", "#254277")
+  .attr("stroke-width", 1.5)
+  .attr("opacity", 0.2);
+
+// Arcs
+arcGroup.selectAll(".arc-path")
+  .data(uniqueCities)
+  .enter()
+  .append("path")
+  .attr("class", "arc-path")
+  .attr("d", d => {
+    const x = xArc(d.name);
+    const h = hArc(d.marketCap);
+    const y = arcH - arcMargin.bottom;
+    return `M ${x} ${y} Q ${x} ${y - h} ${x} ${y}`;
+  })
+  .attr("fill", "none")
+  .attr("stroke", d => cArc(d.marketCap))
+  .attr("stroke-width", d => {
+    if (d.name === selectedCity) {
+      return Math.max(4, Math.sqrt(d.marketCap) * 2);
+    }
+    return Math.max(2, Math.sqrt(d.marketCap) * 1.5);
+  })
+  .attr("opacity", d => d.name === selectedCity ? 1 : 0.7)
+  .style("filter", d => d.name === selectedCity ? "drop-shadow(0 0 8px #254277)" : "none")
+  .style("cursor", "pointer")
+  .on("click", (e, d) => selectCity(d.name));
+
+// Labels
+arcGroup.selectAll(".arc-label")
+  .data(uniqueCities)
+  .enter()
+  .append("text")
+  .attr("x", d => xArc(d.name))
+  .attr("y", arcH - arcMargin.bottom + 20)
+  .attr("text-anchor", "middle")
+  .attr("fill", "#254277")
+  .attr("font-size", "10px")
+  .attr("opacity", 0.2)
+  .text(d => d.name.split(' ')[0]);
+
+// Values
+arcGroup.selectAll(".arc-value")
+  .data(uniqueCities)
+  .enter()
+  .append("text")
+  .attr("x", d => xArc(d.name))
+  .attr("y", d => arcH - arcMargin.bottom - hArc(d.marketCap) - 8)
+  .attr("text-anchor", "middle")
+  .attr("fill", "#FFD700")
+  .attr("font-size", "9px")
+  .attr("opacity", 0.2)
+  .text(d => `$${d.marketCap.toFixed(1)}T`);
+
+// Nodes
+arcGroup.selectAll(".arc-node")
+  .data(uniqueCities)
+  .enter()
+  .append("circle")
+  .attr("cx", d => xArc(d.name))
+  .attr("cy", arcH - arcMargin.bottom)
+  .attr("r", d => d.name === selectedCity ? 7 : 5)
+  .attr("fill", "#254277")
+  .attr("opacity", d => d.name === selectedCity ? 1 : 0.8)
+  .style("cursor", "pointer")
+  .on("click", (e, d) => selectCity(d.name));
+
+// ========================================
+// SCATTER PLOT
+// ========================================
+const scatterSvg = d3.select("#scatter-plot");
+const scatterW = scatterSvg.node().clientWidth || 800;
+const scatterH = 350;
+const scatterM = {top: 50, right: 70, bottom: 50, left: 20};
+
+scatterSvg.attr("viewBox", `0 0 ${scatterW} ${scatterH}`);
+scatterSvg.append("rect").attr("width", scatterW).attr("height", scatterH).attr("fill", "none");
+
+const scatterData = financialCenters.map(c => {
+  const ex = c.exchanges[0];
+  return {
+    city: c.city,
+    peRatio: parseFloat(ex.peRatio.match(/[\d.]+/)[0]),
+    pbRatio: parseFloat(ex.pbRatio.match(/[\d.]+/)[0]),
+    volume: ex.monthlyTradeVolume,
+    ytd: Math.abs(parseFloat(ex.ytd.match(/[\d.]+/)[0]))
+  };
+});
+
+const peMin = d3.min(scatterData, d => d.peRatio);
+const peMax = d3.max(scatterData, d => d.peRatio);
+const pbMin = d3.min(scatterData, d => d.pbRatio);
+const pbMax = d3.max(scatterData, d => d.pbRatio);
+const volMax = d3.max(scatterData, d => d.volume);
+const ytdMax = d3.max(scatterData, d => d.ytd);
+
+const xSc = d3.scaleLinear()
+  .domain([peMin - 1, peMax + 1])
+  .range([scatterM.left, scatterW - scatterM.right]);
+
+const ySc = d3.scaleLinear()
+  .domain([pbMin - 0.2, pbMax + 0.2])
+  .range([scatterH - scatterM.bottom, scatterM.top]);
+
+const rVol = d3.scaleSqrt().domain([0, volMax]).range([3, 25]);
+const rYtd = d3.scaleSqrt().domain([0, ytdMax]).range([2, 20]);
+
+const scatterG = scatterSvg.append("g");
+
+// Axes labels only (no lines)
+scatterG.append("text")
+  .attr("x", scatterW/5)
+  .attr("y", scatterH - 5)
+  .attr("text-anchor", "middle")
+  .attr("fill", "#565656")
+  .attr("font-size", "12px")
+  .attr("font-weight", "bold")
+  .text(" lower ← P/E Ratio ---------------------------------------  higher P/E Ratio");
+
+scatterG.append("text")
+  .attr("transform", "rotate(90)")
+  .attr("x", scatterH/2)
+  .attr("y", -scatterW + 15)
+  .attr("text-anchor", "middle")
+  .attr("fill", "#565656")
+  .attr("font-size", "12px")
+  .attr("font-weight", "bold")
+  .text("lower ← P/B Ratio ---------------------------------------  ←higher P/B Ratio");
+
+function renderScatter() {
+  scatterG.selectAll(".scatter-vol, .scatter-ytd").remove();
+  
+  let filtered = scatterData;
+  if (selectedFilterCity !== "all") {
+    filtered = scatterData.filter(d => d.city === selectedFilterCity);
+  }
+  
+  if (showVolume) {
+    scatterG.selectAll(".scatter-vol")
+      .data(filtered)
+      .enter()
+      .append("circle")
+      .attr("class", "scatter-vol")
+      .attr("cx", d => xSc(d.peRatio))
+      .attr("cy", d => ySc(d.pbRatio))
+      .attr("r", d => rVol(d.volume))
+      .attr("fill", "#4A90E2")
+      .attr("opacity", d => d.city === selectedCity ? 0.95 : 0.5)
+      .attr("stroke", "#FFD700")
+      .attr("stroke-width", d => d.city === selectedCity ? 4.5 : 1)
+      .style("filter", d => d.city === selectedCity ? "drop-shadow(0 0 8px rgba(255, 215, 0, 0.8))" : "none")
+      .style("cursor", "pointer")
+      .on("click", (e, d) => selectCity(d.city));
+  }
+  
+  if (showYtd) {
+    scatterG.selectAll(".scatter-ytd")
+      .data(filtered)
+      .enter()
+      .append("circle")
+      .attr("class", "scatter-ytd")
+      .attr("cx", d => xSc(d.peRatio))
+      .attr("cy", d => ySc(d.pbRatio))
+      .attr("r", d => rYtd(d.ytd))
+      .attr("fill", "none")
+      .attr("stroke", "#FF4444")
+      .attr("stroke-width", d => d.city === selectedCity ? 2.5 : 1.5)
+      .attr("opacity", d => d.city === selectedCity ? 1 : 0.5)
+      .style("filter", d => d.city === selectedCity ? "drop-shadow(0 0 8px rgba(255, 68, 68, 0.8))" : "none");
+  }
+}
+
+renderScatter();
+
+// Legend
+/* const leg = scatterG.append("g").attr("transform", `translate(${scatterM.left + 10}, ${scatterM.top + 10})`);
+leg.append("circle").attr("cx", 10).attr("cy", 0).attr("r", 4).attr("fill", "#4A90E2").attr("stroke", "#FFD700");
+leg.append("text").attr("x", 20).attr("y", 5).attr("fill", "#FFD700").attr("font-size", "10px").text("Volume");
+leg.append("circle").attr("cx", 10).attr("cy", 20).attr("r", 4).attr("fill", "none").attr("stroke", "#FF4444");
+leg.append("text").attr("x", 20).attr("y", 25).attr("fill", "#FF4444").attr("font-size", "10px").text("YTD"); */
+
+// ========================================
+// FILTERS
+// ========================================
+
+
+const filterDiv = d3.select("body").append("div").attr("class", "filter-container");
+
+//const filterDiv2 = d3.select("body").append("div").attr("class", "filter-container2");
+// filterDiv2.append("label").attr("class", "filter-label").text("Filter City:");
+// const citySelect = filterDiv2.append("select");
+// citySelect.append("option").attr("value", "all").text("-select-");
+// financialCenters.forEach(c => {
+//   citySelect.append("option").attr("value", c.city).text(c.city);
+// });
+// citySelect.on("change", function() {
+//   selectedFilterCity = this.value;
+//   renderScatter();
+// });
+
+const volCheck = filterDiv.append("div").attr("class", "checkbox-row");
+volCheck.append("input").attr("type", "checkbox").attr("checked", true)
+  .on("change", function() { showVolume = this.checked; renderScatter(); });
+volCheck.append("label").style("color", "#4A90E2").text("Volume ");
+
+const ytdCheck = filterDiv.append("div").attr("class", "checkbox-row");
+ytdCheck.append("input").attr("type", "checkbox").attr("checked", true)
+  .on("change", function() { showYtd = this.checked; renderScatter(); });
+ytdCheck.append("label").style("color", "#FF4444").text("YTD ");
+
+// Initialize
+selectCity("New York");
+
+</script>
+</body>
+</html>
