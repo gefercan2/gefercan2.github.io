@@ -76,6 +76,9 @@
       font-size:1em;
       color:#454545;text-align:left;
     }
+    #instruction{
+      font-style:italic;
+    }
 
     #titlebox{
       display:grid;
@@ -317,7 +320,7 @@
    <div id="titlebox">
     <!-- <div id="currentTime" class="time-box">      </div>  <div id="localTime" class="time-box city-time-box">    </div> -->
        <div class="time-label"> this is your time</div>
-       <div class="time-display" id="current-time" >00:00:00</div>
+       <div class="time-display" id="current-time">00:00:00</div>
        <div class="time-label"> the time in <span id="city-name"> </span> </div>
        <div class="time-display" id="city-time">00:00:00</div>
 
@@ -332,7 +335,7 @@
       <!-- Info Box -->
       <div id="mainbox1" class="info-box">
 
-        <div class="info-title"> selected city </div>
+        <div class="info-title" id="instruction"> PLEASE SELECT A DOT IN THE GLOBE OR A BUBBLE IN THE CHART TO SEE AN EXCHANGE DATA  > </div>
         <div class="info-content" id="city-info1">Select a city to view details</div>
 
 
@@ -470,7 +473,7 @@ const financialCenters = [
   },
 ];
 
-let selectedCity = "New York";
+let selectedCity = "Dubai";
 let showVolume = true;
 let showYtd = true;
 let selectedFilterCity = "all";
