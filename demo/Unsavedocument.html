@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+
+<style>
+  body {
+    font-family: sans-serif;
+    background: #fff;
+  }
+
+  .dot {
+    fill: black;
+  }
+
+  .dot.blurry {
+    opacity: 0.25;
+    filter: blur(2px);
+  }
+
+  .axis text {
+    font-size: 10px;
+  }
+
+  .tooltip {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 6px;
+    pointer-events: none;
+    font-size: 12px;
+  }
+</style>
+
+<body>
+<svg width="1000" height="500"></svg>
+<div class="tooltip" style="opacity:0;"></div>
+
+<script>
+
+d3.csv("/home/german1/Downloads/Timeline - LOUVRE_AbuDhabi.csv").then(raw => {
+
+  const data = raw
+    .map(d => {
+      d.chart_standardized_date = +d["chart standarized date"];
+      if (isNaN(d.chart_standardized_date)) return null;
+
+      d.historical_age = d["historical age"] || "unknown";
+      d.chart_estimate_type = d["chart estimate type"]?.trim();
+
+      return d;
+    })
+    .filter(d => d !== null);
+
+  const width = 1000;
+  const height = 500;
+  const margin = {top: 60, right: 20, bottom: 60, left: 40};
+
+  const svg = d3.select("svg");
+
+  // --- X SCALE (time) ---
+  const x = d3.scaleLinear()
+    .domain(d3.extent(data, d => d.chart_standardized_date))
+    .range([margin.left, width - margin.right]);
+
+  // --- HISTORICAL AGE BAND ---
+  const ages = [...new Set(data.map(d => d.historical_age))];
+
+  const xBand = d3.scaleBand()
+    .domain(ages)
+    .range([margin.left, width - margin.right])
+    .padding(0.1);
+
+  // --- SIMULATION (BEESWARM) ---
+  const simulation = d3.forceSimulation(data)
+    .force("x", d3.forceX(d => x(d.chart_standardized_date)).strength(1))
+    .force("y", d3.forceY(height / 2))
+    .force("collide", d3.forceCollide(5))
+    .stop();
+
+  for (let i = 0; i < 200; ++i) simulation.tick();
+
+  // --- TOOLTIP ---
+  const tooltip = d3.select(".tooltip");
+
+  // --- DRAW DOTS ---
+  svg.append("g")
+    .selectAll("circle")
+    .data(data)
+    .join("circle")
+    .attr("class", d =>
+      "dot " + (d.chart_estimate_type === "year range" ? "blurry" : "")
+    )
+    .attr("cx", d => d.x)
+    .attr("cy", d => d.y)
+    .attr("r", 4)
+    .on("mouseover", (event, d) => {
+      tooltip.style("opacity", 1)
+        .html(`
+          <strong>${d.Title}</strong><br/>
+          ${d.Maker || "Unknown"}<br/>
+          ${d.date}<br/>
+          ${d["Production Place"]}, ${d["Country (current)"]}<br/>
+          ${d.category || ""}
+        `);
+    })
+    .on("mousemove", event => {
+      tooltip
+        .style("left", (event.pageX + 10) + "px")
+        .style("top", (event.pageY + 10) + "px");
+    })
+    .on("mouseout", () => tooltip.style("opacity", 0));
+
+  // --- AXIS 1: TIME ---
+  svg.append("g")
+    .attr("transform", `translate(0, ${height - margin.bottom})`)
+    .call(d3.axisBottom(x).tickFormat(d => d));
+
+  // --- AXIS 2: HISTORICAL AGE (band labels) ---
+  svg.append("g")
+    .attr("transform", `translate(0, ${margin.top})`)
+    .selectAll("text")
+    .data(ages)
+    .join("text")
+    .attr("x", d => xBand(d) + xBand.bandwidth() / 2)
+    .attr("y", -10)
+    .attr("text-anchor", "middle")
+    .text(d => d);
+
+});
+
+</script>
