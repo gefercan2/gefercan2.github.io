@@ -1,0 +1,112 @@
+Year,Country,Winner Club,city,coordinates longitude,coordinate latitude,foundation year,shirt,runner up club,runner up city,goalscorer,goals,clubs playing that year,link team,link year
+1960,Uruguay,Peñarol,Montevideo,34.9011,56.1645,1891,"vert_stripes, (yellow, black)",Olimpia,Asunción,"Alberto SPENCER   Peñarol (URU) 
+",7,"Argentina - San Lorenzo de Almagro
+Bolivia   - Jorge Wilstermann (Cochabamba)
+Brazil    - EC Bahia (Salvador)
+Chile     - Universidad de Chile (Santiago)
+Colombia  - Millonarios (Bogotá)
+Paraguay  - Olimpia (Asunción)
+Uruguay   - Peñarol (Montevideo)",na,na
+1961,Uruguay,Peñarol,Montevideo,34.9011,56.1645,1891,"vert_stripes, (yellow, black)",Palmeiras,São Paulo,"Osvaldo PANZUTTO Independiente Santa Fe (COL)
+",4,"Argentina - Independiente (Avellaneda)
+Bolivia   - Jorge Wilstermann (Cochabamba)
+Brazil    - Palmeiras (São Paulo)
+Chile     - Colo Colo (Santiago)
+Colombia  - Independiente Santa Fe (Bogotá)
+Ecuador   - Barcelona (Guayaquil)
+Paraguay  - Olimpia (Asunción)
+Peru      - Universitario (Lima)
+Uruguay   - Peñarol (Montevideo)",na,na
+1962,Brazil,Santos,Sao Paulo,23.5505,46.6333,1912,"vert_stripes, (white, black)",Peñarol,Montevideo,"Alberto SPENCER,Peñarol (URU), COUTINHO  Santos FC (BRA),  ,Enrique RAYMONDI        Emelec (ECU) ",6,Santos (Brazil) - Defending ChampionBoca Juniors (Argentina) - Champion of Argentina 1962Botafogo (Brazil) - Winner of the Taça Brasil 1962Universidad de Chile (Chile) - Champion of Chile 1962Millonarios (Colombia) - Champion of Colombia 1962Deportivo Everest (Ecuador) - Champion of Ecuador 1962Olimpia (Paraguay) - Champion of Paraguay 1962Alianza Lima (Peru) - Champion of Peru 1962Peñarol (Uruguay) - Champion of Uruguay 1962,na,na
+1963,Brazil,Santos,Sao Paulo,23.5505,46.6333,1912,"vert_stripes, (white, black)",Boca Juniors,Buenos Aires,José SANFILIPPO  Boca Juniors (ARG) ,7,Santos (Brazil) - Defending ChampionBoca Juniors (Argentina)Botafogo (Brazil)Universidad de Chile (Chile)Millonarios (Colombia)Everest (Ecuador)Olimpia (Paraguay)Alianza Lima (Peru)Peñarol (Uruguay),na,na
+1964,Argentina,Independiente,Avellaneda,34.6611,58.3669,1905,"plain_shirt , (red)",Nacional,Avellaneda,Mario RODRÍGUEZ  Independiente (ARG) ,6,"Argentina: Independiente (Champion), Boca JuniorsBrazil: Santos FC, BahiaChile: Colo-ColoColombia: MillonariosEcuador: BarcelonaParaguay: Cerro PorteñoPeru: Alianza LimaUruguay: Nacional (Runner-up), PeñarolVenezuela: Deportivo Italia",na,na
+1965,Argentina,Independiente,Avellaneda,34.6611,58.3669,1905,"plain_shirt , (red)",Peñarol,Montevideo,PELÉ    Santos FC (BRA)  ,8,"Argentina: Independiente (holder), Boca JuniorsBolivia: The StrongestBrazil: SantosChile: Universidad de ChileEcuador: Deportivo QuitoParaguay: GuaraníPeru: UniversitarioUruguay: PeñarolVenezuela: Deportivo Galicia",na,na
+1966,Uruguay,Peñarol,Montevideo,34.9011,56.1645,1891,"vert_stripes, (yellow, black)",River Plate,Buenos Aires,Daniel Germán ONEGA  River Plate (ARG)   ,17,na,na,na
+1967,Argentina,Racing Club,Avellaneda,34.6611,58.3669,1903,"cross_stripe,(white, red)",Nacional,Montevideo,Norberto RAFFO Racing Club (ARG) ,14,na,na,na
+1968,Argentina,Estudiantes,La Plata,34.9215,57.9545,1905,"ver_strips(white, red)",Palmeiras,São Paulo,TUPÃZINHO Palmeiras (BRA)  ,11,na,na,na
+1969,Argentina,Estudiantes,La Plata,34.9215,57.9545,1905,"ver_strips(white, red)",Nacional,La Plata,Alberto FERRERO    Santiago Wanderers (CHI),8,na,na,na
+1970,Argentina,Estudiantes,La Plata,34.9215,57.9545,1905,"ver_strips(white, red)",Peñarol,Montevideo,"Francisco BERTOCCHILiga Universitaria Quito (ECU), Oscar MAS , River Plate (ARG)",9,na,na,na
+1971,Uruguay,Nacional,Montevideo,34.9011,56.1645,1899,,Estudiantes,Montevideo,"Raúl CASTRONOVO, Peñarol (URU)   Luis ARTIME , Nacional (URU) ",10,na,na,na
+1972,Argentina,Independiente,Avellaneda,34.6611,58.3669,1905,"plain_shirt , (red)",Universitario,Avellaneda,"TONINHO, São Paulo FC (BRA) , Teófilo CUBILLAS        Alianza Lima (PER) 
+Percy ROJAS             Alianza Lima (PER)  Oswaldo RAMÍREZ         Universitario (PER)  ",6,na,na,na
+1973,Argentina,Independiente,Avellaneda,34.6611,58.3669,1905,"plain_shirt , (red)",Colo Colo,Santiago,Carlos CASZELY          Colo Colo (CHI)              ,9,na,na,na
+1974,Argentina,Independiente,Avellaneda,34.6611,58.3669,1905,"plain_shirt , (red)",São Paulo,Avellaneda,"Fernando MORENA Peñarol (URU)   , TERTO São Paulo FC (BRA) , Pedro Virgilio ROCHA São Paulo FC (BRA) ",7,na,na,na
+1975,Argentina,Independiente,Avellaneda,34.6611,58.3669,1905,"plain_shirt , (red)",Unión Española,Avellaneda," Fernando MORENA         Peñarol (URU)    , Oswaldo RAMÍREZ         Universitario (PER)    ",8,na,na,na
+1976,Brazil,Cruzeiro,Belo Horizonte,19.9167,43.9345,1921,"plain_shirt , (blue)",River Plate,Buenos Aires,PALHINHA   [1]          Cruzeiro (BRA)  ,13,na,na,na
+1977,Argentina,Boca Juniors,Buenos AIres,34.6037,58.3816,1905,"single_strip_shirt (blue, yellow)",Cruzeiro,Belo Horizonte,Néstor Leonel SCOTTA    Deportivo Cali (COL)   Juan César SILVA        Portuguesa FC (VEN)       ,5,na,na,na
+1978,Argentina,Boca Juniors,Buenos AIres,34.6037,58.3816,1905,"single_strip_shirt (blue, yellow)",Deportivo Cali,Buenos Aires,"Néstor Leonel SCOTTA    Deportivo Cali (COL)  , Guillermo LA ROSA       Alianza Lima (PER)      ",8,na,na,na
+1979,Paraguay,Olimpia (Asunción),Asuncion,25.2637,57.5759,1902,,Boca Juniors,Buenos Aires,"MILTÃO                  Guaraní (BRA)  
+Juan José ORÉ           Universitario (PER) ",6,na,na,na
+1980,Uruguay,Nacional,Montevideo,34.9011,56.1645,1899,,Internacional,Montevideo,Waldemar VICTORINO      Nacional (URU)   ,6,na,na,na
+1981,Brazil,Flamengo,Rio de Janeiro,22.9068,43.1729,1895,"hor_strips(black,red)",Cobreloa,Santiago,ZICO                    Flamengo (BRA)   ,11,na,na,na
+1982,Uruguay,Peñarol,Montevideo,34.9011,56.1645,1891,"vert_stripes, (yellow, black)",Cobreloa,Santiago,Fernando MORENA         Peñarol (URU)  ,7,na,na,na
+1983,Brazil,Grêmio,Porto Alegre,30.0346,51.2177,1903,"ver_strips(black,sky blue)",Peñarol,Porto Alegre,Arsenio LUZARDO         Nacional (URU)  ,8,na,na,na
+1984,Argentina,Independiente,Avellaneda,34.6611,58.3669,1905,"plain_shirt , (red)",Grêmio,Avellaneda,TITA                    Flamengo (BRA)   ,8,na,na,na
+1985,Argentina,Argentinos Juniors,Buenos AIres,34.6037,58.3816,1904,"plain_shirt , (red)",América de Cali,Cali,Juan Carlos SÁNCHEZ     Blooming (BOL)  ,11,na,na,na
+1986,Argentina,River Plate,Buenos AIres,34.6037,58.3816,1901,"cross_stripe,(white, red)",América de Cali,sBuenos Aires,Juan Carlos DE LIMA     Deportivo Quito (ECU)  ,9,na,na,na
+1987,Uruguay,Peñarol,Montevideo,34.9011,56.1645,1891,"vert_stripes, (yellow, black)",América de Cali,Montevideo,Ricardo GARECA          América de Cali (COL) ,7,na,na,na
+1988,Uruguay,Nacional,Montevideo,34.9011,56.1645,1899,,Newell's Old Boys,Montevideo,Arnoldo IGUARÁN         Millonarios (COL) ,5,na,na,na
+1989,Colombia,Atlético Nacional (Medellín),Medellin,6.2442,75.5812,1947,"ver_strips(white, green)",Olimpia,Bogotá,Carlos AGUILERA         Peñarol (URU)   Raúl Vicente AMARILLA   Olimpia (PAR)                 10,10,na,na,na
+1990,Paraguay,Olimpia (Asunción),Asuncion,25.2637,57.5759,1902,,Barcelona,Guayaquil,Adriano SAMANIEGO       Olimpia (PAR) ,7,na,na,na
+1991,Chile,Colo Colo,Santiago,33.4489,70.6693,1925,"plain_shirt , (white)",Olimpia,Santiago,GAÚCHO  Flamengo (BRA)     ,8,na,na,na
+1992,Brazil,São Paulo,Sao Paulo,23.5505,46.6333,1930,"plain_shirt , (white)",Newell's Old Boys,São Paulo,PALHINHA   [2]          São Paulo FC (BRA) ,7,na,na,na
+1993,Brazil,São Paulo,Sao Paulo,23.5505,46.6333,1930,"plain_shirt , (white)",Universidad Católica, Santiago ,Juan Carlos ALMADA      Universidad Católica (CHI),9,na,na,na
+1994,Argentina,Vélez Sarsfield,Buenos AIres,34.6037,58.3816,1910,"cross_stripe,(black, white)",São Paulo,São Paulo,Stalin RIVAS            Minervén (VEN) ,7,na,na,na
+1995,Brazil,Grêmio,Porto Alegre,30.0346,51.2177,1903,"ver_strips(black,sky blue)",Atlético Nacional,Medellín,JARDEL                  Grêmio (BRA) ,12,na,na,na
+1996,Argentina,River Plate,Buenos AIres,34.6037,58.3816,1901,"cross_stripe,(white, red)",América de Cali,Buenos Aires,Anthony DE ÁVILA        América de Cali (COL) ,11,na,na,na
+1997,Brazil,Cruzeiro,Belo Horizonte,19.9167,43.9345,1921,"plain_shirt , (blue)",Sporting Cristal,Belo Horizonte,Alberto ACOSTA          Universidad Católica (CHI) ,11,na,na,na
+1998,Brazil,Vasco da Gama,Rio de Janeiro,22.9068,43.1729,1898,"cross_stripe,(black, white)",Barcelona,Guayaquil ,SERGIO JOÃO             Bolívar (BOL) ,10,na,na,na
+1999,Brazil,Palmeiras,Sao Paulo,23.5505,46.6333,1914,"plain_shirt , (green)",Deportivo Cali,São Paulo,"Víctor BONILLA          Deportivo Cali (COL)      
+Fernando BAIANO         Corinthians (BRA)  
+GAUCHINHO               Cerro Porteño (PAR) 
+Ruberth MORÁN           Estudiantes de Mérida (VEN) 
+Rubén SOSA              Nacional (URU) 
+Martín ZAPATA           Deportivo Cali (COL) ",6,na,na,na
+2000,Argentina,Boca Juniors,Buenos AIres,34.6037,58.3816,1905,"single_strip_shirt (blue, yellow)",Palmeiras,São Paulo, LUIZÃO                  Corinthians (BRA)           ,14,na,na,na
+2001,Argentina,Boca Juniors,Buenos AIres,34.6037,58.3816,1905,"single_strip_shirt (blue, yellow)",Cruz Azul,Buenos Aires,LOPES Palmeiras (BRA) ,9,na,na,na
+2002,Paraguay,Olimpia (Asunción),Asuncion,25.2637,57.5759,1902,,São Caetano,São Paulo,RODRIGO Mendes          Grêmio (BRA)            ,10,na,na,na
+2003,Argentina,Boca Juniors,Buenos AIres,34.6037,58.3816,1905,"single_strip_shirt (blue, yellow)",Santos,São Paulo,"Marcelo DELGADO         Boca Juniors (ARG) 
+RICARDO Oliveira        Santos (BRA)  ",9,na,na,na
+2004,Colombia,Once Caldas (Manizales),Manizales,5.0689,75.5174,1961,,Boca Juniors,Manizales,LUÍS FABIANO            São Paulo FC (BRA)         ,8,na,na,na
+2005,Brazil,São Paulo,Sao Paulo,23.5505,46.6333,1930,"plain_shirt , (white)",Athletico Paranaense,–,Santiago SALCEDO        Cerro Porteño (PAR) ,9,na,na,na
+2006,Brazil,Internacional,Porto Alegre,30.0346,51.2177,1909,,São Paulo,Porto Alegre,"ALOÍSIO                 São Paulo (BRA)    Félix BORJA             El Nacional (ECU)  
+José Luis CALDERÓN      Estudiantes (ARG) 
+Agustín DELGADO         LDU Quito (ECU) 
+Sebastián EREROS        Vélez Sársfield (ARG) 
+Ernesto FARÍAS          River Plate (ARG) 
+FERNANDÃO               Internacional (BRA) 
+MARCINHO                Palmeiras (BRA) 
+Daniel MONTENEGRO       River Plate (ARG) 
+NILMAR                  Corinthians (BRA) 
+Mariano PAVONE          Estudiantes (ARG) 
+Jorge QUINTEROS         Universidad Católica (CHI) 
+Patricio URRUTIA        LDU Quito (ECU) 
+WASHINGTON              Palmeiras (BRA) ",5,na,na,na
+2007,Argentina,Boca Juniors,Buenos AIres,34.6037,58.3816,1905,"single_strip_shirt (blue, yellow)", Grêmio, Porto Alegre , Salvador CABAÑAS        América (MEX)          ,10,na,na,na
+2008,Ecuador,LDU (Quito),Quito,0.18,78.4678,1930,,Fluminense,Rio de Janeiro,"Salvador CABAÑAS        América (MEX) 
+Marcelo MARTINS         Cruzeiro (BRA)  ",8,na,na,na
+2009,Argentina,Estudiantes,La Plata,34.9215,57.9545,1905,"ver_strips(white, red)",Cruzeiro,Belo Horizonte,Mauro BOSELLI           Estudiantes (ARG)  ,,na,na,na
+2010,Brazil,Internacional,Porto Alegre,30.0346,51.2177,1909,,Guadalajara,Porto Alegre, THIAGO RIBEIRO          Cruzeiro (BRA),8,"Corinthians (São Paulo),Racing (Montevideo),Independiente Medellín,Cerro Porteño (Asunción),São Paulo FC ,Once Caldas (Manizales),Monterrey,Nacional (Asunción) 
+",na,na
+2011,Brazil,Santos,Sao Paulo,23.5505,46.6333,1912,"vert_stripes, (white, black)",Peñarol,São Paulo,"Roberto NANNI           Cerro Porteño (PAR) 
+WALLYSON                Cruzeiro (BRA) ",7,"Libertad (Asunción),Once Caldas (Manizales) ,Universidad San Martín (Lima),San Luis (San Luis Potosí) ,Junior (Barranquilla),Grêmio (Porto Alegre),Oriente Petrolero (Sta. Cruz),León de Huánuco ",na,na
+2012,Brazil,Corinthians,Sao Paulo,23.5505,46.6333,1910,"plain_shirt , (white)",Boca Juniors,São Paulo,"Matías ALUSTIZA         Deportivo Quito (ECU)  
+NEYMAR                  Santos (BRA)  ",8,"Santos,Internacional (Porto Alegre),The Strongest (La Paz) ,Juan Aurich (Chiclayo),Lanús (Buenos Aires) ,Emelec (Guayaquil),Flamengo (Rio de Janeiro),Olimpia (Asunción)",na,na
+2013,Brazil,Atlético Mineiro (Belo Horizonte),Belo Horizonte,19.9167,43.9345,1908,"vert_stripes, (white, black)",Olimpia,Belo Horizonte, JÔ                      Atlético Mineiro (BRA) ,7,"Nacional (Montevideo),Boca Juniors (Buenos Aires),Toluca,Barcelona (Guayaquil),Palmeiras (São Paulo),Tigre (Buenos Aires)  ,Libertad (Asunción),Sporting Cristal (Lima)  
+",na,na
+2014,Argentina,San Lorenzo de Almagro,Buenos AIres,34.6037,58.3816,1908,"cross_stripe,(white, red)",Nacional,Buenos Aires,"Julio dos SANTOS        Cerro Porteño (PAR)
+Nicolás OLIVERA         Defensor Sporting (URU) ",5,"Vélez Sársfield (Buenos Aires),The Strongest (La Paz),Atlético Paranaense (Curitiba),Universitario (Lima),.Unión Española (Santiago), San Lorenzo de Almagro ,Independiente José Terán, ,Botafogo (Rio de Janeiro) 
+",na,na
+2015,Argentina,River Plate,Buenos AIres,34.6037,58.3816,1901,"cross_stripe,(white, red)",Tigres UANL,Buenos Aires,  Gustavo BOU             Racing Club (ARG) ,8,"Independiente Santa Fe (Bogotá),Atl. Mineiro (Belo Horizonte),Colo Colo (Santiago),Atlas (Guadalajara) ,Corinthians (São Paulo) ,São Paulo,San Lorenzo de Almagro ,Danubio (Montevideo)  ",na,na
+2016,Colombia,Atlético Nacional (Medellín),Medellin,6.2442,75.5812,1947,"ver_strips(white, green)",Independiente del Valle,Medellín, Jonathan CALLERI        São Paulo (BRA),9,"River Plate (Buenos Aires),São Paulo ,The Strongest (La Paz),Trujillanos (Valera),Rosario Central,Nacional (Montevideo),Palmeiras (São Paulo),River Plate (Montevideo) ",na,na
+2017,Brazil,Grêmio,Porto Alegre,30.0346,51.2177,1903,"ver_strips(black,sky blue)",Lanús,Lanús, José Gustavo SAND       Lanús (ARG)  ,9,"Botafogo (Rio de Janeiro),Barcelona (Guayaquil),Estudiantes (La Plata),Atlético Nacional (Medellín),Santos,The Strongest (La Paz),Independiente Santa Fe (Bogotá),Sporting Cristal (Lima)",na,na
+2018,Argentina,River Plate,Buenos AIres,34.6037,58.3816,1901,"cross_stripe,(white, red)",Boca Juniors,Madrid,"Miguel Ángel BORJA      Palmeiras (BRA)
+Wilson David MORELO     Independiente Santa Fe (COL) ",9,"Grêmio (Porto Alegre) ,Cerro Porteño (Asunción),Defensor Sporting (Montevideo),Monagas SC (Maturín),Atlético Nacional (Medellín),Colo Colo (Santiago),Bolívar (La Paz),Delfín (Manta) ",na,na
+2019,Brazil,Flamengo,Rio de Janeiro,22.9068,43.1729,1895,"hor_strips(black,red)",River Plate,Buenos Aires,Gabriel BARBOSA         Flamengo (BRA) ,9,"Internacional (Porto Alegre),River Plate (Buenos Aires),Palestino (Santiago),Alianza Lima,Cruzeiro (Belo Horizonte),Emelec (Guayaquil),Deportivo Lara (Barquisimeto),Huracán (Buenos Aires)",na,na
+2020,Brazil,Palmeiras,Sao Paulo,23.5505,46.6333,1914,"plain_shirt , (green)",Santos,São Paulo, Fidel MARTÍNEZ          Barcelona (ECU)  ,8,"Flamengo (Rio de Janeiro),Indep. del Valle (Sangolquí),Atlético Junior (Barranquilla) ,Barcelona (Guayaquil),Palmeiras (São Paulo),Guaraní (Asunción),Bolívar (La Paz),Tigre (Victoria)",na,na
+2021,Brazil,Palmeiras,Sao Paulo,23.5505,46.6333,1914,"plain_shirt , (green)",Flamengo,Rio de Janeiro,Gabriel BARBOSA         Flamengo (BRA),11,"Palmeiras (São Paulo),Defensa y Justicia (Fl. Varela),Indep. del Valle (Sangolquí),Universitario (Lima) ,Internacional (Porto Alegre),Olimpia (Asunción),Dep. Táchira (San Cristóbal),Always Ready (La Paz)           ",na,na
+2022,Brazil,Flamengo,Rio de Janeiro,22.9068,43.1729,1895,"hor_strips(black,red)",Athletico Paranaense,aParana,PEDRO Guilherme Abreu   Flamengo (BRA),12,"Palmeiras (São Paulo),Libertad (Asunción),.Athletico Paranaense (Curitiba),The Strongest (La Paz) , Caracas FC  ,Emelec (Guayaquil),Dep. Táchira (San Cristóbal),Independiente Petrolero (Sucre)",na,na
+2023,Brazil,Fluminense,Rio de Janeiro,22.9068,43.1729,1902,"ver_strips(green, red)",Boca Juniors,Buenos Aires,Germán CANO             Fluminense (BRA),13,"SC Internacional,SE Palmeiras ,Bolívar,Barcelona SC,Cerro Porteño,Nacional,Ind. Medellín,Metropolitanos FC    ",na,na
+2024,Brazil,Botafogo,Rio de Janeiro,22.9068,43.1729,1904,"vert_stripes, (white, black)",Atlético Mineiro,, JÚNIOR SANTOS           Botafogo (BRA),10,"Fluminense FC  ,Colo-Colo ,Cerro Porteño ,Alianza Lima , São Paulo FC ,Talleres, Barcelona SC, Cobresal",na,
+2025,Brazil,Flamengo,Rio de Janeiro,22.9068,43.1729,1895,"hor_strips(black,red)",Palmeiras,São Paulo,José Manuel LÓPEZ       Palmeiras (BRA)  ,7,,,
+,,,,,,,,,,Adrián MARTÍNEZ         Racing Club (ARG)  ,,,,

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>FIFA Dashboard</title>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://unpkg.com/topojson-client@3"></script>
+
+<style>
+body { margin:0; font-family: Arial; }
+#container { width:100%; height:100vh; display:flex; flex-direction:column; }
+
+/* TOP */
+#top { height:20%; display:flex; }
+#titlebox { width:30%; padding:10px; }
+#introbox { width:40%; padding:10px; }
+#filterbox { width:30%; display:flex; align-items:center; justify-content:space-around; }
+
+/* BOTTOM */
+#bottom { height:80%; display:flex; }
+#globeHolder { width:30%; }
+#right { width:70%; display:flex; flex-direction:column; }
+
+#chartHolder { height:50%; }
+#infoSection { height:50%; display:flex; }
+
+#sectionTitle { width:30%; padding:10px; }
+#infobox { width:40%; padding:10px; overflow:auto; }
+#shirtbox { width:30%; padding:10px; }
+</style>
+</head>
+
+<body>
+
+<div id="container">
+
+    <!-- TOP -->
+    <div id="top">
+        <div id="titlebox">
+            <h2>Club World Champions</h2>
+        </div>
+        <div id="introbox">
+            <p>Interactive exploration of champions across years, countries, and clubs.</p>
+        </div>
+        <div id="filterbox">
+            <select id="mainFilter">
+                <option value="country">country</option>
+                <option value="year">year</option>
+                <option value="club">club</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- BOTTOM -->
+    <div id="bottom">
+        <div id="globeHolder"></div>
+
+        <div id="right">
+            <div id="chartHolder"></div>
+
+            <div id="infoSection">
+                <div id="sectionTitle"></div>
+                <div id="infobox"></div>
+                <div id="shirtbox"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+// =====================
+// LOAD DATA
+// =====================
+let data = [];
+
+d3.csv("2000-2016_FIFA WORLD CLUB CUP - Libertadores finals.csv").then(d => {
+    data = d;
+    init();
+});
+
+// =====================
+// GLOBAL STATE
+// =====================
+let state = {
+    mode: "country",
+    selected: null
+};
+
+// =====================
+// INIT
+// =====================
+function init(){
+    initGlobe();
+    updateAll();
+}
+
+// =====================
+// FILTER
+// =====================
+d3.select("#mainFilter").on("change", function(){
+    state.mode = this.value;
+    state.selected = null;
+    updateAll();
+});
+
+// =====================
+// MAIN UPDATE
+// =====================
+function updateAll(){
+    updateGlobe();
+    updateChart();
+    updateSectionTitle();
+    updateInfoBox();
+    updateShirtBox();
+}
+
+// =====================
+// GLOBE
+// =====================
+let projection = d3.geoOrthographic()
+    .scale(150)
+    .translate([150,150])
+    .rotate([60, -30]); // South America focus
+
+let path = d3.geoPath(projection);
+let svgGlobe;
+
+function initGlobe(){
+
+    svgGlobe = d3.select("#globeHolder")
+        .append("svg")
+        .attr("width","100%")
+        .attr("height","100%");
+
+    d3.json("https://unpkg.com/world-atlas@2/countries-110m.json")
+        .then(world => {
+
+        let countries = topojson.feature(world, world.objects.countries);
+
+        svgGlobe.selectAll("path")
+            .data(countries.features)
+            .enter()
+            .append("path")
+            .attr("d", path)
+            .attr("fill","#ddd")
+            .attr("stroke","#999");
+    });
+}
+
+function updateGlobe(){
+
+    if(state.mode === "country"){
+        // choropleth
+        let counts = d3.rollup(data, v=>v.length, d=>d.country);
+
+        svgGlobe.selectAll("path")
+            .attr("fill", d => {
+                let c = counts.get(d.properties.name);
+                return c ? d3.interpolateBlues(c/5) : "#eee";
+            });
+    }
+
+    if(state.mode === "year"){
+        drawPoints(d => +d.year);
+    }
+
+    if(state.mode === "club"){
+        drawPoints(d => d.club);
+    }
+}
+
+function drawPoints(key){
+
+    svgGlobe.selectAll("circle").remove();
+
+    svgGlobe.selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("cx", d => projection([+d["coordinates long"], +d["coordinates lat"]])[0])
+        .attr("cy", d => projection([+d["coordinates long"], +d["coordinates lat"]])[1])
+        .attr("r", 3)
+        .attr("fill","red")
+        .on("click", (e,d)=>{
+            state.selected = d;
+            updateAll();
+        });
+}
+
+// =====================
+// CHART
+// =====================
+function updateChart(){
+
+    d3.select("#chartHolder").html("");
+
+    let svg = d3.select("#chartHolder")
+        .append("svg")
+        .attr("width","100%")
+        .attr("height","100%");
+
+    if(state.mode === "country"){
+        let counts = Array.from(d3.rollup(data, v=>v.length, d=>d.country));
+
+        let simulation = d3.forceSimulation(counts)
+            .force("charge", d3.forceManyBody().strength(5))
+            .force("center", d3.forceCenter(300,150));
+
+        let nodes = svg.selectAll("circle")
+            .data(counts)
+            .enter()
+            .append("circle")
+            .attr("r", d=> d[1]*5)
+            .attr("fill","#69b");
+
+        simulation.on("tick", ()=>{
+            nodes
+                .attr("cx", d=>d.x)
+                .attr("cy", d=>d.y);
+        });
+    }
+
+    if(state.mode === "year"){
+        let years = d3.group(data, d=>d.year);
+
+        let y = d3.scaleBand()
+            .domain(Array.from(years.keys()))
+            .range([20,300]);
+
+        svg.selectAll("text")
+            .data(data)
+            .enter()
+            .append("text")
+            .attr("x",100)
+            .attr("y", d=>y(d.year))
+            .text(d=>d.club);
+    }
+
+    if(state.mode === "club"){
+        let nodes = data.map(d=>({id:d.club}));
+        let links = data.map(d=>({source:d.club, target:d.city}));
+
+        let sim = d3.forceSimulation(nodes)
+            .force("link", d3.forceLink(links).distance(50))
+            .force("charge", d3.forceManyBody())
+            .force("center", d3.forceCenter(300,150));
+
+        let link = svg.selectAll("line")
+            .data(links)
+            .enter().append("line")
+            .attr("stroke","#aaa");
+
+        let node = svg.selectAll("circle")
+            .data(nodes)
+            .enter().append("circle")
+            .attr("r",5)
+            .attr("fill","black");
+
+        sim.on("tick", ()=>{
+            link
+                .attr("x1", d=>d.source.x)
+                .attr("y1", d=>d.source.y)
+                .attr("x2", d=>d.target.x)
+                .attr("y2", d=>d.target.y);
+
+            node
+                .attr("cx", d=>d.x)
+                .attr("cy", d=>d.y);
+        });
+    }
+}
+
+// =====================
+// SECTION TITLE
+// =====================
+function updateSectionTitle(){
+
+    let el = d3.select("#sectionTitle").html("");
+
+    if(state.mode === "country"){
+        let countries = [...new Set(data.map(d=>d.country))];
+
+        el.append("div").text("Select a country");
+
+        el.append("select")
+            .on("change", function(){
+                state.selected = this.value;
+                updateAll();
+            })
+            .selectAll("option")
+            .data(countries)
+            .enter()
+            .append("option")
+            .text(d=>d);
+    }
+
+    if(state.mode === "year"){
+        let years = [...new Set(data.map(d=>d.year))];
+
+        el.append("div").text("Select a year");
+
+        el.append("select")
+            .on("change", function(){
+                state.selected = this.value;
+                updateAll();
+            })
+            .selectAll("option")
+            .data(years)
+            .enter()
+            .append("option")
+            .text(d=>d);
+    }
+
+    if(state.mode === "club"){
+        el.text(state.selected ? state.selected.club : "Select a club");
+    }
+}
+
+// =====================
+// INFOBOX
+// =====================
+function updateInfoBox(){
+
+    let el = d3.select("#infobox").html("");
+
+    if(state.mode === "country" && state.selected){
+        let list = data.filter(d=>d.country === state.selected);
+        el.selectAll("div")
+            .data(list)
+            .enter()
+            .append("div")
+            .text(d=>d.club + " ("+d.year+")");
+    }
+
+    if(state.mode === "year" && state.selected){
+        let list = data.filter(d=>d.year === state.selected);
+        el.selectAll("div")
+            .data(list)
+            .enter()
+            .append("div")
+            .text(d=>d.club);
+    }
+
+    if(state.mode === "club" && state.selected){
+        el.text(JSON.stringify(state.selected));
+    }
+}
+
+// =====================
+// SHIRTBOX
+// =====================
+function updateShirtBox(){
+
+    let el = d3.select("#shirtbox").html("");
+
+    if(state.mode === "club" && state.selected){
+        el.append("div")
+            .style("width","50px")
+            .style("height","50px")
+            .style("background","red");
+
+        el.append("div")
+            .style("width","50px")
+            .style("height","50px")
+            .style("background","blue");
+    }
+
+    if(state.mode === "year" && state.selected){
+        let d = data.find(x=>x.year === state.selected);
+        if(d){
+            el.append("div")
+                .style("font-size","24px")
+                .text(d.goalscorer + " ("+d.goals+")");
+        }
+    }
+
+    if(state.mode === "country" && state.selected){
+        let list = data.filter(d=>d.country === state.selected);
+
+        el.selectAll("div")
+            .data(list)
+            .enter()
+            .append("div")
+            .text(d=> d.year + " - " + d.goals);
+    }
+}
+
+</script>
+</body>
+</html>
