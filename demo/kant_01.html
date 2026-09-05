@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -259,7 +258,7 @@
         // Zoom behavior
         const zoom = d3.zoom()
 		//zoom in zoom out
-            .scaleExtent([0.5, 1.5])
+            .scaleExtent([0.3, 3])
             .on("zoom", (event) => {
                 g.attr("transform", event.transform);
             });
@@ -321,26 +320,54 @@
 
 
 
-        // Circular positioning function
-        function getCircularPosition(d, siblings, index) {
-            const level = d.depth;
-            const radius = level === 0 ? 0 : 100 + (level *180);
-            
-            if (level === 0) {
-                return { x: centerX, y: centerY };
+        // ---------------------------------------------------------------
+        // SECTOR-BASED RADIAL LAYOUT
+        // ---------------------------------------------------------------
+        // Every node inherits an angular sector [angleStart, angleEnd)
+        // from its parent, and divides that same sector equally among
+        // its own visible children. Because a child's sector is always
+        // nested inside its parent's sector, an entire subtree is
+        // geometrically confined to the region "near" its parent —
+        // this is what keeps node 1-1's descendants in the upper half,
+        // node 1-2's descendants in the lower half, and each
+        // grandchild inside its own parent's quarter, and so on.
+        //
+        // Root's sector is fixed to (-PI, PI) using the convention
+        // y = centerY + r*sin(angle):
+        //   angle in (-PI, 0)  -> sin < 0 -> y < centerY -> UPPER half
+        //   angle in (0, PI)   -> sin > 0 -> y > centerY -> LOWER half
+        // So root's first child gets the first half of that range
+        // (upper), and its second child gets the second half (lower).
+        // ---------------------------------------------------------------
+        const baseRadius = 90;
+        const radiusStep = 170;
+
+        function assignAngles(node, angleStart, angleEnd) {
+            node.angleStart = angleStart;
+            node.angleEnd = angleEnd;
+            node.angle = (angleStart + angleEnd) / 2;
+
+            if (node.children && node.children.length > 0) {
+                const step = (angleEnd - angleStart) / node.children.length;
+                node.children.forEach((child, i) => {
+                    const childStart = angleStart + i * step;
+                    const childEnd = childStart + step;
+                    assignAngles(child, childStart, childEnd);
+                });
             }
-            
-            const angleStep = (2 * Math.PI) / Math.max(siblings.length, 1);
-            const angle = index * angleStep - Math.PI / 2;
-            
-            // Group nodes of same type closer together
-            const groupOffset = d.data.Group === "40" ? -0.2 : d.data.Group === "20" ? 0.2 : 0;
-            const adjustedAngle = angle + groupOffset;
-            
-            return {
-                x: centerX + radius * Math.cos(adjustedAngle),
-                y: centerY + radius * Math.sin(adjustedAngle)
-            };
+        }
+
+        function applyPositions(nodeList) {
+            nodeList.forEach(d => {
+                if (d.depth === 0) {
+                    d.x = centerX;
+                    d.y = centerY;
+                } else {
+                    const radius = baseRadius + d.depth * radiusStep;
+                    d.x = centerX + radius * Math.cos(d.angle);
+                    d.y = centerY + radius * Math.sin(d.angle);
+                }
+            });
         }
 
         let root = d3.hierarchy(createHierarchy());
@@ -362,34 +389,24 @@
 
         // Update function
         function update(source) {
-            const nodes = root.descendants();
-            const links = root.links();
+            const nodesList = root.descendants();
+            const linksList = root.links();
 
-            // Calculate positions for all nodes
-            const nodesByLevel = {};
-            nodes.forEach(d => {
-                if (!nodesByLevel[d.depth]) nodesByLevel[d.depth] = [];
-                nodesByLevel[d.depth].push(d);
-            });
-
-            // Set circular positions
-            Object.keys(nodesByLevel).forEach(level => {
-                const levelNodes = nodesByLevel[level];
-                levelNodes.forEach((d, i) => {
-                    const pos = getCircularPosition(d, levelNodes, i);
-                    d.x = pos.x;
-                    d.y = pos.y;
-                });
-            });
+            // Recompute sectors for the CURRENTLY VISIBLE tree, then
+            // convert each node's angle + depth into an (x, y) position.
+            assignAngles(root, -Math.PI, Math.PI);
+            applyPositions(nodesList);
 
             // Update nodes
             const node = g.selectAll('g.node')
-                .data(nodes, d => d.id || (d.id = ++nodeId));
+                .data(nodesList, d => d.id || (d.id = ++nodeId));
 
             const nodeEnter = node.enter().append('g')
                 .attr('class', 'node')
-                .attr("transform", d => `translate(${source.x || centerX +10},${source.y || centerY +10})`)
-                .on('click', click);
+                .attr("transform", d => `translate(${source.x || centerX},${source.y || centerY})`)
+                .on('click', click)
+                .on('mouseover', handleMouseOver)
+                .on('mouseout', handleMouseOut);
 
             nodeEnter.append('circle')
                 .attr('r', d => Math.max(8, parseInt(d.data.Group) / 4))
@@ -426,7 +443,7 @@
 
             // Update links
             const link = g.selectAll('path.link')
-                .data(links, d => d.target.id);
+                .data(linksList, d => d.target.id);
 
             const linkEnter = link.enter().insert('path', "g")
                 .attr("class", "link")
@@ -492,9 +509,38 @@
             .style("opacity", 1);
         }
   
+            function handleMouseOver(event, d) {
+        // Dim every node/link, then bring only the hovered one to full opacity
+        g.selectAll('.node').each(function(n) {
+            const isHovered = n === d;
+            d3.select(this).select('circle').style('opacity', isHovered ? 1 : 0.5);
+            d3.select(this).selectAll('text').style('opacity', isHovered ? 1 : 0.7);
+        });
+        g.selectAll('.link').style('opacity', 0.8);
+
+        showTooltip(event, d);
+        }
+
+        function handleMouseOut(event, d) {
+            // Restore default look: circles back to 0.5, text back to 0.5
+            // unless that node is currently "selected" (kept expanded), then 1
+            g.selectAll('.node').each(function(n) {
+                const isSelected = selectedNodes.has(n);
+                d3.select(this).select('circle').style('opacity', 0.5);
+                d3.select(this).selectAll('text').style('opacity', isSelected ? 1 : 0.5);
+            });
+            g.selectAll('.link').style('opacity', 0.2);
+
+            hideTooltip();
+        }
+
+    function hideTooltip() {
+        d3.select("#tooltip").style("opacity", 0);
+    }
+
 
         function updateOpacity() {
-            const hasSelected = nodes.some(d => d.children || d._children);
+            const hasSelected = nodesList => nodesList.some(d => d.children || d._children);
             
             g.selectAll(".node")
                 .classed("dimmed", d => hasSelected && !d.children && !d._children && d.depth > 0);
@@ -504,30 +550,24 @@
         }
 
 	
-        // Drag functions
-        function dragstarted(event, d) {
-            if (!event.active) simulation.alphaTarget(0.3).restart();
-            d.fx = d.x;
-            d.fy = d.y;
-        }
-
-        function dragged(event, d) {
-            d.fx = event.x;
-            d.fy = event.y;
-        }
-
-        function dragended(event, d) {
-            if (!event.active) simulation.alphaTarget(0);
-            d.fx = null;
-            d.fy = null;
-        }
-
-
 
         // Initialize
         let nodeId = 0;
+        let bookAnalysisData = {}; // will hold { "Section ID": { wordCount, paragraphCount, topWords } }
         selectedNodes.add(root);
         update(root);
+
+        const sectionTitles = nodes.map(n => n.ID);
+
+        fetchAndAnalyzeBook(
+            "https://github.com/gefercan2/datasets_and_texts/blob/main/Kant_CritiqueOfPureReason.txt",
+            sectionTitles
+        ).then(result => {
+            bookAnalysisData = result.analysis;
+            console.log("✅ All done. Full book analysis object stored in bookAnalysisData:", bookAnalysisData);
+        }).catch(err => {
+            console.error("❌ Fetch failed (likely CORS). See fallback below.", err);
+        });
 
         // Handle window resize
         window.addEventListener('resize', () => {
@@ -535,6 +575,127 @@
             const newHeight = window.innerHeight;
             svg.attr("viewBox", `0 0 ${newWidth} ${newHeight}`);
         });
-    </script>
+  
+        const STOPWORDS = new Set([
+  "the","a","an","and","or","but","if","then","else","of","to","in","on","for","with",
+  "as","by","at","from","is","are","was","were","be","been","being","this","that","these",
+  "those","it","its","his","her","their","our","your","my","i","you","he","she","we","they",
+  "not","no","so","such","than","too","very","can","will","just","do","does","did","has",
+  "have","had","which","who","whom","what","when","where","why","how","all","each","other",
+  "into","about","up","down","out","over","under","again","further","once","there","here",
+  "both","few","more","most","some","any","only","own","same","because","while","after",
+  "before","between","through","during","above","below","off","on","also","would","could",
+  "should","may","might","must","them","us"
+]);
+
+function analyzeText(rawText, topN = 10, neighbourWindow = 2, neighboursPerWord = 5) {
+    // --- paragraphs: split on one or more blank lines ---
+    const paragraphs = rawText
+        .split(/\n\s*\n/)
+        .map(p => p.trim())
+        .filter(p => p.length > 0);
+
+    // --- tokenize into lowercase words (letters + apostrophes) ---
+    const words = rawText.toLowerCase().match(/[a-zà-öø-ÿ']+/g) || [];
+
+    // --- frequency count, excluding stopwords ---
+    const freq = {};
+    words.forEach(w => {
+        if (!STOPWORDS.has(w) && w.length > 1) {
+            freq[w] = (freq[w] || 0) + 1;
+        }
+    });
+
+    const topWords = Object.entries(freq)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, topN)
+        .map(([word, count]) => ({ word, count }));
+
+    // --- for each top word, find its most frequent neighbours
+    //     (words appearing within `neighbourWindow` positions of it) ---
+    function neighboursOf(target) {
+        const neighFreq = {};
+        words.forEach((w, i) => {
+            if (w !== target) return;
+            for (let off = -neighbourWindow; off <= neighbourWindow; off++) {
+                if (off === 0) continue;
+                const n = words[i + off];
+                if (n && n !== target && !STOPWORDS.has(n) && n.length > 1) {
+                    neighFreq[n] = (neighFreq[n] || 0) + 1;
+                }
+            }
+        });
+        return Object.entries(neighFreq)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, neighboursPerWord)
+            .map(([word, count]) => ({ word, count }));
+    }
+
+    const topWordsWithNeighbours = topWords.map(tw => ({
+        ...tw,
+        neighbours: neighboursOf(tw.word)
+    }));
+
+    return {
+        wordCount: words.length,
+        paragraphCount: paragraphs.length,
+        topWords: topWordsWithNeighbours
+    };
+}
+function locateSections(fullText, titles) {
+    console.log("Step 2: Locating chapter/section boundaries in the raw text...");
+    const matches = [];
+    let searchStart = 0;
+
+    titles.forEach(title => {
+        const idx = fullText.indexOf(title, searchStart);
+        if (idx !== -1) {
+            matches.push({ title, index: idx });
+            searchStart = idx + title.length;
+        } else {
+            console.warn(`  ⚠ Title not found in source text: "${title}"`);
+        }
+    });
+
+    const sections = matches.map((m, i) => {
+        const end = (i + 1 < matches.length) ? matches[i + 1].index : fullText.length;
+        const text = fullText.slice(m.index + m.title.length, end);
+        return { title: m.title, text };
+    });
+
+    console.log(`Step 2 complete: matched ${sections.length} of ${titles.length} section titles.`);
+    return sections;
+}
+
+function buildBookAnalysis(fullText, sectionTitles) {
+    const sections = locateSections(fullText, sectionTitles);
+
+    console.log("Step 3: Analysing each section (word count, paragraphs, top words, neighbours)...");
+    const analysis = {};
+    sections.forEach((sec, i) => {
+        console.log(`  Analysing (${i + 1}/${sections.length}): "${sec.title}"`);
+        analysis[sec.title] = analyzeText(sec.text);
+    });
+    console.log("Step 3 complete: all sections analysed.");
+
+    console.log("Step 4: Building final JSON object...");
+    const json = JSON.stringify(analysis, null, 2);
+    console.log("Step 4 complete. Sample of JSON output:", json.slice(0, 300) + "...");
+
+    return { analysis, json };
+}
+
+// --- Option A: fetch directly from Gutenberg ---
+async function fetchAndAnalyzeBook(url, sectionTitles) {
+    console.log("Step 1: Fetching book text from:", url);
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Failed to fetch: " + response.status);
+    const fullText = await response.text();
+    console.log(`Step 1 complete: fetched ${fullText.length} characters.`);
+
+    return buildBookAnalysis(fullText, sectionTitles);
+}
+
+</script>
 </body>
 </html>
