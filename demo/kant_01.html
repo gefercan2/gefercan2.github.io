@@ -9,7 +9,7 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            font-family:'Times New Roman', Times, serif;
             background: #f5f5f5;
         }
 
@@ -25,7 +25,7 @@
         }
 
         .node text {
-            font: 1em Arial;
+            font: 1em Times;
             text-anchor: middle;
             cursor: pointer;
             fill: #333;
@@ -38,7 +38,7 @@
 
         .link {
             fill: none;
-            stroke: #999;
+            stroke: #797777;
             stroke-width: 2.5px; 
 	    stroke-dasharray: 2;
         }
@@ -70,10 +70,13 @@
 
 
 <body>
-    <div id="tree-container">  <div class="tooltip" id="tooltip"></div> </div>
+    <div id="tree-container">  <div class="tooltip" id="tooltip"></div>   <input type="file" id="fileInput" accept=".txt">
+    <pre id="analysisOutput" style="white-space: pre-wrap; font-family: monospace;"></pre></div>
+  
 
     <script>
         // Data structure
+        
         const nodes = [
          { "ID": "CRITIQUE OF PURE REASON", "Group": "565", "brief": "The Critique of Pure Reason is arranged around several basic distinctions. After the two Prefaces (the A edition Preface of 1781 and the B edition Preface of 1787) and the Introduction" },
 { "ID": "Doctrine of Elements", "Group": "310", "brief": "The Doctrine of Elements sets out the a priori products of the mind" },
@@ -362,16 +365,48 @@
                 if (d.depth === 0) {
                     d.x = centerX;
                     d.y = centerY;
-                } else {
-                    const radius = baseRadius + d.depth * radiusStep;
-                    d.x = centerX + radius * Math.cos(d.angle);
-                    d.y = centerY + radius * Math.sin(d.angle);
+                    return;
+                }
+                const isLeaf = !d.children && !d._children;
+                const radius = isLeaf ? outerRadius : baseRadius + d.depth * radiusStep;
+                d.x = centerX + radius * Math.cos(d.angle);
+                d.y = centerY + radius * Math.sin(d.angle);
+            });
+
+            // --- Reduce label overlap: stagger radius when siblings are packed tightly ---
+            const byParent = d3.group(nodeList.filter(d => d.depth > 0), d => d.parent);
+            byParent.forEach(siblings => {
+                if (siblings.length < 2) return;
+                const sectorSpan = siblings[0].parent.angleEnd - siblings[0].parent.angleStart;
+                const anglePerChild = sectorSpan / siblings.length;
+                if (Math.abs(anglePerChild) < (7 * Math.PI / 180)) {
+                    siblings.forEach((d, i) => {
+                        const stagger = (i % 2 === 0) ? 0 : 34;
+                        const radius = Math.hypot(d.x - centerX, d.y - centerY) + stagger;
+                        d.x = centerX + radius * Math.cos(d.angle);
+                        d.y = centerY + radius * Math.sin(d.angle);
+                    });
                 }
             });
         }
 
         let root = d3.hierarchy(createHierarchy());
         let selectedNodes = new Set([root]); // Root is selected initially
+
+        // --- Outer dashed guide circle; all leaf nodes ("no children left") snap onto it ---
+        const totalMaxDepth = d3.max(root.descendants(), d => d.depth);
+        const outerRadius = baseRadius + totalMaxDepth * radiusStep;
+
+        g.append("circle")
+            .attr("class", "outer-guide")
+            .attr("cx", centerX)
+            .attr("cy", centerY)
+            .attr("r", outerRadius)
+            .attr("fill", "none")
+            .attr("stroke", "#999")
+            .attr("stroke-width", 1.5)
+            .attr("stroke-dasharray", "4,6")
+            .attr("opacity", 0.4);
 
         // Collapse all children initially except root
         function collapse(d) {
@@ -401,28 +436,39 @@
             const node = g.selectAll('g.node')
                 .data(nodesList, d => d.id || (d.id = ++nodeId));
 
-            const nodeEnter = node.enter().append('g')
-                .attr('class', 'node')
-                .attr("transform", d => `translate(${source.x || centerX},${source.y || centerY})`)
-                .on('click', click)
-                .on('mouseover', handleMouseOver)
-                .on('mouseout', handleMouseOut);
+        const nodeEnter = node.enter().append('g')
+            .attr('class', 'node')
+            .attr("transform", d => `translate(${source.x || centerX},${source.y || centerY})`)
+            .on('click', click)
+            .on('mouseover', handleMouseOver)
+            .on('mouseout', handleMouseOut);
 
-            nodeEnter.append('circle')
-                .attr('r', d => Math.max(8, parseInt(d.data.Group) / 4))
-                .style("fill", d => d._children ? "#4CAF50" : d.children ? "#FF9800" : "#2196F3");
+        nodeEnter.each(function(d) { d.floatPhase = Math.random() * Math.PI * 2; });
 
-            // Add text with wrapping
-            nodeEnter.each(function(d) {
-                const textGroup = d3.select(this).append('g').attr('class', 'text-group');
-                const lines = wrapText(d.data.ID, 120);
-                
-                lines.forEach((line, i) => {
-                    textGroup.append('text')
-                        .attr('dy', (i - (lines.length - 1) / 2) * 14)
-                        .text(line);
-                });
+        const floatInner = nodeEnter.append('g').attr('class', 'float-inner');
+
+        floatInner.append('circle')
+            .attr('class', 'selection-ring')
+            .attr('r', d => Math.max(8, parseInt(d.data.Group) / 4) + 6)
+            .attr('fill', 'none')
+            .attr('stroke', '#FFD700')
+            .attr('stroke-width', 2)
+            .style('opacity', 0);
+
+        floatInner.append('circle')
+            .attr('class', 'main-circle')
+            .attr('r', d => Math.max(8, parseInt(d.data.Group) / 4))
+            .style("fill", d => d._children ? "#4CAF50" : d.children ? "#FF9800" : "#2196F3");
+
+        floatInner.each(function(d) {
+            const textGroup = d3.select(this).append('g').attr('class', 'text-group');
+            const lines = wrapText(d.data.ID, 120);
+            lines.forEach((line, i) => {
+                textGroup.append('text')
+                    .attr('dy', (i - (lines.length - 1) / 2) * 14)
+                    .text(line);
             });
+        });
 
             const nodeUpdate = nodeEnter.merge(node);
 
@@ -430,8 +476,11 @@
                 .duration(750)
                 .attr("transform", d => `translate(${d.x},${d.y})`);
 
-            nodeUpdate.select('circle')
+            nodeUpdate.select('.main-circle')
                 .style("fill", d => d._children ? "#4CAF50" : d.children ? "#FF9800" : "#2196F3");
+
+            nodeUpdate.select('.selection-ring')
+                .style('opacity', d => d === activeNode ? 1 : 0);
 
             // Update text opacity based on selection
             nodeUpdate.classed('selected', d => selectedNodes.has(d));
@@ -495,14 +544,30 @@
         }
 
 
-       function showTooltip(event, d) {
+        function showTooltip(event, d) {
             const tooltip = d3.select("#tooltip");
             const rect = event.target.getBoundingClientRect();
-            
+
+            let statsHtml = "";
+            const stats = bookAnalysisData[d.data.ID];
+            if (stats) {
+                const topWordsHtml = stats.topWords
+                    .slice(0, 5)
+                    .map(tw => `${tw.word} (${tw.count})`)
+                    .join(", ");
+
+                statsHtml = `
+                    <hr style="border-color:#555; margin:6px 0;">
+                    <strong>Words:</strong> ${stats.wordCount} &nbsp;
+                    <strong>Paragraphs:</strong> ${stats.paragraphCount}<br>
+                    <strong>Top words:</strong> ${topWordsHtml}
+                `;
+            }
+
             tooltip.html(`
                 <strong>${d.data.ID}</strong><br>
-                ${d.data.brief}<br>
-                <a href="https://${d.data.link}" target="_blank">More info</a>
+                ${d.data.brief}
+                ${statsHtml}
             `)
             .style("left", (rect.left + window.scrollX) + "px")
             .style("top", (rect.bottom + window.scrollY + 10) + "px")
@@ -550,6 +615,22 @@
         }
 
 	
+        let activeNode = null;
+        let pinnedNode = null;
+
+        // --- Floating oscillation loop ---
+        d3.timer((elapsed) => {
+            g.selectAll('.node').each(function(d) {
+                if (d.depth === 0) return; // root stays still
+                const amplitude = 2;
+                const speed = 0.0015;
+                const dx = Math.sin(elapsed * speed + d.floatPhase) * amplitude;
+                const dy = Math.cos(elapsed * speed + d.floatPhase) * amplitude;
+                d3.select(this).select('.float-inner').attr('transform', `translate(${dx},${dy})`);
+            });
+        });
+
+
 
         // Initialize
         let nodeId = 0;
@@ -695,6 +776,22 @@ async function fetchAndAnalyzeBook(url, sectionTitles) {
 
     return buildBookAnalysis(fullText, sectionTitles);
 }
+
+
+document.getElementById('fileInput').addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (event) {
+        const fullText = event.target.result;
+        console.log("Step 1 complete: file loaded, length =", fullText.length);
+        const result = buildBookAnalysis(fullText, nodes.map(n => n.ID));
+        bookAnalysisData = result.analysis;
+        console.log("✅ Analysis stored in bookAnalysisData.");
+    };
+    reader.readAsText(file);
+});
+
 
 </script>
 </body>
