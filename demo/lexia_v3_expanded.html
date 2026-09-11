@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lexia — Concentric Text Analysis</title>
+<title> Lexia — Concentric Text Analysis</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,500;1,9..144,200&display=swap" rel="stylesheet">
@@ -379,6 +379,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .ts-row{display:flex;justify-content:space-between;font-size:10px;color:var(--t2);
   padding:6px 0;border-bottom:0.5px solid var(--b1)}
 .ts-row span:last-child{color:var(--t1)}
+
+/* ── EXPORT BUTTONS (stage 3 sidebar) ── */
+.ts-export-row{display:flex;gap:6px;margin-top:8px}
+.ts-export-btn{
+  flex:1;padding:7px 6px;background:var(--b1);border:0.5px solid var(--b2);border-radius:6px;
+  color:var(--t2);font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.04em;
+  cursor:pointer;transition:all .15s;text-align:center;
+}
+.ts-export-btn:hover{background:var(--b2);color:var(--gold2);border-color:var(--gold)}
 </style>
 </head>
 
@@ -819,6 +828,15 @@ function renderFullText(fileIdx, highlightWord, focusParaIdx){
     <div class="ts-row"><span>avg sentence</span><span>${m.avgSentenceLen} w</span></div>
     <div class="ts-row"><span>readability</span><span>${m.readability} (${m.flesch})</span></div>
     <div class="ts-row"><span>citations</span><span>${m.citationCount}</span></div>
+
+    <div class="ts-title" style="margin-top:20px">export analysis</div>
+    <div class="ts-export-row">
+      <button class="ts-export-btn" onclick="saveSpecFile('csv')">↓ specs .csv</button>
+      <button class="ts-export-btn" onclick="saveSpecFile('txt')">↓ specs .txt</button>
+    </div>
+    <div class="ts-export-row">
+      <button class="ts-export-btn" onclick="saveChartSVG()">↓ chart .svg</button>
+    </div>
   `;
   if(focusParaIdx!==null && focusParaIdx!==undefined){
     setTimeout(()=>{
@@ -1365,7 +1383,7 @@ function applyWordHighlight(word){
       /* Keep the existing font-size but add 3px to the matching word */
       const cur = parseFloat(this.getAttribute('data-base-fs')||
                              this.style.fontSize||'9');
-      return (this.getAttribute('data-word')===word ? cur+3 : cur)+'px';
+      return (this.getAttribute('data-word')===word ? cur-3 : cur)+'px';
     });
 
   /* C1 topic bubbles: brighten if they relate to this word */
@@ -1568,10 +1586,10 @@ function renderChart(data){
   /* ── MASTER SCALE ───────────────────────────────────────────────────
      base: fraction of the shorter viewport side.
      Raise to fill more screen; lower to shrink everything.           */
-  const base = Math.min(W,H) * .43;
+  const base = Math.min(W,H) * .99;
 
   /* ── C1: topic force bubble zone ───────────────────────────────── */
-  const R1  = base * .205;
+  const R1  = base * .225;
 
   /* ── C2: paragraph donut band ───────────────────────────────────────
      The full C2 band spans R2i → R2BAND_OUT.
@@ -1579,7 +1597,7 @@ function renderChart(data){
      ringH  : fixed radial thickness of ONE file's ring.
      gap    : clear space between consecutive rings.
      The outermost ring's outer edge = R2BAND_OUT regardless of count.  */
-  const R2i        = base * .27;   /* inner edge of innermost ring      */
+  const R2i        = base * .35;   /* inner edge of innermost ring      */
   const ringH      = base * .038;  /* radial height — same for all rings */
   const ringGap    = base * .012;  /* gap between consecutive rings      */
   const nFiles     = (data.perFile && data.perFile.length > 1)
@@ -2054,7 +2072,7 @@ function renderC3(g,data,rIn,rOut){
 function renderC4(g, data, rIn, rOut){
   if(!data.citations.length) return;
 
-  const rMid = (rIn+rOut)/2;
+  const rMid = (rIn+rOut)/0.2;
   const c4   = g.append('g');
 
   /* Background glow ring */
@@ -2092,14 +2110,14 @@ function renderC4(g, data, rIn, rOut){
     .style('cursor','pointer');
 
   /* Outer glow halo — soft circle behind the square */
-  cg.append('circle').attr('r',9)
+  cg.append('circle').attr('r',19)
     .attr('fill','rgba(201,126,126,.07)').attr('stroke','none');
 
   /* ── SQUARE ICON (rect rotated 45° = diamond) ──────────────────────
      SVG <rect> with half-size=4px, rotated 45° around its own centre.
      This gives a clean diamond/square shape clearly distinct from
      the circular word dots in C3.                                     */
-  const SQ = 4.5;   /* half side-length in px — adjust to resize */
+  const SQ = 2.5;   /* half side-length in px — adjust to resize */
   cg.append('rect')
     .attr('x', -SQ).attr('y', -SQ)
     .attr('width',  SQ*2).attr('height', SQ*2)
