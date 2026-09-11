@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title> Lexia — Concentric Text Analysis</title>
+<title>Lexia — Concentric Text Analysis</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,500;1,9..144,200&display=swap" rel="stylesheet">
@@ -230,7 +230,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 #ctx-expand:hover{background:var(--b2);color:var(--t1)}
 
 /* ── STAGE 3 FILE TABS ── */
-#ft-tabs{display:none;gap:4px;position:sticky;top:0;z-index:5;
+#ft-tabs{display:none;gap:4px;position:sticky;top:0;z-index:5;margin-left:100px;
   padding:16px 40px 10px;background:linear-gradient(var(--bg) 70%,transparent);flex-wrap:wrap}
 .ft-tab-btn{
   padding:6px 12px;background:var(--b1);border:0.5px solid var(--b2);border-radius:6px;
@@ -429,11 +429,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 
     <div class="stage" id="stage_03">
         <div id="original_text">
-        <div id="back_button_3" onclick="goToStage(2)"> back </div>
-        <div id="ft-tabs"></div>
-        <div id="main_column"></div>
+            <div id="back_button_3" onclick="goToStage(2)"> back </div>
+            <div id="ft-tabs"></div>
+            <div id="main_column"></div>
+        </div>
+        <div id="text_sidebar">
+
       </div>
-      <div id="text_sidebar"></div>
     </div>
 
   </div>
