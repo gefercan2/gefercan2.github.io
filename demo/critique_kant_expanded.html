@@ -11804,6 +11804,7 @@ function assignAngles(node, angleStart, angleEnd) {
             .on('mouseout', handleMouseOut);
 
         nodeEnter.each(function(d) { d.floatPhase = Math.random() * Math.PI * 2; });
+        nodeEnter.on('click.hideSidebar', hideSidebarOnce);
 
         const floatInner = nodeEnter.append('g').attr('class', 'float-inner');
         // NEW: semi-transparent, blurred circle sized by this node's word count.
@@ -12072,6 +12073,14 @@ floatInner.each(function(d) {
             .addEventListener('click', () => {
                 document.getElementById('container').classList.remove('showing-text');
             });
+
+        document.getElementById('sidebar-diagram').classList.add('open');
+
+function hideSidebarOnce() {
+    document.getElementById('sidebar-diagram').classList.remove('open');
+    g.selectAll('.node').on('click.hideSidebar', null);
+}
+g.selectAll('.node').on('click.hideSidebar', hideSidebarOnce);
 
 // Cache so each section is only analyzed once per page load
 
