@@ -14,7 +14,7 @@
 html, body {
   width: 100vw; height: 100vh; overflow: hidden;
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #045678, #141428);  /* ← BACKGROUND GRADIENT */
+  background: linear-gradient(135deg, #045678, #141427);  /* ← BACKGROUND GRADIENT */
   color: white;
 }
 
@@ -45,7 +45,7 @@ html, body {
 
 /* ══════════════════════════════════════
    SHARED DRAGGABLE / COLLAPSIBLE PANEL
-   (used by legend, timeline, info panel)
+   (used by legend, timeline, info panel, tools panel)
    ══════════════════════════════════════ */
 .panel {
   position: fixed;
@@ -72,8 +72,7 @@ html, body {
 .panel-body { padding: 22px; }
 
 /* Legend */
-.legend-item { display: flex; align-items: center; margin-bottom: 7px; gap: 8px; font-size: 1em; }
-.legend-item2 { display: flex; align-items: center; margin-bottom: 7px; gap: 8px; font-size: 0.8em; }
+.legend-item { display: flex; align-items: center; margin-bottom: 7px; gap: 8px; font-size: 11px; }
 .legend-item:last-child { margin-bottom: 0; }
 .legend-diamond {
   width:14px; height:14px; background:#ff4444;          /* ← sync with CONFIG.node.artistColor */
@@ -90,10 +89,11 @@ html, body {
 }
 
 /* Panel positions */
-#legendPanel   { top: 80px; left: 18px; }
+#legendPanel   { top: 70px; left: 18px; }
 #timelinePanel { top: 70px; right: 22px; }
-#infoPanel     { top: 370px; left: 18px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+#infoPanel     { top: 350px; left: 18px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
 #infoPanel.visible { opacity: 1; pointer-events: auto; }
+#toolsPanel    { top: 70px; left: 260px; width: 300px; }
 
 /* Info panel content */
 .info-circle {
@@ -111,322 +111,81 @@ html, body {
   padding: 5px 10px; border-radius: 5px; display: block; text-align: center;}
 .info-link:hover { background: rgba(102,204,255,0.28); }
 
+/* ══════════════════════════════════════
+   TOOLS PANEL — Search & Compare tabs
+   ══════════════════════════════════════ */
+.tool-tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+.tool-tab-btn {
+  flex: 1; background: rgba(102,204,255,0.08); border: 1px solid rgba(102,204,255,0.28);
+  color: rgba(255,255,255,0.65); padding: 6px 8px; border-radius: 6px; cursor: pointer;
+  font-size: 11px; font-weight: bold; transition: background 0.2s, color 0.2s;
+}
+.tool-tab-btn:hover { background: rgba(102,204,255,0.18); }
+.tool-tab-btn.active { background: rgba(102,204,255,0.30); color: #66ccff; border-color: rgba(102,204,255,0.55); }
+
+.tool-tab-content { display: none; }
+.tool-tab-content.active { display: block; }
+
+/* Search tab */
+#searchInput {
+  width: 100%; padding: 7px 9px; border-radius: 6px;
+  border: 1px solid rgba(102,204,255,0.32); background: rgba(255,255,255,0.05);
+  color: white; font-size: 12px; outline: none;
+}
+#searchInput::placeholder { color: rgba(255,255,255,0.35); }
+#searchInput:focus { border-color: rgba(102,204,255,0.65); background: rgba(255,255,255,0.08); }
+
+.search-results { margin-top: 6px; max-height: 190px; overflow-y: auto; }
+.search-result-item {
+  padding: 6px 8px; font-size: 11.5px; border-radius: 5px; cursor: pointer;
+  display: flex; align-items: center; gap: 8px; transition: background 0.15s;
+}
+.search-result-item:hover { background: rgba(102,204,255,0.16); }
+.search-result-swatch { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.search-result-type { margin-left: auto; font-size: 9px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.03em; }
+.search-empty { font-size: 11px; color: rgba(255,255,255,0.4); padding: 6px 2px; }
+
+/* Compare tab */
+.compare-select {
+  width: 100%; padding: 7px 9px; margin-bottom: 8px; border-radius: 6px;
+  border: 1px solid rgba(102,204,255,0.32); background: rgba(20,22,42,0.9);
+  color: white; font-size: 11.5px; outline: none;
+}
+.compare-select:focus { border-color: rgba(102,204,255,0.65); }
+.compare-grid { display: flex; gap: 8px; margin-top: 12px; }
+.compare-col { flex: 1; min-width: 0; text-align: center; }
+.compare-col .info-circle { width: 54px; height: 54px; font-size: 18px; margin-bottom: 6px; border-width: 2px; }
+.compare-col .info-name { font-size: 10.5px; margin-bottom: 4px; }
+.compare-col .info-meta { font-size: 9px; line-height: 1.45; margin-bottom: 0; }
+.compare-empty { font-size: 11px; color: rgba(255,255,255,0.4); text-align: center; margin-top: 16px; }
+
 /* Timeline SVG elements */
 .timeline-axis { stroke: rgba(255,255,255,0.55); stroke-width: 2; }
 .timeline-tick { stroke: rgba(255,255,255,0.35); stroke-width: 1; }
-.tl-year-lbl   { fill: rgba(255,255,255,0.65); font-size:0.8em; }
+.tl-year-lbl   { fill: rgba(255,255,255,0.65); font-size: 9px; }
 .timeline-node { cursor: pointer; stroke: white; stroke-width: 1.5; transition: opacity 0.3s; }
 .timeline-arc  { fill:none; stroke:#ff4444; stroke-width:2.5; opacity:0; transition:opacity 0.3s; } /* ← ARC COLOR */
-.tl-node-lbl   { fill: white; font-size: 0.8em; pointer-events:none; font-weight:bold; transition:opacity 0.01s; }
+.tl-node-lbl   { fill: white; font-size: 8.5px; pointer-events:none; font-weight:bold; transition:opacity 0.3s; }
 
 /* Network SVG elements */
-.network-node { cursor:pointer; stroke:white; stroke-width:1; transition:opacity 0.3s; }
+.network-node { cursor:pointer; stroke:white; stroke-width:2; transition:opacity 0.3s; }
 .network-link { fill:none; stroke:rgba(255,255,255,0.32); stroke-width:2; transition:opacity 0.3s; }
-.node-label   { fill:white; font-size:0.7em; text-anchor:middle; pointer-events:none; font-weight:bold; transition:opacity 0.3s; }
+.node-label   { fill:white; font-size:11px; text-anchor:middle; pointer-events:none; font-weight:bold; transition:opacity 0.3s; }
 
 /* Circular containment boundary guide (visual only, not a clip) */
 .containment-guide { fill:none; stroke: rgba(102,204,255,0.15); stroke-width: 1.5; stroke-dasharray: 6 6; }
 
-/* ======= SIDEMENU STYLES ==================== */
-	    /* Side Menu Styles */
-        .menu-toggle {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            width: 50px;
-            height: 50px;
-            background-color: #667eea;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            z-index: 1001;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 5px;
-            transition: all 0.3s ease;
-        }
-
-        .menu-toggle:hover {
-            background-color: #5568d3;
-        }
-
-        .menu-toggle span {
-            width: 25px;
-            height: 3px;
-            background-color: white;
-            border-radius: 2px;
-            transition: all 0.3s ease;
-        }
-
-        .menu-toggle.active span:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
-        }
-
-        .menu-toggle.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .menu-toggle.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -6px);
-        }
-
-        .side-menu {
-            position: fixed;
-            top: 0;
-            right: -65%;
-            width: 65%;
-            height: 100vh;
-            background-color: white;
-            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
-            transition: right 0.4s ease;
-            z-index: 1000;
-            overflow-y: auto;
-        }
-
-        .side-menu.active {
-            right: 0;
-        }
-
-        .menu-content {
-            padding: 80px 40px 40px 40px;
-        }
-
-        .menu-options {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .menu-option {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
-
-        .menu-option:hover {
-            background-color: #e9ecef;
-            border-color: #667eea;
-        }
-
-        .menu-option h2 {
-            margin: 0 0 10px 0;
-            color: #333;
-            font-size: 1.5em;
-        }
-
-        .menu-option p {
-            margin: 0;
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        .article-view {
-            display: none;
-            padding: 20px;
-        }
-
-        .article-view.active {
-            display: block;
-        }
-
-        .article-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #667eea;
-        }
-
-        .back-button {
-            background-color: #667eea;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-right: 20px;
-            transition: background-color 0.3s ease;
-        }
-
-        .back-button:hover {
-            background-color: #5568d3;
-        }
-
-        .article-title {
-            font-size: 2em;
-            color: #333;
-            margin: 0;
-        }
-
-        .article-image {
-            width: 100%;
-            max-height: 400px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 30px;
-        }
-
-        .article-content {
-            line-height: 1.8;
-            color: #444;
-            font-size: 1.1em;
-        }
-
-        .article-content p {
-            margin-bottom: 20px;
-            text-align: justify;
-        }
-
-        .article-content h3 {
-            margin-top: 30px;
-            margin-bottom: 15px;
-            color: #667eea;
-        }
-
-       /* Overlay */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            z-index: 999;
-        }
-
-        .overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-
-
 </style>
 </head>
-
 <body>
 
-
-    <!-- Menu Toggle Button -->
-    <button class="menu-toggle" id="menuToggle">
-        <span></span>
-        <span></span>
-        <span></span>
-    </button>
-  
-    <!-- Overlay -->
-    <div class="overlay" id="overlay"></div>
-
-	 <!-- Side Menu -->
-    <div class="side-menu" id="sideMenu">
-        <div class="menu-content">
-
-            <!-- Main Menu Options -->
-            <div class="menu-options" id="menuOptions">
-                <div class="menu-option" data-article="1">
-                    <h2>The Renaissance Period</h2>
-                    <p>Discover the historical context and cultural significance of the Italian Renaissance</p>
-                </div>
-                <div class="menu-option" data-article="2">
-                    <h2>Renaissance Artists & Techniques</h2>
-                    <p>Explore the innovative artistic techniques and master artists of this golden age</p>
-                </div>
-            </div>
-
-            <!-- Article 1 -->
-            <div class="article-view" id="article1">
-                <div class="article-header">
-                    <button class="back-button" onclick="showMenu()">← Back</button>
-                    <h1 class="article-title">The Renaissance Period</h1>
-                </div>
-                 <!-- <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Eyck_-_Arnolfini_Portrait.jpg/400px-Van_Eyck_-_Arnolfini_Portrait.jpg" alt="Renaissance Art" class="article-image">-->
-                <div class="article-content">
-                    <p>The Italian Renaissance was a period of great cultural change and achievement that began in Italy during the 14th century and lasted until the 17th century. It marked the transition from the Middle Ages to modernity and was characterized by an effort to revive and surpass the ideas and achievements of classical antiquity.</p>
-                    
-                    <h3>Historical Context</h3>
-                    <p>The Renaissance began in Florence, Italy, in the 14th century. The city's wealthy merchants and bankers, particularly the Medici family, became great patrons of the arts and humanities. This patronage system allowed artists, scholars, and thinkers to pursue their work without the burden of financial constraints, leading to an explosion of creativity and innovation.</p>
-                    
-                    <p>The period saw the rise of humanism, a movement that emphasized the value and agency of human beings and favored critical thinking and evidence over acceptance of religious dogma. Humanist scholars studied classical texts from ancient Greece and Rome, seeking to understand and emulate the achievements of these ancient civilizations.</p>
-                    
-                    <h3>Cultural Significance</h3>
-                    <p>The Renaissance had a profound impact on European culture, transforming art, architecture, politics, science, and literature. It represented a rebirth of classical learning and wisdom after the stagnation of the Middle Ages. The period witnessed the emergence of a new approach to art that emphasized naturalism, perspective, and the human form.</p>
-                    
-                    <p>Artists began to see themselves as intellectuals rather than mere craftsmen, and their work reflected a deep understanding of anatomy, mathematics, and the natural world. The invention of linear perspective revolutionized painting, allowing artists to create the illusion of three-dimensional space on a two-dimensional surface.</p>
-                    
-                    <h3>Major City-States</h3>
-                    <p>Italy during the Renaissance was not a unified nation but rather a collection of independent city-states, each with its own government, culture, and artistic traditions. Florence, Venice, Rome, Milan, and Naples were among the most powerful and influential of these city-states.</p>
-                    
-                    <p>Florence, under the rule of the Medici family, became the birthplace of the Renaissance. Venice, with its vast maritime empire and wealth from trade, developed a distinctive artistic style characterized by rich colors and sensuous beauty. Rome, as the seat of the Catholic Church, attracted artists from across Italy to work on papal commissions, including the decoration of the Sistine Chapel.</p>
-                    
-                    <h3>Legacy</h3>
-                    <p>The Renaissance laid the foundations for modern Western culture. Its emphasis on individual achievement, scientific inquiry, and artistic excellence continues to influence our world today. The period produced some of history's greatest artists, including Leonardo da Vinci, Michelangelo, and Raphael, whose works remain celebrated and studied centuries after their creation.</p>
-                    
-                    <p>The Renaissance also saw significant advances in science, with figures like Galileo Galilei challenging traditional beliefs about the universe. The printing press, invented by Johannes Gutenberg, revolutionized the spread of knowledge, making books more accessible and contributing to increased literacy rates across Europe.</p>
-                </div>
-            </div>
-
-            <!-- Article 2 -->
-            <div class="article-view" id="article2">
-                <div class="article-header">
-                    <button class="back-button" onclick="showMenu()">← Back</button>
-                    <h1 class="article-title">Renaissance Artists & Techniques</h1>
-                </div>
-          <!--       <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/402px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg" alt="Mona Lisa" class="article-image"> -->
-                <div class="article-content">
-                    <p>The Renaissance period witnessed revolutionary developments in artistic techniques and the emergence of master artists whose works continue to captivate audiences worldwide. These innovations transformed the way artists approached their craft and set new standards for artistic excellence that would influence generations to come.</p>
-                    
-                    <h3>Linear Perspective</h3>
-                    <p>One of the most significant innovations of Renaissance art was the development of linear perspective by Filippo Brunelleschi in the early 15th century. This mathematical system allowed artists to create the illusion of three-dimensional space on a flat surface, with parallel lines appearing to converge at a vanishing point on the horizon.</p>
-                    
-                    <p>Artists like Masaccio and Piero della Francesca mastered this technique, creating paintings that seemed to open windows onto realistic scenes. The use of perspective transformed painting from a flat, decorative art into a medium capable of representing the visible world with unprecedented accuracy.</p>
-                    
-                    <h3>Sfumato and Chiaroscuro</h3>
-                    <p>Leonardo da Vinci pioneered the technique of sfumato, which involves the subtle blending of colors and tones to create soft, almost imperceptible transitions between light and shadow. This technique, most famously employed in the Mona Lisa, gave his paintings a mysterious, atmospheric quality and made his figures appear more lifelike and three-dimensional.</p>
-                    
-                    <p>Chiaroscuro, the dramatic use of light and shadow to create volume and depth, became another hallmark of Renaissance painting. Artists like Caravaggio would later take this technique to new extremes, using stark contrasts between light and dark to create powerful, emotionally charged compositions.</p>
-                    
-                    <h3>Anatomical Study</h3>
-                    <p>Renaissance artists were deeply interested in the accurate representation of the human body. Many, including Leonardo da Vinci and Michelangelo, conducted detailed anatomical studies, even performing dissections to better understand the structure of muscles, bones, and organs beneath the skin.</p>
-                    
-                    <p>This knowledge allowed them to depict the human form with unprecedented realism and grace. Michelangelo's David and his figures on the Sistine Chapel ceiling demonstrate a profound understanding of human anatomy and the ability to represent the body in complex, dynamic poses.</p>
-                    
-                    <h3>Master Artists</h3>
-                    <p>Leonardo da Vinci (1452-1519) epitomized the Renaissance ideal of the universal genius, excelling not only as a painter but also as a scientist, inventor, and engineer. His notebooks contain detailed observations of nature, innovative designs for machines, and studies of human anatomy that were centuries ahead of their time.</p>
-                    
-                    <p>Michelangelo Buonarroti (1475-1564) was renowned primarily as a sculptor but also created some of the most iconic paintings in Western art, including the ceiling of the Sistine Chapel. His works are characterized by heroic figures with powerful, muscular bodies that express intense emotion and spiritual struggle.</p>
-                    
-                    <p>Raphael Sanzio (1483-1520) was celebrated for his graceful compositions and the serene beauty of his figures. His frescoes in the Vatican, particularly "The School of Athens," exemplify the Renaissance ideals of harmony, balance, and the synthesis of classical philosophy with Christian theology.</p>
-                    
-                    <h3>Color and Composition</h3>
-                    <p>Renaissance artists developed sophisticated approaches to color theory and composition. The Venetian school, including artists like Titian and Giorgione, became famous for their use of rich, luminous colors and their ability to capture the effects of light on different surfaces.</p>
-                    
-                    <p>Composition became more dynamic and complex, with artists carefully orchestrating the arrangement of figures and objects to guide the viewer's eye through the painting and create a sense of narrative drama. The triangular composition, often used to create stability and focus, became a standard device in Renaissance art.</p>
-                    
-                    <h3>Lasting Impact</h3>
-                    <p>The techniques developed during the Renaissance formed the foundation of Western art education for centuries. Art academies taught students to master perspective, anatomy, and classical composition, ensuring that Renaissance principles continued to shape artistic practice long after the period itself had ended. Even today, these fundamental skills remain essential components of art training around the world.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-<div class="dash-title"> RENAISSANCE NETWORK</div>
+<div class="dash-title">  RENAISSANCE NETWORK</div>
 <div class="zoom-controls">
   <button class="zoom-btn" id="zoomIn">＋</button>
   <button class="zoom-btn" id="zoomOut">－</button>
 </div>
 
 <div id="netWrapper"><svg id="networkSvg"></svg></div>
-
-
 
 <!-- LEGEND PANEL — draggable + collapsible -->
 <div class="panel" id="legendPanel">
@@ -435,20 +194,42 @@ html, body {
     <div class="panel-actions"><button class="panel-btn" id="legendToggle">−</button></div>
   </div>
   <div class="panel-body" id="legendBody">
-
     <div class="legend-item"><div class="legend-diamond"></div><span>Artist</span></div>
     <div class="legend-item"><div class="legend-octagon"></div><span>City</span></div>
-    <div class="legend-item"><div class="legend-pop"></div><span>Population</span></div>
-  <div class="legend-item2"><span>Click on any artist node to see his connection to the main cities as well as his life span. Each node is connected to its Wikipedia page. Also there is more info available trough the top menu button.
-
- <br><br> </span></div>
+    <div class="legend-item"><div class="legend-pop"></div><span>Population</span></div><br>
   </div>
+</div>
+
+<!-- TOOLS PANEL — Search & Compare, draggable + collapsible -->
+<div class="panel" id="toolsPanel">
+  <div class="panel-header" id="toolsHeader">
+    <span class="panel-title">Search &amp; Compare</span>
+    <div class="panel-actions"><button class="panel-btn" id="toolsToggle">−</button></div>
+  </div>
+  <div class="panel-body" id="toolsBody">
+    <div class="tool-tabs">
+      <button class="tool-tab-btn active" id="tabSearchBtn">Search</button>
+      <button class="tool-tab-btn" id="tabCompareBtn">Compare</button>
+    </div>
+
+    <div class="tool-tab-content active" id="tabSearch">
+      <input type="text" id="searchInput" placeholder="Search artist or city…" autocomplete="off">
+      <div class="search-results" id="searchResults"></div>
+    </div>
+
+    <div class="tool-tab-content" id="tabCompare">
+      <select class="compare-select" id="compareSelect1"><option value="">Select artist / city 1…</option></select>
+      <select class="compare-select" id="compareSelect2"><option value="">Select artist / city 2…</option></select>
+      <select class="compare-select" id="compareSelect3"><option value="">Select artist / city 3…</option></select>
+      <div id="compareResults"><div class="compare-empty">Pick up to three to compare</div></div><br>
+    </div>
+  </div><br>
 </div>
 
 <!-- TIMELINE PANEL — draggable + collapsible -->
 <div class="panel" id="timelinePanel">
   <div class="panel-header" id="timelineHeader">
-    <span class="panel-title">Timeline 1300–1600</span>
+    <span class="panel-title">Timeline 1400–1600</span>
     <div class="panel-actions"><button class="panel-btn" id="timelineToggle">−</button></div>
   </div>
   <div class="panel-body" id="timelineBody"><svg id="timelineSvg"></svg></div>
@@ -457,7 +238,7 @@ html, body {
 <!-- INFO PANEL — draggable, replaces the old tooltip -->
 <div class="panel" id="infoPanel">
   <div class="panel-header" id="infoHeader">
-    <span class="panel-title">Selected artist</span>
+    <span class="panel-title">Selected node</span>
     <div class="panel-actions"><button class="panel-btn" id="infoClose">×</button></div>
   </div>
   <div class="panel-body">
@@ -469,44 +250,6 @@ html, body {
 </div>
 
 <script>
-
-	 // Menu functionality
-        const menuToggle = document.getElementById('menuToggle');
-        const sideMenu = document.getElementById('sideMenu');
-        const overlay = document.getElementById('overlay');
-        const menuOptions = document.querySelectorAll('.menu-option');
-
-        menuToggle.addEventListener('click', function() {
-            menuToggle.classList.toggle('active');
-            sideMenu.classList.toggle('active');
-            overlay.classList.toggle('active');
-        });
-
-        overlay.addEventListener('click', function() {
-            menuToggle.classList.remove('active');
-            sideMenu.classList.remove('active');
-            overlay.classList.remove('active');
-        });
-
-        menuOptions.forEach(option => {
-            option.addEventListener('click', function() {
-                const articleNum = this.getAttribute('data-article');
-                showArticle(articleNum);
-            });
-        });
-
-        function showArticle(num) {
-            document.getElementById('menuOptions').style.display = 'none';
-            document.getElementById('article' + num).classList.add('active');
-        }
-
-        function showMenu() {
-            document.querySelectorAll('.article-view').forEach(article => {
-                article.classList.remove('active');
-            });
-            document.getElementById('menuOptions').style.display = 'block';
-        }
-
 
 /* ═══════════════════════════════════════════════════════════════
    DATA DEFINITIONS
@@ -942,7 +685,6 @@ const CITIES_DATA = [
   { name:"SIENA", population:12000 },
   { name:"ROME",   population:35000 },
   { name:"NAPLES",   population:50000 }
- 
 ];
 
 
@@ -955,22 +697,22 @@ const CONFIG = {
   node: {
     artistColor:   "#ff4444",
     cityColor:     "#4466ff",
-    artistSize:    8,
-    citySize:      11,
+    artistSize:    16,
+    citySize:      20,
     strokeColor:   "white",
     strokeWidth:   2,
     labelOffset:   28,
-    labelFontSize: 11,
-    selectedLabelFontSize: 16 
+     labelFontSize: 11,
+    selectedLabelFontSize: 16  
   },
 
   /* Force simulation physics */
   force: {
-    linkDistance:    160,
-    chargeStrength: -380,
-    centerStrength:  1.05,
-    collideRadius:   60,
-    alphaDecay:      0.028
+    linkDistance:    180,
+    chargeStrength: -580,
+    centerStrength:  0.05,
+    collideRadius:   40,
+    alphaDecay:      0.0028
   },
 
   /* Initial / pinned node positions */
@@ -996,14 +738,14 @@ const CONFIG = {
      Restricts node MOVEMENT to a circular area (not a visual clip).
      Change `diameter` to resize the allowed area (px).             */
   containment: {
-    diameter:   1000,     // ← DIAMETER OF THE ALLOWED CIRCULAR AREA
+    diameter:   920,     // ← DIAMETER OF THE ALLOWED CIRCULAR AREA
     showGuide:  true,    // draw a faint dashed reference circle
     guideColor: "rgba(102,204,255,0.15)"
   },
 
   /* Population bubble layer */
   bubbles: {
-    maxRadius:     100,
+    maxRadius:     80,
     fillColor:     "rgba(255,200,80,0.07)",
     strokeColor:   "rgba(255,190,60,0.30)",
     strokeWidth:    2,
@@ -1038,13 +780,14 @@ const CONFIG = {
   timeline: {
     yearRange:      [1300, 1600],
     tickYears:      [1300,1350,1400,1425,1450,1475,1500,1525,1550,1575,1600],
-    nodeRadius:      9,
+    nodeRadius:      5,
     squareSize:     10,
     arcNodeX:       50,
     axisX:          80,
     labelAltOffset: 30,
-   labelFontSize: 8.5,
+    labelFontSize: 8.5,
     selectedLabelFontSize: 12 
+
   }
 };
 
@@ -1143,7 +886,6 @@ function selectNode(name, d) {
 
   if (d) populateInfoPanel(d);
 }
-
 
 /* Clicking empty space resets highlighting (info panel stays until × is clicked) */
 document.addEventListener('click', e => {
@@ -1344,7 +1086,7 @@ function initNetwork() {
    ═══════════════════════════════════════════════════════════════ */
 function initTimeline() {
   const { yearRange, tickYears, nodeRadius, squareSize, arcNodeX, axisX, labelAltOffset } = CONFIG.timeline;
-  const TW = 200, TH = 600, marginT = 20, marginB = 18;
+  const TW = 200, TH = 700, marginT = 20, marginB = 18;
 
   const svg   = d3.select('#timelineSvg').attr('width', TW).attr('height', TH);
   const scale = d3.scaleLinear().domain(yearRange).range([marginT, TH - marginB]);
@@ -1368,7 +1110,7 @@ function initTimeline() {
 
   svg.selectAll('.timeline-arc').data(artists).join('path').attr('class', 'timeline-arc')
     .attr('d', d => {
-      const y1 = scale(d.birthYear), y2 = scale(d.deathYear), midY = (y1 + y2) / 2, cx = arcNodeX - 72;
+      const y1 = scale(d.birthYear), y2 = scale(d.deathYear), midY = (y1 + y2) / 2, cx = arcNodeX - 22;
       return `M${arcNodeX} ${y1} Q${cx} ${midY} ${arcNodeX} ${y2}`;
     });
 
@@ -1398,17 +1140,169 @@ function initTimeline() {
     .attr('y', d => scale(d.year) + 3.5)
     .attr('text-anchor', 'start')
     .text(d => `${d.name.split(' ')[0]} ${d.nodeType === 'birth' ? 'b.' : 'd.'} ${d.year}`);
-
-  // ── initial (dimmed) opacity before any node is selected ──
-  svg.selectAll('.timeline-node').style('opacity', CONFIG.timelineEffects.deselectedOpacity);
+svg.selectAll('.timeline-node').style('opacity', CONFIG.timelineEffects.deselectedOpacity);
   svg.selectAll('.tl-node-lbl').style('opacity', CONFIG.timelineEffects.deselectedOpacity);
+}
 
+
+/* ═══════════════════════════════════════════════════════════════
+   SEARCH — live filter with autofill dropdown
+   Selecting a result highlights that node plus its linked targets
+   (reuses selectNode, same as clicking the node directly).
+   ═══════════════════════════════════════════════════════════════ */
+const searchInput      = document.getElementById('searchInput');
+const searchResultsEl  = document.getElementById('searchResults');
+
+function renderSearchResults(query) {
+  searchResultsEl.innerHTML = '';
+  if (!query.trim()) return;
+
+  const q = query.trim().toLowerCase();
+  const matches = NODES_DATA.filter(d => d.name.toLowerCase().includes(q));
+
+  if (!matches.length) {
+    searchResultsEl.innerHTML = '<div class="search-empty">No matches</div>';
+    return;
+  }
+
+  matches.slice(0, 8).forEach(d => {
+    const color = d.type === 'artist' ? CONFIG.node.artistColor : CONFIG.node.cityColor;
+    const item = document.createElement('div');
+    item.className = 'search-result-item';
+    item.innerHTML = `
+      <span class="search-result-swatch" style="background:${color}"></span>
+      <span>${d.name}</span>
+      <span class="search-result-type">${d.type}</span>
+    `;
+    item.addEventListener('click', e => {
+      e.stopPropagation();
+      selectNode(d.name, d);
+      searchInput.value = d.name;
+      searchResultsEl.innerHTML = '';
+    });
+    searchResultsEl.appendChild(item);
+  });
+}
+
+searchInput.addEventListener('input', e => renderSearchResults(e.target.value));
+searchInput.addEventListener('focus', e => { if (e.target.value) renderSearchResults(e.target.value); });
+searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const q = e.target.value.trim().toLowerCase();
+    const match = NODES_DATA.find(d => d.name.toLowerCase() === q) ||
+                  NODES_DATA.find(d => d.name.toLowerCase().includes(q));
+    if (match) { selectNode(match.name, match); searchInput.value = match.name; searchResultsEl.innerHTML = ''; }
+  }
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('#tabSearch')) searchResultsEl.innerHTML = '';
+});
+
+
+/* ═══════════════════════════════════════════════════════════════
+   TOOLS PANEL TAB SWITCHING (Search ↔ Compare)
+   ═══════════════════════════════════════════════════════════════ */
+function switchTab(tab) {
+  document.getElementById('tabSearchBtn').classList.toggle('active', tab === 'search');
+  document.getElementById('tabCompareBtn').classList.toggle('active', tab === 'compare');
+  document.getElementById('tabSearch').classList.toggle('active', tab === 'search');
+  document.getElementById('tabCompare').classList.toggle('active', tab === 'compare');
+}
+document.getElementById('tabSearchBtn').addEventListener('click', () => switchTab('search'));
+document.getElementById('tabCompareBtn').addEventListener('click', () => switchTab('compare'));
+
+
+/* ═══════════════════════════════════════════════════════════════
+   COMPARE — up to three artists/cities side by side
+   Populates the network + timeline highlight to the union of the
+   selected nodes and their direct links, and renders a comparison
+   grid with each node's key facts.
+   ═══════════════════════════════════════════════════════════════ */
+const compareSelectIds = ['compareSelect1', 'compareSelect2', 'compareSelect3'];
+
+compareSelectIds.forEach(id => {
+  const sel = document.getElementById(id);
+  const artistGroup = document.createElement('optgroup'); artistGroup.label = 'Artists';
+  const cityGroup   = document.createElement('optgroup'); cityGroup.label   = 'Cities';
+  NODES_DATA.forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d.name; opt.textContent = d.name;
+    (d.type === 'artist' ? artistGroup : cityGroup).appendChild(opt);
+  });
+  sel.appendChild(artistGroup);
+  sel.appendChild(cityGroup);
+  sel.addEventListener('change', updateCompare);
+});
+
+function resetNetworkHighlight() {
+  const { selectedOpacity: sO } = CONFIG.effects;
+  const { selectedOpacity: tsO } = CONFIG.timelineEffects;
+  d3.selectAll('.network-node,.node-label').style('opacity', sO);
+  d3.selectAll('.network-link').style('opacity', sO);
+  d3.selectAll('.timeline-node,.tl-node-lbl').style('opacity', tsO);
+  d3.selectAll('.timeline-arc').style('opacity', 0);
+}
+
+function updateCompare() {
+  const selectedNames = compareSelectIds
+    .map(id => document.getElementById(id).value)
+    .filter(Boolean);
+
+  const compareResultsEl = document.getElementById('compareResults');
+
+  if (!selectedNames.length) {
+    compareResultsEl.innerHTML = '<div class="compare-empty">Pick up to three to compare</div>';
+    resetNetworkHighlight();
+    return;
+  }
+
+  // Union of the selected nodes plus everything each one links to
+  const highlightSet = new Set();
+  selectedNames.forEach(name => getConnected(name).forEach(n => highlightSet.add(n)));
+
+  const { selectedOpacity: sO, deselectedOpacity: dO, linkDeselectedOpacity: lO } = CONFIG.effects;
+  const { selectedOpacity: tsO, deselectedOpacity: tdO } = CONFIG.timelineEffects;
+
+  d3.selectAll('.network-node').style('opacity', n => highlightSet.has(n.name) ? sO : dO);
+  d3.selectAll('.node-label').style('opacity',   n => highlightSet.has(n.name) ? sO : dO);
+  d3.selectAll('.network-link').style('opacity', l => {
+    const ls = typeof l.source === 'object' ? l.source.name : l.source;
+    const lt = typeof l.target === 'object' ? l.target.name : l.target;
+    return (selectedNames.includes(ls) || selectedNames.includes(lt)) ? sO : lO;
+  });
+  d3.selectAll('.timeline-node').style('opacity', n => selectedNames.includes(n.name) ? tsO : tdO);
+  d3.selectAll('.tl-node-lbl').style('opacity',   n => selectedNames.includes(n.name) ? tsO : tdO);
+  d3.selectAll('.timeline-arc').style('opacity',  n => selectedNames.includes(n.name) ? 1 : 0);
+
+  // Comparison grid
+  compareResultsEl.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.className = 'compare-grid';
+
+  selectedNames.forEach(name => {
+    const d = NODES_DATA.find(n => n.name === name);
+    if (!d) return;
+    const col = document.createElement('div');
+    col.className = 'compare-col';
+    const circle = d.image
+      ? `<div class="info-circle"><img src="${d.image}" alt="${d.name}"></div>`
+      : `<div class="info-circle">${d.name.charAt(0)}</div>`;
+    const deathTxt = d.death ? ' · ' + d.death : '';
+    col.innerHTML = `
+      ${circle}
+      <div class="info-name">${d.name}</div>
+      <div class="info-meta">${d.type} · ${d.birth}${deathTxt}<br><em>${d["main discipline"] || ''}</em></div>
+    `;
+    grid.appendChild(col);
+  });
+
+  compareResultsEl.appendChild(grid);
 }
 
 
 /* ═══════════════════════════════════════════════════════════════
    GENERIC PANEL BEHAVIOUR — draggable + collapsible
-   Reused by the legend, timeline, and info panels.
+   Reused by the legend, timeline, tools, and info panels.
    ═══════════════════════════════════════════════════════════════ */
 function makePanelDraggable(panelId, headerId) {
   const panel = document.getElementById(panelId), header = document.getElementById(headerId);
@@ -1440,8 +1334,6 @@ function makeCollapsible(toggleId, bodyId) {
 }
 
 
-
-
 /* ═══════════════════════════════════════════════════════════════
    BOOT
    ═══════════════════════════════════════════════════════════════ */
@@ -1451,8 +1343,10 @@ window.addEventListener('DOMContentLoaded', () => {
   makePanelDraggable('legendPanel', 'legendHeader');
   makePanelDraggable('timelinePanel', 'timelineHeader');
   makePanelDraggable('infoPanel', 'infoHeader');
+  makePanelDraggable('toolsPanel', 'toolsHeader');
   makeCollapsible('legendToggle', 'legendBody');
   makeCollapsible('timelineToggle', 'timelineBody');
+  makeCollapsible('toolsToggle', 'toolsBody');
 });
 
 </script>
