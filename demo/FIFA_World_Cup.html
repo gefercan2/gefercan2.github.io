@@ -1,50 +1,552 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>World Cup Best Results Scatter Plot</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <title>World Cup Dashboard</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
+      --bg: #0a0a0a;
+      --bg2: #111;
+      --bg3: #161616;
+      --border: rgba(255,255,255,0.08);
+      --border2: rgba(255,255,255,0.15);
+      --text: #e8e8e0;
+      --text2: rgba(232,232,224,0.5);
+      --text3: rgba(232,232,224,0.25);
+      --accent: #c8f542;
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'IBM Plex Sans', sans-serif;
       --color-uefa: #378ADD;
       --color-conmebol: #D85A30;
       --color-afc: #639922;
       --color-caf: #BA7517;
       --color-concacaf: #7F77DD;
       --color-ofc: #9B59B6;
-      --color-base-dot: #999999;
-      --color-stage-line: #b0b0b0;
-      --color-grid-line: #e0e0e0;
-      --color-concentric: #000000;
-      --color-text: #2c2c2a;
-      --color-text-muted: #888780;
-      --color-bg-primary: #ffffff;
-      --color-bg-secondary: #f8f8f8;
-      --color-border: #ddd;
+      --color-base-dot: #666666;
+      --color-stage-line: #666666;
+      --color-grid-line: #404040;
+      --color-concentric: #ffffff;
+      --color-text: #f0f0f0;
+      --color-text-muted: #a0a0a0;
+      --color-bg-primary: #1a1a1a;
+      --color-bg-secondary: #2a2a2a;
+      --color-border: #444;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      overflow: hidden;
     }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      padding: 2rem;
+    /* ── NAVBAR ── */
+    #navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 48px;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border2);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0 20px;
+      z-index: 9999;
+    }
+
+    #navbar .nav-logo {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-right: 20px;
+      white-space: nowrap;
+    }
+
+    #navbar button {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text2);
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 6px 14px;
+      cursor: pointer;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    #navbar button:hover,
+    #navbar button.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── OUTER SCROLL WRAPPER ── */
+    #scroll-wrapper {
+      position: fixed;
+      top: 48px;
+      left: 0;
+      width: 100%;
+      height: calc(100vh - 48px);
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-behavior: smooth;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border2) transparent;
+    }
+
+    #scroll-wrapper::-webkit-scrollbar { height: 4px; }
+    #scroll-wrapper::-webkit-scrollbar-track { background: transparent; }
+    #scroll-wrapper::-webkit-scrollbar-thumb { background: var(--border2); }
+
+    /* ── CONTAINER ── */
+    #container {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      height: 100%;
+      width: max-content;
+    }
+
+    /* ── EACH PANEL ── */
+    .stageBlock {
+      width: 100vw;
+      height: 100%;
+      flex-shrink: 0;
+      overflow-y: auto;
+      border-right: 1px solid var(--border);
+      position: relative;
+      padding: 20px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border2) transparent;
+    }
+
+    .stageBlock::-webkit-scrollbar { width: 4px; }
+    .stageBlock::-webkit-scrollbar-thumb { background: var(--border2); }
+
+    /* ── SCATTER PLOT STYLES ── */
+    .controls {
+      display: flex;
+      gap: 1.5em;
+      flex-wrap: wrap;
+      align-items: center;
+      padding: 10px 14px;
+      border:none;
+      border-radius: 20px;
+      margin-bottom: 16px;
+      background: none;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .control-group label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--color-text-muted);
+    }
+
+    .control-group select {
+      padding: 5px 8px;
+      border: 0.5px solid var(--color-border);
+      border-radius: 4px;
+      font-size: 12px;
       background: var(--color-bg-primary);
       color: var(--color-text);
     }
 
+    .confederation-filters {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .conf-filter-btn {
+      padding: 5px 10px;
+      border: 0.5px solid var(--color-border);
+      border-radius: 4px;
+      font-size: 11px;
+      background: var(--color-bg-primary);
+      color: var(--color-text);
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .conf-filter-btn:hover { border-color: var(--color-text-muted); }
+    .conf-filter-btn.active.uefa  { background: var(--color-uefa);     color: white; border-color: var(--color-uefa); }
+    .conf-filter-btn.active.conmebol { background: var(--color-conmebol); color: white; border-color: var(--color-conmebol); }
+    .conf-filter-btn.active.afc   { background: var(--color-afc);      color: white; border-color: var(--color-afc); }
+    .conf-filter-btn.active.caf   { background: var(--color-caf);      color: white; border-color: var(--color-caf); }
+    .conf-filter-btn.active.concacaf { background: var(--color-concacaf); color: white; border-color: var(--color-concacaf); }
+    .conf-filter-btn.active.ofc   { background: var(--color-ofc);      color: white; border-color: var(--color-ofc); }
+
+    .panel-title {
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--color-text);
+      margin-bottom: 4px;
+    }
+
+    .panel-subtitle {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      margin-bottom: 14px;
+    }
+
+    #chart { width: 100%; }
+
+    .axis path, .axis line { stroke: none; }
+    .axis { font-size: 11px; color: var(--color-text-muted); }
+    .axis-label { font-size: 12px; fill: var(--color-text-muted); font-weight: 500; }
+    .grid-line { stroke: none; }
+    .stage-line { stroke: #666; stroke-width: 2; opacity: 0.5; }
+    .base-dot { fill: #666; opacity: 1; }
+    .participation-circle { fill-opacity: 0.5; stroke-width: 1.5; }
+    .concentric-circle { fill: none; stroke: #fff; stroke-width: 1; opacity: 0.5; }
+    .node-group { opacity: 1; transition: opacity 0.3s; }
+    .node-group.hidden { opacity: 0.08; pointer-events: none; }
+
+    #tooltip-scatter {
+      position: fixed;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 11px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: 500;
+      color: var(--text);
+      font-family: var(--mono);
+    }
+
+    #tooltip-scatter.active { opacity: 1; }
+
+    .legend {
+      margin-top: 16px;
+      padding: 12px 16px;
+      background: none;
+      border-radius: 16px;
+      border: none;
+      font-size: 11px;
+      color: var(--color-text);
+    }
+
+    .legend-item { display: inline-block; margin-right: 16px; margin-bottom: 4px; }
+    .legend-color { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+
+    /* ── SANKEY STYLES ── */
+    #p5-container canvas { display: block; }
+
+    #tooltip-sankey {
+      position: fixed;
+      background: rgba(0,0,0,0.85);
+      color: white;
+      padding: 7px 11px;
+      border-radius: 4px;
+      pointer-events: none;
+      font-size: 11px;
+      z-index: 500;
+      display: none;
+      font-family: var(--mono);
+    }
+
+    /* ── CHORD STYLES ── */
+    #row-2-1 {
+      display: flex;
+      align-items: stretch;
+      border-bottom: 1px solid var(--border);
+      min-height: 56px;
+    }
+
+    #div-2-1-1 {
+      flex: 0 0 180px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+    }
+
+    #div-2-1-1 .logo-mark {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      line-height: 1.4;
+    }
+
+    #div-2-1-2 {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+    }
+
+    #div-2-1-2 h1 {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      color: var(--text);
+    }
+
+    #div-2-1-2 h1 span { color: var(--accent); }
+
+    #div-2-1-3 {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+    }
+
+    #div-2-1-3 p {
+      font-size: 9px;
+      color: var(--text2);
+      font-family: var(--mono);
+      line-height: 1.5;
+      max-width: 240px;
+      text-align: right;
+    }
+
+    #row-2-2 {
+      display: flex;
+      align-items: stretch;
+      border-bottom: 1px solid var(--border);
+      min-height: 48px;
+    }
+
+    #div-2-2-1 {
+      flex: 0 0 180px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 10px;
+    }
+
+    #div-2-2-2 {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 20px;
+    }
+
+    #div-2-2-3 {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 9px;
+      font-family: var(--mono);
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      white-space: nowrap;
+    }
+
+    select {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 4px 8px;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(232,232,224,0.3)'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      padding-right: 22px;
+      min-width: 90px;
+      letter-spacing: 0.04em;
+    }
+
+    select:focus { border-color: var(--accent); }
+
+    .ctrl-group { display: flex; align-items: center; gap: 8px; }
+
+    .leg-items { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .leg-item { display: flex; align-items: center; gap: 4px; font-size: 9px; font-family: var(--mono); color: var(--text2); white-space: nowrap; }
+    .leg-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+    #row-2-3 {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+    }
+
+    #diagram-area {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      min-height: 500px;
+    }
+
+    #diagram-area canvas { display: block; max-width: 100%; max-height: 100%; }
+
+    #chord-tip {
+      position: fixed;
+      pointer-events: none;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      padding: 9px 12px;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text);
+      line-height: 1.7;
+      z-index: 1000;
+      display: none;
+      max-width: 200px;
+    }
+
+    #chord-tip .ct-title { font-size: 11px; color: var(--accent); margin-bottom: 4px; }
+
+    #node-tip {
+      position: fixed;
+      pointer-events: none;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      padding: 9px 12px;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text);
+      line-height: 1.7;
+      z-index: 1001;
+      display: none;
+      max-width: 200px;
+    }
+
+    #node-tip .nt-name { font-size: 11px; color: var(--accent); margin-bottom: 4px; }
+    #node-tip .nt-best { color: var(--text2); font-size: 9px; margin-top: 4px; }
+
+    #sd {
+      position: absolute;
+      right: 0; top: 0;
+      height: 100%;
+      z-index: 100;
+      display: flex;
+      flex-direction: row-reverse;
+    }
+
+    #sd-toggle {
+      width: 26px;
+      background: var(--bg3);
+      border-left: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      writing-mode: vertical-rl;
+      font-family: var(--mono);
+      font-size: 8px;
+      letter-spacing: 0.15em;
+      color: var(--text2);
+      text-transform: uppercase;
+      user-select: none;
+      transition: color 0.2s;
+      gap: 6px;
+      padding: 12px 0;
+    }
+
+    #sd-toggle:hover { color: var(--accent); border-color: var(--accent); }
+    #sd-toggle .arr { font-size: 10px; }
+
+    #sp {
+      width: 0;
+      overflow: hidden;
+      background: var(--bg3);
+      border-left: 1px solid var(--border);
+      transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    #sp.open { width: 260px; }
+    #sp-inner { width: 260px; display: flex; flex-direction: column; height: 100%; padding: 16px 0; overflow-y: auto; }
+
+    .sp-section { border-bottom: 1px solid var(--border); padding: 14px 16px; }
+    .sp-section:last-child { border-bottom: none; }
+    .sp-section-title { font-family: var(--mono); font-size: 8px; letter-spacing: 0.2em; color: var(--text3); text-transform: uppercase; margin-bottom: 10px; }
+    .sp-stat { margin-bottom: 7px; }
+    .sp-stat-label { font-size: 9px; color: var(--text2); font-family: var(--mono); }
+    .sp-stat-value { font-size: 12px; color: var(--text); font-family: var(--mono); font-weight: 500; }
+    .sp-team-list { display: flex; flex-direction: column; gap: 5px; }
+    .sp-team-row { display: flex; align-items: center; justify-content: space-between; font-family: var(--mono); font-size: 9px; }
+    .sp-team-name { color: var(--text); }
+    .sp-team-rank { color: var(--text3); }
+    .sp-match { font-family: var(--mono); font-size: 9px; color: var(--text2); line-height: 1.7; margin-bottom: 7px; border-left: 2px solid var(--border2); padding-left: 7px; }
+    .sp-match-teams { color: var(--text); font-size: 10px; }
+
+    .sp-groups-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
+    .sp-group-btn {
+      padding: 5px 6px;
+      font-family: var(--mono);
+      font-size: 9px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--text2);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+      letter-spacing: 0.05em;
+    }
+    .sp-group-btn:hover, .sp-group-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
+
+    #reset-btn {
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: var(--text2);
+      font-family: var(--mono);
+      font-size: 9px;
+      padding: 5px 10px;
+      cursor: pointer;
+      letter-spacing: 0.08em;
+      transition: all 0.15s;
+    }
+
+    #reset-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── SIDE MENU (scatter) ── */
     .menu-button {
       position: fixed;
-      top: 2rem;
-      right: 2rem;
-      width: 50px;
-      height: 50px;
-      background: var(--color-bg-secondary);
-      border: 0.5px solid var(--color-border);
+      top: 34px;
+      right: 14px;
+      width: 40px;
+      height: 40px;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
       border-radius: 4px;
       cursor: pointer;
       display: flex;
@@ -53,872 +555,1256 @@
       align-items: center;
       gap: 4px;
       z-index: 100;
-      transition: background-color 0.2s;
     }
 
-    .menu-button:hover {
-      background: var(--color-border);
-    }
-
-    .menu-button span {
-      width: 24px;
-      height: 2px;
-      background: var(--color-text);
-      display: block;
-    }
+    .menu-button span { width: 20px; height: 2px; background: var(--text); display: block; }
 
     .side-menu {
       position: fixed;
-      top: 0;
+      top: 48px;
       right: 0;
-      width: 50%;
-      height: 100vh;
-      background: var(--color-bg-primary);
-      border-left: 0.5px solid var(--color-border);
-      box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+      width: 44%;
+      height: calc(100vh - 48px);
+      background: var(--bg3);
+      border-left: 1px solid var(--border2);
       transform: translateX(100%);
       transition: transform 0.3s ease;
-      z-index: 99;
+      z-index: 5000;
       overflow-y: auto;
     }
 
-    .side-menu.active {
-      transform: translateX(0);
-    }
+    .side-menu.active { transform: translateX(0); }
 
     .menu-close {
       position: absolute;
-      top: 1.5rem;
-      right: 1.5rem;
-      width: 30px;
-      height: 30px;
+      top: 14px;
+      right: 14px;
+      width: 28px;
+      height: 28px;
       background: none;
       border: none;
-      font-size: 24px;
+      font-size: 22px;
       cursor: pointer;
-      color: var(--color-text);
+      color: var(--text);
     }
 
-    .menu-content {
-      padding: 4rem 2rem 2rem;
-    }
-
-    .menu-title {
-      font-size: 18px;
-      font-weight: 500;
-      margin-bottom: 2rem;
-      color: var(--color-text);
-    }
+    .menu-content { padding: 3.5rem 1.5rem 1.5rem; }
+    .menu-title { font-size: 16px; font-weight: 500; margin-bottom: 1.5rem; color: var(--text); }
 
     .article-option {
-      padding: 1.5rem;
-      border: 0.5px solid var(--color-border);
+      padding: 1.2rem;
+      border: 1px solid var(--border);
       border-radius: 4px;
       margin-bottom: 1rem;
       cursor: pointer;
       transition: all 0.2s;
     }
 
-    .article-option:hover {
-      background: var(--color-bg-secondary);
-      border-color: var(--color-text-muted);
-    }
-
-    .article-option h3 {
-      font-size: 14px;
-      font-weight: 500;
-      margin-bottom: 0.5rem;
-      color: var(--color-text);
-    }
-
-    .article-option p {
-      font-size: 12px;
-      color: var(--color-text-muted);
-      line-height: 1.5;
-    }
+    .article-option:hover { background: var(--bg2); border-color: var(--border2); }
+    .article-option h3 { font-size: 13px; font-weight: 500; margin-bottom: 0.4rem; color: var(--text); }
+    .article-option p { font-size: 11px; color: var(--text2); line-height: 1.5; }
 
     .menu-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.3);
+      top: 48px; left: 0;
+      width: 100%; height: calc(100vh - 48px);
+      background: rgba(0,0,0,0.5);
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
-      z-index: 98;
+      z-index: 4999;
     }
 
-    .menu-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .menu-overlay.active { opacity: 1; pointer-events: auto; }
 
-    .controls {
-      width: 45%;
-      border-radius:25px;
-      margin: 0px;
-      display: flex;
-      gap: 2em;
-      position: absolute;
-      right: 8%;
-      padding: 1em;
-      border: 0.5px solid var(--color-border); */
-    }
-
-    .control-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .control-group label {
-      font-size: 12px;
-      font-weight: 500;
-      color: #666;
-    }
-
-    .control-group select {
-      padding: 6px 8px;
-      border: 0.5px solid var(--color-border);
-      border-radius: 4px;
-      font-size: 13px;
-      background: var(--color-bg-primary);
-      color: var(--color-text);
-    }
-
-    .confederation-filters {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .conf-filter-btn {
-      padding: 6px 12px;
-      border: 0.5px solid var(--color-border);
-      border-radius: 4px;
-      font-size: 12px;
-      background: var(--color-bg-primary);
-      color: var(--color-text);
-      cursor: pointer;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-
-    .conf-filter-btn:hover {
-      border-color: var(--color-text-muted);
-    }
-
-    .conf-filter-btn.active {
-      font-weight: 500;
-      border-width: 1.5px;
-    }
-
-    .conf-filter-btn.active.uefa {
-      background: var(--color-uefa);
-      color: white;
-      border-color: var(--color-uefa);
-    }
-
-    .conf-filter-btn.active.conmebol {
-      background: var(--color-conmebol);
-      color: white;
-      border-color: var(--color-conmebol);
-    }
-
-    .conf-filter-btn.active.afc {
-      background: var(--color-afc);
-      color: white;
-      border-color: var(--color-afc);
-    }
-
-    .conf-filter-btn.active.caf {
-      background: var(--color-caf);
-      color: white;
-      border-color: var(--color-caf);
-    }
-
-    .conf-filter-btn.active.concacaf {
-      background: var(--color-concacaf);
-      color: white;
-      border-color: var(--color-concacaf);
-    }
-
-    .conf-filter-btn.active.ofc {
-      background: var(--color-ofc);
-      color: white;
-      border-color: var(--color-ofc);
-    }
-
-    #chart {
-      width: 100%;
-      max-width: 100%;
-      margin: 0 auto;
-    }
-
-    .axis {
-      font-size: 12px;
-      color: var(--color-text-muted);
-    }
-
-    .axis-label {
-      font-size: 13px;
-      color: var(--color-text-muted);
-      font-weight: 500;
-    }
-
-    .axis path,
-    .axis line {
-      stroke: none;
-    }
-
-    .grid-line {
-      stroke: none;
-      /* stroke: var(--color-grid-line);
-      stroke-width: 0.5;
-      stroke-dasharray: 2; */
-    }
-
-    .stage-line {
-      stroke: var(--color-stage-line);
-      stroke-width: 2;
-      opacity: 0.6;
-    }
-
-    .base-dot {
-      fill: var(--color-base-dot);
-      opacity: 1;
-    }
-
-    .participation-circle {
-      fill-opacity: 0.5;
-      stroke-width: 1.5;
-    }
-
-    .concentric-circle {
-      fill: none;
-      stroke: var(--color-concentric);
-      stroke-width: 1;
-      opacity: 0.6;
-    }
-
-    .node-group {
-      opacity: 1;
-      transition: opacity 0.3s;
-    }
-
-    .node-group.hidden {
-      opacity: 0.1;
-      pointer-events: none;
-    }
-
-    .title {
-      font-size: 3em;
-      font-weight: 500;
-      fill: var(--color-text);
-    }
-
-    .tooltip {
-      position: absolute;
-      background: var(--color-bg-secondary);
-      border: 0.5px solid var(--color-border);
-      border-radius: 4px;
-      padding: 8px 12px;
-      font-size: 12px;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.2s;
-      z-index: 10;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    .tooltip.active {
-      opacity: 1;
-    }
-
-    .legend {
-      max-width: 100%;
-      margin: 2rem auto 0;
-      padding: 1rem;
-      background: var(--color-bg-secondary);
-      border-radius: 24px;
-      border: 0.5px solid var(--color-border);
-      font-size: 12px;
-    }
-
-    .legend-item {
-      display: inline-block;
-      margin-right: 2rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .legend-color {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      margin-right: 4px;
-      vertical-align: middle;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --color-base-dot: #666666;
-        --color-stage-line: #666666;
-        --color-grid-line: #404040;
-        --color-concentric: #ffffff;
-        --color-text: #f0f0f0;
-        --color-text-muted: #a0a0a0;
-        --color-bg-primary: #1a1a1a;
-        --color-bg-secondary: #2a2a2a;
-        --color-border: #444;
-      }
-
-      body {
-        background: var(--color-bg-primary);
-      }
-
-      .menu-button:hover {
-        background: #333;
-      }
-    }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); }
   </style>
 </head>
 
-
-
-
 <body>
 
-<button class="menu-button" id="menuButton">
-  <span></span>
-  <span></span>
-  <span></span>
-</button>
+<!-- ══════════════════════════════════════════
+     NAVBAR — fixed, outside container
+══════════════════════════════════════════ -->
+<nav id="navbar">
+  <div class="nav-logo">FIFA WC</div>
+  <button onclick="scrollToPanel('stage01_ChartPlot')" id="nav-btn-0">Overview</button>
+  <button onclick="scrollToPanel('stage02_Sankey')"    id="nav-btn-1">Sankey</button>
+  <button onclick="scrollToPanel('stage03_Chord')"     id="nav-btn-2">2026 Cup</button>
+</nav>
 
-<div class="menu-overlay" id="menuOverlay"></div>
+<!-- ══════════════════════════════════════════
+     SCROLL WRAPPER
+══════════════════════════════════════════ -->
+<div id="scroll-wrapper">
+  <div id="container">
+      <button class="menu-button" id="menuButton">
+      <span></span><span></span><span></span>
+      </button>
+    <div class="menu-overlay" id="menuOverlay"></div>
+    <div class="side-menu" id="sideMenu">
+        <button class="menu-close" id="menuClose">×</button>
+        <div class="menu-content">
+          <div class="menu-title">Articles</div>
+          <div class="article-option">
+            <h3>Understanding D3 Violin Plots</h3>
+            <p>A comprehensive guide to the code structure and logic behind interactive data visualizations using D3.js.</p>
+          </div>
+          <div class="article-option">
+            <h3>World Cup Performance Analysis</h3>
+            <p>Deep dive into the statistical patterns of World Cup tournament results across confederations.</p>
+          </div>
+        </div>
+      </div>
 
-<div class="side-menu" id="sideMenu">
-  <button class="menu-close" id="menuClose">&times;</button>
-  <div class="menu-content">
-    <div class="menu-title">Articles</div>
+    <!-- ══════════════════════════════════════
+         PANEL 1 — Scatter Plot
+    ══════════════════════════════════════ -->
+    <div class="stageBlock" id="stage01_ChartPlot">
+
+
+
+      <div class="panel-title">World Cup Performance</div>
+      <div class="panel-subtitle">Best Results by Stage and Year </div>
+      <div class="controls">
+        <div class="control-group">
+          <label for="yAxisSelect">Y-Axis:</label>
+          <select id="yAxisSelect">
+            <option value="best" selected>Best Result Year</option>
+            <option value="debut">Debut Year</option>
+          </select>
+        </div>
+        <div class="confederation-filters">
+          <label style="font-size:11px;font-weight:500;color:var(--color-text-muted);">Confederations:</label>
+          <button class="conf-filter-btn active uefa"     data-conf="all">All</button>
+          <button class="conf-filter-btn"                 data-conf="UEFA">UEFA</button>
+          <button class="conf-filter-btn"                 data-conf="CONMEBOL">CONMEBOL</button>
+          <button class="conf-filter-btn"                 data-conf="AFC">AFC</button>
+          <button class="conf-filter-btn"                 data-conf="CAF">CAF</button>
+          <button class="conf-filter-btn"                 data-conf="CONCACAF">CONCACAF</button>
+          <button class="conf-filter-btn"                 data-conf="OFC">OFC</button>
+        </div>
+          <div class="legend" id="legend">Circle size = appearances | Concentric rings = multiple titles | Position = FIFA ranking Apr 2026</div>
+      </div>
+
+      <div id="chart"></div>
+      <div id="tooltip-scatter" class="tooltip"></div>
     
-    <div class="article-option" onclick="window.open('#article1')">
-      <h3>Understanding D3 Violin Plots</h3>
-      <p>A comprehensive guide to the code structure and logic behind interactive data visualizations using D3.js. Explore how hierarchical data is transformed and rendered into meaningful visual patterns.</p>
+
+    </div>
+    <!-- /stage01 -->
+
+    <!-- ══════════════════════════════════════
+         PANEL 2 — Sankey
+    ══════════════════════════════════════ -->
+    <div class="stageBlock" id="stage02_Sankey">
+      <div class="panel-title">FIFA Confederations</div>
+      <div class="panel-subtitle">2010, 2014, 2018 &amp; 2022 World Cup Tournament Stages</div>
+      <div id="p5-container"></div>
+      <div id="tooltip-sankey"></div>
     </div>
 
-    <div class="article-option" onclick="window.open('#article2')">
-      <h3>World Cup Performance Analysis</h3>
-      <p>Deep dive into the statistical patterns of World Cup tournament results. Learn how confederation performance, historical trends, and country rankings reveal insights about international football competition.</p>
-    </div>
-  </div>
-</div>
- 
- <div class="controls">
- 
-  <div class="control-group">
-    <!-- <label for="yAxisSelect">Y-Axis Display:</label> -->
-    <select id="yAxisSelect">
-      <option value="best">Best Result Year</option>
-      <option value="debut">Debut Year</option>
-    </select>
-  </div>
+    <!-- ══════════════════════════════════════
+         PANEL 3 — Chord Diagram
+    ══════════════════════════════════════ -->
+    <div class="stageBlock" id="stage03_Chord" style="padding:0; display:flex; flex-direction:column;">
 
-  <div class="confederation-filters">
-    <label style="font-size: 12px; font-weight: 500; color: #666;">Confederations:</label>
-    <button class="conf-filter-btn active uefa" data-conf="all">All</button>
-    <button class="conf-filter-btn" data-conf="UEFA">UEFA</button>
-    <button class="conf-filter-btn" data-conf="CONMEBOL">CONMEBOL</button>
-    <button class="conf-filter-btn" data-conf="AFC">AFC</button>
-    <button class="conf-filter-btn" data-conf="CAF">CAF</button>
-    <button class="conf-filter-btn" data-conf="CONCACAF">CONCACAF</button>
-    <button class="conf-filter-btn" data-conf="OFC">OFC</button>
-  </div>
+      <div id="row-2-1">
+        <div id="div-2-1-1"><div class="logo-mark">FIFA WC<br>2026™</div></div>
+        <div id="div-2-1-2">
+          <h1>Group Stage <span>Chord Diagram</span> — 48 Teams / 12 Groups</h1>
+        </div>
+        <div id="div-2-1-3">
+          <p>Each node = 1 team. Chords connect group opponents. Node size ∝ 100 − FIFA ranking. Jun 11 – Jul 19, 2026 · USA · Mexico · Canada</p>
+        </div>
+      </div>
 
- </div>
+      <div id="row-2-2">
+        <div id="div-2-2-1">
+          <div class="ctrl-group">
+            <label for="sort-sel">Sort</label>
+            <select id="sort-sel">
+              <option value="alpha">A → Z</option>
+              <option value="conf">Confederation</option>
+            </select>
+          </div>
+        </div>
+        <div id="div-2-2-2">
+          <div class="ctrl-group">
+            <label for="group-sel">Group</label>
+            <select id="group-sel">
+              <option value="">All groups</option>
+              <option value="A">Group A</option><option value="B">Group B</option>
+              <option value="C">Group C</option><option value="D">Group D</option>
+              <option value="E">Group E</option><option value="F">Group F</option>
+              <option value="G">Group G</option><option value="H">Group H</option>
+              <option value="I">Group I</option><option value="J">Group J</option>
+              <option value="K">Group K</option><option value="L">Group L</option>
+            </select>
+          </div>
+          <button id="reset-btn">Reset</button>
+        </div>
+        <div id="div-2-2-3">
+          <div class="leg-items">
+            <div class="leg-item"><div class="leg-dot" style="background:#4d9de0"></div>UEFA</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#f4a261"></div>CONMEBOL</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#2dc653"></div>CAF</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#bc5090"></div>AFC</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#e63946"></div>CONCACAF</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#06b6d4"></div>OFC</div>
+          </div>
+        </div>
+      </div>
 
-<div class="title">World Cup Performance:</div>
-<div class="subtitle">Best Results by Stage and Year</div>
-<div id="chart"></div>
-<div class="tooltip" id="tooltip"></div>
- <div class="legend" id="legend"></div>
+      <div id="row-2-3" style="flex:1; position:relative;">
+        <div id="diagram-area">
+          <canvas id="cv"></canvas>
+        </div>
+        <div id="sd">
+          <div id="sd-toggle" onclick="togglePanel()">
+            <span class="arr" id="sd-arr">◂</span>
+            <span>Details</span>
+          </div>
+          <div id="sp">
+            <div id="sp-inner">
+              <div class="sp-section">
+                <div class="sp-section-title">Tournament</div>
+                <div class="sp-stat"><div class="sp-stat-label">Teams</div><div class="sp-stat-value">48</div></div>
+                <div class="sp-stat"><div class="sp-stat-label">Groups</div><div class="sp-stat-value">12</div></div>
+                <div class="sp-stat"><div class="sp-stat-label">Host nations</div><div class="sp-stat-value">USA · MEX · CAN</div></div>
+                <div class="sp-stat"><div class="sp-stat-label">Dates</div><div class="sp-stat-value">Jun 11 – Jul 19</div></div>
+              </div>
+              <div class="sp-section" id="sp-selected">
+                <div class="sp-section-title">Selection</div>
+                <div style="font-size:9px;color:var(--text3);font-family:var(--mono)">Click a node or chord to see details here.</div>
+              </div>
+              <div class="sp-section">
+                <div class="sp-section-title">Quick group select</div>
+                <div class="sp-groups-grid" id="sp-groups">
+                  <button class="sp-group-btn" onclick="setGroup('A')">A</button>
+                  <button class="sp-group-btn" onclick="setGroup('B')">B</button>
+                  <button class="sp-group-btn" onclick="setGroup('C')">C</button>
+                  <button class="sp-group-btn" onclick="setGroup('D')">D</button>
+                  <button class="sp-group-btn" onclick="setGroup('E')">E</button>
+                  <button class="sp-group-btn" onclick="setGroup('F')">F</button>
+                  <button class="sp-group-btn" onclick="setGroup('G')">G</button>
+                  <button class="sp-group-btn" onclick="setGroup('H')">H</button>
+                  <button class="sp-group-btn" onclick="setGroup('I')">I</button>
+                  <button class="sp-group-btn" onclick="setGroup('J')">J</button>
+                  <button class="sp-group-btn" onclick="setGroup('K')">K</button>
+                  <button class="sp-group-btn" onclick="setGroup('L')">L</button>
+                </div>
+              </div>
+              <div class="sp-section">
+                <div class="sp-section-title">About</div>
+                <div style="font-size:9px;color:var(--text2);font-family:var(--mono);line-height:1.7">
+                  Node size = 100 − FIFA Rank<br>(Apr 2026 official rankings)<br><br>
+                  Chord value = 1 (both sides)<br>Click outside to reset.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="chord-tip"></div>
+      <div id="node-tip"></div>
+
+    </div><!-- /stage03 -->
+
+  </div><!-- /container -->
+</div><!-- /scroll-wrapper -->
 
 
+<!-- ══════════════════════════════════════════════════════
+     SCRIPT 1 — NAVBAR SCROLL + ACTIVE STATE
+══════════════════════════════════════════════════════ -->
 <script>
-// Menu functionality
-const menuButton = document.getElementById("menuButton");
-const sideMenu = document.getElementById("sideMenu");
-const menuOverlay = document.getElementById("menuOverlay");
-const menuClose = document.getElementById("menuClose");
+  function scrollToPanel(id) {
+    const wrapper = document.getElementById('scroll-wrapper');
+    const panel   = document.getElementById(id);
+    if (!panel) return;
+    wrapper.scrollTo({ left: panel.offsetLeft, behavior: 'smooth' });
+  }
 
-menuButton.addEventListener("click", () => {
-  sideMenu.classList.add("active");
-  menuOverlay.classList.add("active");
-});
+  // Highlight active nav button on scroll
+  const wrapper  = document.getElementById('scroll-wrapper');
+  const panels   = ['stage01_ChartPlot','stage02_Sankey','stage03_Chord'];
+  const navBtns  = [
+    document.getElementById('nav-btn-0'),
+    document.getElementById('nav-btn-1'),
+    document.getElementById('nav-btn-2')
+  ];
 
-menuClose.addEventListener("click", () => {
-  sideMenu.classList.remove("active");
-  menuOverlay.classList.remove("active");
-});
-
-menuOverlay.addEventListener("click", () => {
-  sideMenu.classList.remove("active");
-  menuOverlay.classList.remove("active");
-});
-
-// Confederation filter state
-let activeConfederation = "all";
-
-// Actual color values for use in JavaScript
-const confColorsActual = {
-  "UEFA": "#378ADD",
-  "CONMEBOL": "#D85A30",
-  "AFC": "#639922",
-  "CAF": "#BA7517",
-  "CONCACAF": "#7F77DD",
-  "OFC": "#9B59B6"
-};
-
-// Complete JSON Data with all teams
-const data = [
-  { team: "England", appearances: 17, bestResult: "Champions", bestYear: 1966, debutYear: 1950, timesAchieved: 1, confederation: "UEFA", ranking: 4 },
-  { team: "France", appearances: 17, bestResult: "Champions", bestYear: 1998, debutYear: 1930, timesAchieved: 2, confederation: "UEFA", ranking: 1 },
-  { team: "Germany", appearances: 21, bestResult: "Champions", bestYear: 1954, debutYear: 1934, timesAchieved: 4, confederation: "UEFA", ranking: 10 },
-  { team: "Uruguay", appearances: 15, bestResult: "Champions", bestYear: 1930, debutYear: 1930, timesAchieved: 2, confederation: "CONMEBOL", ranking: 17 },
-  { team: "Argentina", appearances: 19, bestResult: "Champions", bestYear: 1978, debutYear: 1930, timesAchieved: 3, confederation: "CONMEBOL", ranking: 3 },
-  { team: "Brazil", appearances: 23, bestResult: "Champions", bestYear: 1958, debutYear: 1930, timesAchieved: 5, confederation: "CONMEBOL", ranking: 6 },
-  { team: "Italy", appearances: 18, bestResult: "Champions", bestYear: 1934, debutYear: 1934, timesAchieved: 4, confederation: "UEFA", ranking: 12 },
-  { team: "Spain", appearances: 17, bestResult: "Champions", bestYear: 2010, debutYear: 1934, timesAchieved: 1, confederation: "UEFA", ranking: 2 },
-  { team: "Bulgaria", appearances: 7, bestResult: "Fourth place", bestYear: 1994, debutYear: 1962, timesAchieved: 1, confederation: "UEFA", ranking: 86 },
-  { team: "Morocco", appearances: 7, bestResult: "Fourth place", bestYear: 2022, debutYear: 1970, timesAchieved: 1, confederation: "CAF", ranking: 8 },
-  { team: "Russia", appearances: 11, bestResult: "Fourth place", bestYear: 1966, debutYear: 1958, timesAchieved: 1, confederation: "UEFA", ranking: 36 },
-  { team: "Serbia", appearances: 13, bestResult: "Fourth place", bestYear: 1930, debutYear: 1930, timesAchieved: 1, confederation: "UEFA", ranking: 39 },
-  { team: "South Korea", appearances: 12, bestResult: "Fourth place", bestYear: 2002, debutYear: 1954, timesAchieved: 1, confederation: "AFC", ranking: 25 },
-  { team: "Angola", appearances: 1, bestResult: "Group stage", bestYear: 2006, debutYear: 2006, timesAchieved: 1, confederation: "CAF", ranking: 89 },
-  { team: "Bolivia", appearances: 3, bestResult: "Group stage", bestYear: 1930, debutYear: 1930, timesAchieved: 1, confederation: "CONMEBOL", ranking: 76 },
-  { team: "Bosnia and Herzegovina", appearances: 2, bestResult: "Group stage", bestYear: 2014, debutYear: 2014, timesAchieved: 1, confederation: "UEFA", ranking: 65 },
-  { team: "Canada", appearances: 3, bestResult: "Group stage", bestYear: 1986, debutYear: 1986, timesAchieved: 1, confederation: "CONCACAF", ranking: 30 },
-  { team: "Cape Verde", appearances: 1, bestResult: "Group stage", bestYear: 2026, debutYear: 2026, timesAchieved: 1, confederation: "CAF", ranking: 60 },
-  { team: "Chile", appearances: 9, bestResult: "Third place", bestYear: 1962, debutYear: 1930, timesAchieved: 1, confederation: "CONMEBOL", ranking: 54 },
-  { team: "China", appearances: 1, bestResult: "Group stage", bestYear: 2002, debutYear: 2002, timesAchieved: 1, confederation: "AFC", ranking: 94 },
-  { team: "Colombia", appearances: 7, bestResult: "Quarter-finals", bestYear: 2014, debutYear: 1962, timesAchieved: 1, confederation: "CONMEBOL", ranking: 13 },
-  { team: "Costa Rica", appearances: 6, bestResult: "Quarter-finals", bestYear: 2014, debutYear: 1990, timesAchieved: 1, confederation: "CONCACAF", ranking: 51 },
-  { team: "Croatia", appearances: 7, bestResult: "Runners-up", bestYear: 2018, debutYear: 1998, timesAchieved: 1, confederation: "UEFA", ranking: 11 },
-  { team: "Cuba", appearances: 1, bestResult: "Quarter-finals", bestYear: 1938, debutYear: 1938, timesAchieved: 1, confederation: "CONCACAF", ranking: 164 },
-  { team: "Curaçao", appearances: 1, bestResult: "Group stage", bestYear: 2026, debutYear: 2026, timesAchieved: 1, confederation: "CONCACAF", ranking: 82 },
-  { team: "Czech Republic", appearances: 10, bestResult: "Runners-up", bestYear: 1934, debutYear: 1934, timesAchieved: 1, confederation: "UEFA", ranking: 41 },
-  { team: "Denmark", appearances: 6, bestResult: "Quarter-finals", bestYear: 1998, debutYear: 1986, timesAchieved: 1, confederation: "UEFA", ranking: 20 },
-  { team: "DR Congo", appearances: 2, bestResult: "Group stage", bestYear: 1974, debutYear: 1974, timesAchieved: 1, confederation: "CAF", ranking: 46 },
-  { team: "East Germany", appearances: 1, bestResult: "Quarter-finals", bestYear: 1974, debutYear: 1974, timesAchieved: 1, confederation: "UEFA", ranking: 200 },
-  { team: "Ecuador", appearances: 5, bestResult: "Round of 16", bestYear: 2006, debutYear: 2002, timesAchieved: 1, confederation: "CONMEBOL", ranking: 23 },
-  { team: "Egypt", appearances: 4, bestResult: "Round of 16", bestYear: 1934, debutYear: 1934, timesAchieved: 1, confederation: "CAF", ranking: 29 },
-  { team: "El Salvador", appearances: 2, bestResult: "Group stage", bestYear: 1970, debutYear: 1970, timesAchieved: 1, confederation: "CONCACAF", ranking: 100 },
-  { team: "Ghana", appearances: 5, bestResult: "Quarter-finals", bestYear: 2010, debutYear: 2006, timesAchieved: 1, confederation: "CAF", ranking: 74 },
-  { team: "Greece", appearances: 3, bestResult: "Round of 16", bestYear: 2014, debutYear: 1994, timesAchieved: 1, confederation: "UEFA", ranking: 47 },
-  { team: "Haiti", appearances: 2, bestResult: "Group stage", bestYear: 1974, debutYear: 1974, timesAchieved: 1, confederation: "CONCACAF", ranking: 83 },
-  { team: "Honduras", appearances: 3, bestResult: "Group stage", bestYear: 1982, debutYear: 1982, timesAchieved: 1, confederation: "CONCACAF", ranking: 66 },
-  { team: "Hungary", appearances: 9, bestResult: "Runners-up", bestYear: 1938, debutYear: 1934, timesAchieved: 1, confederation: "UEFA", ranking: 42 },
-  { team: "Iceland", appearances: 1, bestResult: "Group stage", bestYear: 2018, debutYear: 2018, timesAchieved: 1, confederation: "UEFA", ranking: 75 },
-  { team: "Indonesia", appearances: 1, bestResult: "Round of 16", bestYear: 1938, debutYear: 1938, timesAchieved: 1, confederation: "AFC", ranking: 122 },
-  { team: "Iran", appearances: 7, bestResult: "Group stage", bestYear: 1978, debutYear: 1978, timesAchieved: 1, confederation: "AFC", ranking: 21 },
-  { team: "Iraq", appearances: 2, bestResult: "Group stage", bestYear: 1986, debutYear: 1986, timesAchieved: 1, confederation: "AFC", ranking: 57 },
-  { team: "Israel", appearances: 1, bestResult: "Group stage", bestYear: 1970, debutYear: 1970, timesAchieved: 1, confederation: "UEFA", ranking: 77 },
-  { team: "Ivory Coast", appearances: 4, bestResult: "Group stage", bestYear: 2010, debutYear: 2006, timesAchieved: 1, confederation: "CAF", ranking: 34 },
-  { team: "Jamaica", appearances: 1, bestResult: "Group stage", bestYear: 1998, debutYear: 1998, timesAchieved: 1, confederation: "CONCACAF", ranking: 71 },
-  { team: "Japan", appearances: 8, bestResult: "Round of 16", bestYear: 2002, debutYear: 1998, timesAchieved: 1, confederation: "AFC", ranking: 18 },
-  { team: "Jordan", appearances: 1, bestResult: "Group stage", bestYear: 2026, debutYear: 2026, timesAchieved: 1, confederation: "AFC", ranking: 63 },
-  { team: "Kuwait", appearances: 1, bestResult: "Group stage", bestYear: 1982, debutYear: 1982, timesAchieved: 1, confederation: "AFC", ranking: 134 },
-  { team: "Mexico", appearances: 18, bestResult: "Quarter-finals", bestYear: 1970, debutYear: 1930, timesAchieved: 1, confederation: "AFC", ranking: 15 },
-  { team: "Netherlands", appearances: 12, bestResult: "Runners-up", bestYear: 1974, debutYear: 1934, timesAchieved: 1, confederation: "UEFA", ranking: 7 },
-  { team: "New Zealand", appearances: 3, bestResult: "Group stage", bestYear: 1982, debutYear: 1982, timesAchieved: 1, confederation: "OFC", ranking: 85 },
-  { team: "Nigeria", appearances: 6, bestResult: "Round of 16", bestYear: 1994, debutYear: 1994, timesAchieved: 1, confederation: "CAF", ranking: 26 },
-  { team: "North Korea", appearances: 2, bestResult: "Quarter-finals", bestYear: 1966, debutYear: 1966, timesAchieved: 1, confederation: "AFC", ranking: 200 },
-  { team: "Northern Ireland", appearances: 3, bestResult: "Quarter-finals", bestYear: 1958, debutYear: 1958, timesAchieved: 1, confederation: "UEFA", ranking: 70 },
-  { team: "Norway", appearances: 4, bestResult: "Round of 16", bestYear: 1938, debutYear: 1938, timesAchieved: 1, confederation: "UEFA", ranking: 31 },
-  { team: "Panama", appearances: 2, bestResult: "Group stage", bestYear: 2018, debutYear: 2018, timesAchieved: 1, confederation: "CONCACAF", ranking: 33 },
-  { team: "Paraguay", appearances: 9, bestResult: "Quarter-finals", bestYear: 2010, debutYear: 1930, timesAchieved: 1, confederation: "UEFA", ranking: 40 },
-  { team: "Peru", appearances: 5, bestResult: "Quarter-finals", bestYear: 1970, debutYear: 1930, timesAchieved: 1, confederation: "CONMEBOL", ranking: 53 },
-  { team: "Poland", appearances: 9, bestResult: "Third place", bestYear: 1974, debutYear: 1938, timesAchieved: 1, confederation: "UEFA", ranking: 35 },
-  { team: "Portugal", appearances: 9, bestResult: "Third place", bestYear: 1966, debutYear: 1966, timesAchieved: 1, confederation: "UEFA", ranking: 5 },
-  { team: "Qatar", appearances: 2, bestResult: "Group stage", bestYear: 2022, debutYear: 2022, timesAchieved: 1, confederation: "AFC", ranking: 55 },
-  { team: "Republic of Ireland", appearances: 3, bestResult: "Quarter-finals", bestYear: 1990, debutYear: 1990, timesAchieved: 1, confederation: "UEFA", ranking: 59 },
-  { team: "Romania", appearances: 7, bestResult: "Quarter-finals", bestYear: 1994, debutYear: 1930, timesAchieved: 1, confederation: "UEFA", ranking: 56 },
-  { team: "Saudi Arabia", appearances: 7, bestResult: "Round of 16", bestYear: 1994, debutYear: 1994, timesAchieved: 1, confederation: "AFC", ranking: 61 },
-  { team: "Scotland", appearances: 9, bestResult: "Group stage", bestYear: 1954, debutYear: 1954, timesAchieved: 1, confederation: "UEFA", ranking: 43 },
-  { team: "Senegal", appearances: 4, bestResult: "Quarter-finals", bestYear: 2002, debutYear: 2002, timesAchieved: 1, confederation: "CAF", ranking: 14 },
-  { team: "Slovakia", appearances: 9, bestResult: "Runners-up", bestYear: 1934, debutYear: 1934, timesAchieved: 1, confederation: "UEFA", ranking: 48 },
-  { team: "Slovenia", appearances: 2, bestResult: "Group stage", bestYear: 2002, debutYear: 2002, timesAchieved: 1, confederation: "UEFA", ranking: 58 },
-  { team: "South Africa", appearances: 4, bestResult: "Group stage", bestYear: 2002, debutYear: 1998, timesAchieved: 1, confederation: "CAF", ranking: 60 },
-  { team: "Sweden", appearances: 13, bestResult: "Runners-up", bestYear: 1958, debutYear: 1934, timesAchieved: 1, confederation: "UEFA", ranking: 38 },
-  { team: "Switzerland", appearances: 13, bestResult: "Quarter-finals", bestYear: 1954, debutYear: 1934, timesAchieved: 1, confederation: "UEFA", ranking: 19 },
-  { team: "Togo", appearances: 1, bestResult: "Group stage", bestYear: 2006, debutYear: 2006, timesAchieved: 1, confederation: "CAF", ranking: 121 },
-  { team: "Trinidad and Tobago", appearances: 1, bestResult: "Group stage", bestYear: 2006, debutYear: 2006, timesAchieved: 1, confederation: "CONCACAF", ranking: 102 },
-  { team: "Tunisia", appearances: 7, bestResult: "Group stage", bestYear: 1978, debutYear: 1978, timesAchieved: 1, confederation: "CAF", ranking: 44 },
-  { team: "Turkey", appearances: 3, bestResult: "Third place", bestYear: 2002, debutYear: 1954, timesAchieved: 1, confederation: "UEFA", ranking: 22 },
-  { team: "Ukraine", appearances: 1, bestResult: "Quarter-finals", bestYear: 2006, debutYear: 2006, timesAchieved: 1, confederation: "UEFA", ranking: 32 },
-  { team: "United Arab Emirates", appearances: 1, bestResult: "Group stage", bestYear: 1990, debutYear: 1990, timesAchieved: 1, confederation: "AFC", ranking: 68 },
-  { team: "United States", appearances: 12, bestResult: "Third place", bestYear: 1930, debutYear: 1930, timesAchieved: 1, confederation: "CONCACAF", ranking: 16 },
-  { team: "Uzbekistan", appearances: 1, bestResult: "Group stage", bestYear: 2026, debutYear: 2026, timesAchieved: 1, confederation: "AFC", ranking: 50 },
-  { team: "Wales", appearances: 2, bestResult: "Quarter-finals", bestYear: 1958, debutYear: 1958, timesAchieved: 1, confederation: "UEFA", ranking: 37 }
-];
-
-// Map stage names to numeric values for x-axis
-const stageMap = {
-  "Champions": 5,
-  "Runners-up": 4.5,
-  "Third place": 4.2,
-  "Fourth place": 4,
-  "Semi-finals": 3.8,
-  "Quarter-finals": 3,
-  "Round of 16": 2,
-  "Group stage": 1,
-  "TBD": 1
-};
-
-// Stage labels for x-axis
-const stageLabels = {
-  1: "Group",
-  2: "R16",
-  3: "QF",
-  3.8: "SF",
-  4: "4th",
-  4.2: "3rd",
-  4.5: "Final",
-  5: "Winner"
-};
-
-// Transform data
-const transformedData = data.map(d => ({
-  ...d,
-  stageValue: stageMap[d.bestResult],
-  x: stageMap[d.bestResult],
-  y_best: d.bestYear,
-  y_debut: d.debutYear,
-  radius: Math.sqrt(d.appearances) * 2.5
-}));
-
-// Improved overlap avoidance with ranking-based positioning
-function resolveOverlaps(data, xScale, yScale) {
-  const padding = 20;
-  const maxIterations = 150;
-  let iterations = 0;
-  let overlaps = true;
-
-  data.forEach(d => {
-    d.offsetX = 0;
-    d.offsetY = 0;
+  wrapper.addEventListener('scroll', () => {
+    const scrollLeft = wrapper.scrollLeft;
+    const vw = window.innerWidth;
+    let active = 0;
+    panels.forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (el && el.offsetLeft <= scrollLeft + vw / 2) active = i;
+    });
+    navBtns.forEach((b, i) => b.classList.toggle('active', i === active));
   });
+</script>
 
-  while (overlaps && iterations < maxIterations) {
-    overlaps = false;
-    iterations++;
+<!-- ══════════════════════════════════════════════════════
+     SCRIPT 2 — SIDE MENU
+══════════════════════════════════════════════════════ -->
+<script>
+  const menuButton  = document.getElementById('menuButton');
+  const sideMenu    = document.getElementById('sideMenu');
+  const menuOverlay = document.getElementById('menuOverlay');
+  const menuClose   = document.getElementById('menuClose');
 
-    for (let i = 0; i < data.length; i++) {
-      for (let j = i + 1; j < data.length; j++) {
-        const d1 = data[i];
-        const d2 = data[j];
+  menuButton.addEventListener('click', () => {
+    sideMenu.classList.add('active');
+    menuOverlay.classList.add('active');
+  });
+  menuClose.addEventListener('click', closeMenu);
+  menuOverlay.addEventListener('click', closeMenu);
+  function closeMenu() {
+    sideMenu.classList.remove('active');
+    menuOverlay.classList.remove('active');
+  }
+</script>
 
-        if (d1.x === d2.x && d1.currentY === d2.currentY) {
-          const x1 = xScale(d1.x) + d1.offsetX;
-          const y1 = yScale(d1.currentY) + d1.offsetY;
-          const x2 = xScale(d2.x) + d2.offsetX;
-          const y2 = yScale(d2.currentY) + d2.offsetY;
+<!-- ══════════════════════════════════════════════════════
+     SCRIPT 3 — SCATTER PLOT (D3)
+══════════════════════════════════════════════════════ -->
+<script>
+  const confColorsActual = {
+    UEFA:     '#378ADD',
+    CONMEBOL: '#D85A30',
+    AFC:      '#639922',
+    CAF:      '#BA7517',
+    CONCACAF: '#7F77DD',
+    OFC:      '#9B59B6'
+  };
 
-          const dx = x2 - x1;
-          const dy = y2 - y1;
-          const distance = Math.sqrt(dx * dx + dy * dy);
+  const SCATTER_DATA = [
+    { team:'England',     appearances:17, bestResult:'Champions',      bestYear:1966, debutYear:1950, timesAchieved:1, confederation:'UEFA',     ranking:4  },
+    { team:'France',      appearances:17, bestResult:'Champions',      bestYear:1998, debutYear:1930, timesAchieved:2, confederation:'UEFA',     ranking:1  },
+    { team:'Germany',     appearances:21, bestResult:'Champions',      bestYear:1954, debutYear:1934, timesAchieved:4, confederation:'UEFA',     ranking:10 },
+    { team:'Uruguay',     appearances:15, bestResult:'Champions',      bestYear:1930, debutYear:1930, timesAchieved:2, confederation:'CONMEBOL', ranking:17 },
+    { team:'Argentina',   appearances:19, bestResult:'Champions',      bestYear:1978, debutYear:1930, timesAchieved:3, confederation:'CONMEBOL', ranking:3  },
+    { team:'Brazil',      appearances:23, bestResult:'Champions',      bestYear:1958, debutYear:1930, timesAchieved:5, confederation:'CONMEBOL', ranking:6  },
+    { team:'Italy',       appearances:18, bestResult:'Champions',      bestYear:1934, debutYear:1934, timesAchieved:4, confederation:'UEFA',     ranking:12 },
+    { team:'Spain',       appearances:17, bestResult:'Champions',      bestYear:2010, debutYear:1934, timesAchieved:1, confederation:'UEFA',     ranking:2  },
+    { team:'Bulgaria',    appearances:7,  bestResult:'Fourth place',   bestYear:1994, debutYear:1962, timesAchieved:1, confederation:'UEFA',     ranking:86 },
+    { team:'Morocco',     appearances:7,  bestResult:'Fourth place',   bestYear:2022, debutYear:1970, timesAchieved:1, confederation:'CAF',      ranking:8  },
+    { team:'Russia',      appearances:11, bestResult:'Fourth place',   bestYear:1966, debutYear:1958, timesAchieved:1, confederation:'UEFA',     ranking:36 },
+    { team:'Serbia',      appearances:13, bestResult:'Fourth place',   bestYear:1930, debutYear:1930, timesAchieved:1, confederation:'UEFA',     ranking:39 },
+    { team:'South Korea', appearances:12, bestResult:'Fourth place',   bestYear:2002, debutYear:1954, timesAchieved:1, confederation:'AFC',      ranking:25 },
+    { team:'Croatia',     appearances:7,  bestResult:'Runners-up',     bestYear:2018, debutYear:1998, timesAchieved:1, confederation:'UEFA',     ranking:11 },
+    { team:'Czech Republic',appearances:10,bestResult:'Runners-up',    bestYear:1934, debutYear:1934, timesAchieved:1, confederation:'UEFA',     ranking:41 },
+    { team:'Hungary',     appearances:9,  bestResult:'Runners-up',     bestYear:1938, debutYear:1934, timesAchieved:1, confederation:'UEFA',     ranking:42 },
+    { team:'Netherlands', appearances:12, bestResult:'Runners-up',     bestYear:1974, debutYear:1934, timesAchieved:1, confederation:'UEFA',     ranking:7  },
+    { team:'Sweden',      appearances:13, bestResult:'Runners-up',     bestYear:1958, debutYear:1934, timesAchieved:1, confederation:'UEFA',     ranking:38 },
+    { team:'Slovakia',    appearances:9,  bestResult:'Runners-up',     bestYear:1934, debutYear:1934, timesAchieved:1, confederation:'UEFA',     ranking:48 },
+    { team:'Chile',       appearances:9,  bestResult:'Third place',    bestYear:1962, debutYear:1930, timesAchieved:1, confederation:'CONMEBOL', ranking:54 },
+    { team:'Poland',      appearances:9,  bestResult:'Third place',    bestYear:1974, debutYear:1938, timesAchieved:1, confederation:'UEFA',     ranking:35 },
+    { team:'Portugal',    appearances:9,  bestResult:'Third place',    bestYear:1966, debutYear:1966, timesAchieved:1, confederation:'UEFA',     ranking:5  },
+    { team:'Turkey',      appearances:3,  bestResult:'Third place',    bestYear:2002, debutYear:1954, timesAchieved:1, confederation:'UEFA',     ranking:22 },
+    { team:'United States',appearances:12,bestResult:'Third place',    bestYear:1930, debutYear:1930, timesAchieved:1, confederation:'CONCACAF', ranking:16 },
+    { team:'Colombia',    appearances:7,  bestResult:'Quarter-finals', bestYear:2014, debutYear:1962, timesAchieved:1, confederation:'CONMEBOL', ranking:13 },
+    { team:'Costa Rica',  appearances:6,  bestResult:'Quarter-finals', bestYear:2014, debutYear:1990, timesAchieved:1, confederation:'CONCACAF', ranking:51 },
+    { team:'Cuba',        appearances:1,  bestResult:'Quarter-finals', bestYear:1938, debutYear:1938, timesAchieved:1, confederation:'CONCACAF', ranking:164},
+    { team:'Denmark',     appearances:6,  bestResult:'Quarter-finals', bestYear:1998, debutYear:1986, timesAchieved:1, confederation:'UEFA',     ranking:20 },
+    { team:'Ghana',       appearances:5,  bestResult:'Quarter-finals', bestYear:2010, debutYear:2006, timesAchieved:1, confederation:'CAF',      ranking:74 },
+    { team:'Japan',       appearances:8,  bestResult:'Round of 16',    bestYear:2002, debutYear:1998, timesAchieved:1, confederation:'AFC',      ranking:18 },
+    { team:'Mexico',      appearances:18, bestResult:'Quarter-finals', bestYear:1970, debutYear:1930, timesAchieved:1, confederation:'CONCACAF', ranking:15 },
+    { team:'Nigeria',     appearances:6,  bestResult:'Round of 16',    bestYear:1994, debutYear:1994, timesAchieved:1, confederation:'CAF',      ranking:26 },
+    { team:'North Korea', appearances:2,  bestResult:'Quarter-finals', bestYear:1966, debutYear:1966, timesAchieved:1, confederation:'AFC',      ranking:200},
+    { team:'Senegal',     appearances:4,  bestResult:'Quarter-finals', bestYear:2002, debutYear:2002, timesAchieved:1, confederation:'CAF',      ranking:14 },
+    { team:'Switzerland', appearances:13, bestResult:'Quarter-finals', bestYear:1954, debutYear:1934, timesAchieved:1, confederation:'UEFA',     ranking:19 },
+    { team:'Ecuador',     appearances:5,  bestResult:'Round of 16',    bestYear:2006, debutYear:2002, timesAchieved:1, confederation:'CONMEBOL', ranking:23 },
+    { team:'Egypt',       appearances:4,  bestResult:'Round of 16',    bestYear:1934, debutYear:1934, timesAchieved:1, confederation:'CAF',      ranking:29 },
+    { team:'Angola',      appearances:1,  bestResult:'Group stage',    bestYear:2006, debutYear:2006, timesAchieved:1, confederation:'CAF',      ranking:89 },
+    { team:'Bolivia',     appearances:3,  bestResult:'Group stage',    bestYear:1930, debutYear:1930, timesAchieved:1, confederation:'CONMEBOL', ranking:76 },
+    { team:'Canada',      appearances:3,  bestResult:'Group stage',    bestYear:1986, debutYear:1986, timesAchieved:1, confederation:'CONCACAF', ranking:30 },
+    { team:'Iran',        appearances:7,  bestResult:'Group stage',    bestYear:1978, debutYear:1978, timesAchieved:1, confederation:'AFC',      ranking:21 },
+    { team:'New Zealand', appearances:3,  bestResult:'Group stage',    bestYear:1982, debutYear:1982, timesAchieved:1, confederation:'OFC',      ranking:85 },
+    { team:'Scotland',    appearances:9,  bestResult:'Group stage',    bestYear:1954, debutYear:1954, timesAchieved:1, confederation:'UEFA',     ranking:43 },
+    { team:'Tunisia',     appearances:7,  bestResult:'Group stage',    bestYear:1978, debutYear:1978, timesAchieved:1, confederation:'CAF',      ranking:44 }
+  ];
+
+  const stageMap = {
+    'Champions':      5,
+    'Runners-up':     4.5,
+    'Third place':    4.2,
+    'Fourth place':   4,
+    'Quarter-finals': 3,
+    'Round of 16':    2,
+    'Group stage':    1
+  };
+
+  const stageLabels = { 1:'Group', 2:'R16', 3:'QF', 4:'4th', 4.2:'3rd', 4.5:'Final', 5:'Winner' };
+
+  const transformedData = SCATTER_DATA.map(d => ({
+    ...d,
+    stageValue: stageMap[d.bestResult] || 1,
+    x: stageMap[d.bestResult] || 1,
+    y_best: d.bestYear,
+    y_debut: d.debutYear,
+    radius: Math.sqrt(d.appearances) * 2.5,
+    offsetX: 0,
+    offsetY: 0
+  }));
+
+  function resolveOverlaps(data, xScale, yScale) {
+    const padding = 18;
+    let iterations = 0;
+    let overlaps = true;
+    data.forEach(d => { d.offsetX = 0; d.offsetY = 0; });
+    while (overlaps && iterations < 120) {
+      overlaps = false; iterations++;
+      for (let i = 0; i < data.length; i++) {
+        for (let j = i + 1; j < data.length; j++) {
+          const d1 = data[i], d2 = data[j];
+          if (d1.x !== d2.x || d1.currentY !== d2.currentY) continue;
+          const x1 = xScale(d1.x) + d1.offsetX, y1 = yScale(d1.currentY) + d1.offsetY;
+          const x2 = xScale(d2.x) + d2.offsetX, y2 = yScale(d2.currentY) + d2.offsetY;
+          const dx = x2 - x1, dy = y2 - y1;
+          const dist = Math.sqrt(dx*dx + dy*dy);
           const minDist = d1.radius + d2.radius + padding;
-
-          if (distance < minDist) {
+          if (dist < minDist) {
             overlaps = true;
             const angle = Math.atan2(dy, dx);
-            const moveDistance = (minDist - distance) / 2.5;
-            
+            const move = (minDist - dist) / 2.5;
             if (d1.ranking < d2.ranking) {
-              d2.offsetX = (d2.offsetX || 0) + Math.cos(angle) * moveDistance * 1.5;
-              d2.offsetY = (d2.offsetY || 0) + Math.sin(angle) * moveDistance * 1.5;
+              d2.offsetX += Math.cos(angle) * move * 1.5;
+              d2.offsetY += Math.sin(angle) * move * 1.5;
             } else {
-              d1.offsetX = (d1.offsetX || 0) - Math.cos(angle) * moveDistance * 1.5;
-              d1.offsetY = (d1.offsetY || 0) - Math.sin(angle) * moveDistance * 1.5;
+              d1.offsetX -= Math.cos(angle) * move * 1.5;
+              d1.offsetY -= Math.sin(angle) * move * 1.5;
             }
           }
         }
       }
     }
+    return data;
   }
 
-  return data;
-}
+  const sMargin = { top:36, right:50, bottom:70, left:70 };
+  const sWidth  = 1300 - sMargin.left - sMargin.right;
+  const sHeight = 480  - sMargin.top  - sMargin.bottom;
 
-// Dimensions
-const margin = { top: 40, right: 60, bottom: 80, left: 80 };
-const width = Math.min(1400, window.innerWidth - 40) - margin.left - margin.right;
-const height = 500 - margin.top - margin.bottom;
+  let currentYAxis = 'best';
+  let activeConfederation = 'all';
 
-// Initialize state
-let currentYAxis = "best";
+  const svg = d3.select('#chart').append('svg')
+    .attr('viewBox', [0, 0, sWidth + sMargin.left + sMargin.right, sHeight + sMargin.top + sMargin.bottom])
+    .attr('preserveAspectRatio', 'xMinYMin meet')
+    .style('background', 'var(--color-bg-primary)');
 
-// Create SVG
-const svg = d3.select("#chart")
-  .append("svg")
-  .attr("viewBox", [0, 0, width + margin.left + margin.right, height + margin.top + margin.bottom])
-  .attr("preserveAspectRatio", "xMinYMin meet")
-  .style("background-color", "var(--color-bg-primary)");
+  const g = svg.append('g').attr('transform', `translate(${sMargin.left},${sMargin.top})`);
 
-const g = svg.append("g")
-  .attr("transform", `translate(${margin.left},${margin.top})`);
+  const xScale = d3.scaleLinear().domain([0.5, 5.5]).range([0, sWidth]);
+  const yScale = d3.scaleLinear().domain([1930, 2030]).range([sHeight, 0]);
+  const rScale = d3.scaleSqrt().domain([1, 23]).range([4, 16]);
 
-// Scales
-const xScale = d3.scaleLinear()
-  .domain([0.5, 5.5])
-  .range([0, width]);
+  g.append('g').attr('class', 'grid-group');
+  const stageLineG = g.append('g').attr('class', 'stage-line-group');
+  const dotsG      = g.append('g').attr('class', 'dots-group');
 
-const yScale = d3.scaleLinear()
-  .domain([1930, 2030])
-  .range([height, 0]);
+  const xAxis = d3.axisBottom(xScale)
+    .tickValues([1, 2, 3, 4, 4.2, 4.5, 5])
+    .tickFormat(d => stageLabels[d] || '');
 
-const radiusScale = d3.scaleSqrt()
-  .domain([1, 23])
-  .range([4, 16]);
+  g.append('g').attr('transform', `translate(0,${sHeight})`).call(xAxis).attr('class', 'axis');
+  g.append('text').attr('x', sWidth/2).attr('y', sHeight+55).attr('class','axis-label').style('text-anchor','middle').text('Best World Cup Stage Reached');
 
-// Group containers
-const gridGroup = g.append("g").attr("class", "grid-group");
-const stageLineGroup = g.append("g").attr("class", "stage-line-group");
-const dotsGroup = g.append("g").attr("class", "dots-group");
+  ;[1,2,3,4,4.2,4.5,5].forEach(v => {
+    stageLineG.append('line').attr('class','stage-line')
+      .attr('x1', xScale(v)).attr('x2', xScale(v))
+      .attr('y1', 80).attr('y2', sHeight);
+  });
 
-// Function to update stage lines
-function updateStageLines() {
-  stageLineGroup.selectAll("*").remove();
-  
-  const stagePositions = [1, 2, 3, 3.8, 4, 4.2, 4.5, 5];
-  stageLineGroup.selectAll(".stage-line")
-    .data(stagePositions)
-    .enter()
-    .append("line")
-    .attr("class", "stage-line")
-    .attr("x1", d => xScale(d) + 80)
-    .attr("x2", d => xScale(d) + 80)
-    .attr("y1", 110)
-    .attr("y2", height)
-    .attr("stroke-width", 2);
-}
+  function updateAxes(type) {
+    g.selectAll('.axis-y, .axis-label-y').remove();
+    g.append('g').attr('class','axis axis-y').call(d3.axisLeft(yScale).tickFormat(d3.format('d')));
+    g.append('text').attr('class','axis-label axis-label-y')
+      .attr('transform','rotate(-90)').attr('y',-58).attr('x',-sHeight/2)
+      .style('text-anchor','middle')
+      .text(type === 'best' ? 'Year of Best Result' : 'Debut Year');
+  }
 
-// Function to update grid lines
-function updateGridLines() {
-  gridGroup.selectAll("*").remove();
-  
-  gridGroup.selectAll(".grid-line-x")
-    .data(xScale.ticks(8))
-    .enter()
-    .append("line")
-    .attr("class", "grid-line")
-    .attr("x1", d => xScale(d))
-    .attr("x2", d => xScale(d))
-    .attr("y1", 0)
-    .attr("y2", height);
+  function updateViz(type) {
+    const yVal = type === 'best' ? 'y_best' : 'y_debut';
+    const dat  = transformedData.map(d => ({ ...d, currentY: d[yVal], offsetX:0, offsetY:0 }));
+    resolveOverlaps(dat, xScale, yScale);
 
-  gridGroup.selectAll(".grid-line-y")
-    .data(yScale.ticks(10))
-    .enter()
-    .append("line")
-    .attr("class", "grid-line")
-    .attr("x1", 0)
-    .attr("x2", width)
-    .attr("y1", d => yScale(d))
-    .attr("y2", d => yScale(d));
-}
+    dotsG.selectAll('*').remove();
+    const ttip = d3.select('#tooltip-scatter');
 
-// Function to update axes
-function updateAxes(yAxisType) {
-  svg.selectAll(".y-axis-label").remove();
-  
-  const yAxisLabel = yAxisType === "best" ? "Year of Best Result" : "Debut Year";
-  
-  g.selectAll(".axis-y").remove();
-  const yAxis = d3.axisLeft(yScale)
-    .tickFormat(d3.format("d"));
+    const ng = dotsG.selectAll('.node-group').data(dat).enter().append('g')
+      .attr('class', d => `node-group ${activeConfederation !== 'all' && d.confederation !== activeConfederation ? 'hidden' : ''}`)
+      .attr('transform', d => `translate(${xScale(d.x)+d.offsetX},${yScale(d.currentY)+d.offsetY})`);
 
-  g.append("g")
-    .attr("class", "axis axis-y")
-    .call(yAxis);
+    ng.append('circle').attr('class','base-dot').attr('r',1.5);
+    ng.append('circle').attr('class','participation-circle')
+      .attr('r', d => rScale(d.appearances))
+      .attr('fill', d => confColorsActual[d.confederation])
+      .attr('stroke', d => confColorsActual[d.confederation]);
 
-  g.append("text")
-    .attr("class", "y-axis-label")
-    .attr("transform", "rotate(-90)")
-    .attr("y", -65)
-    .attr("x", -height / 2)
-    .attr("class", "axis-label")
-    .style("text-anchor", "middle")
-    .text(yAxisLabel);
-}
-
-// Function to update visualization
-function updateVisualization(yAxisType) {
-  const yValue = yAxisType === "best" ? "y_best" : "y_debut";
-
-  const dataWithY = transformedData.map(d => ({
-    ...d,
-    currentY: d[yValue],
-    offsetX: 0,
-    offsetY: 0
-  }));
-
-  resolveOverlaps(dataWithY, xScale, yScale);
-
-  dotsGroup.selectAll("*").remove();
-
-  const tooltip = d3.select("#tooltip");
-
-  // Draw node groups
-  const nodeGroups = dotsGroup.selectAll(".node-group")
-    .data(dataWithY)
-    .enter()
-    .append("g")
-    .attr("class", d => `node-group ${activeConfederation !== "all" && d.confederation !== activeConfederation ? "hidden" : ""}`)
-    .attr("transform", d => `translate(${xScale(d.x) + d.offsetX},${yScale(d.currentY) + d.offsetY})`);
-
-  // Base gray dot
-  nodeGroups.append("circle")
-    .attr("class", "base-dot")
-    .attr("r", 1.5);
-
-  // Participation circle with proper color
-  nodeGroups.append("circle")
-    .attr("class", "participation-circle")
-    .attr("r", d => radiusScale(d.appearances))
-    .attr("fill", d => confColorsActual[d.confederation])
-    .attr("stroke", d => confColorsActual[d.confederation]);
-
-  // Concentric circles
-  nodeGroups.each(function(d) {
-    if (d.timesAchieved > 1) {
-      for (let i = 1; i < d.timesAchieved; i++) {
-        d3.select(this).append("circle")
-          .attr("class", "concentric-circle")
-          .attr("r", radiusScale(d.appearances) + (i * 4));
+    ng.each(function(d) {
+      if (d.timesAchieved > 1) {
+        for (let i = 1; i < d.timesAchieved; i++) {
+          d3.select(this).append('circle').attr('class','concentric-circle')
+            .attr('r', rScale(d.appearances) + i*4);
+        }
       }
+    });
+
+    ng.on('mouseover', (event, d) => {
+      ttip.classed('active', true)
+        .html(`<strong>${d.team}</strong><br/>Stage: ${d.bestResult}<br/>Year: ${d[yVal]}<br/>Appearances: ${d.appearances}<br/>Ranking: #${d.ranking}<br/>Conf: ${d.confederation}`)
+        .style('left',(event.clientX+12)+'px').style('top',(event.clientY-12)+'px');
+    })
+    .on('mousemove', (event) => {
+      ttip.style('left',(event.clientX+12)+'px').style('top',(event.clientY-12)+'px');
+    })
+    .on('mouseout', () => ttip.classed('active', false));
+  }
+
+  document.querySelectorAll('.conf-filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.conf-filter-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      activeConfederation = this.dataset.conf;
+      dotsG.selectAll('.node-group').classed('hidden', d =>
+        activeConfederation !== 'all' && d.confederation !== activeConfederation);
+    });
+  });
+
+  document.getElementById('yAxisSelect').addEventListener('change', e => {
+    currentYAxis = e.target.value;
+    updateAxes(currentYAxis);
+    updateViz(currentYAxis);
+  });
+
+  // Build legend
+  /* const lgd = d3.select('#legend');
+  lgd.append('div').style('font-weight','500').style('margin-bottom','6px').text('Confederations:');
+  Object.entries(confColorsActual).forEach(([conf, col]) => {
+    const item = lgd.append('div').attr('class','legend-item');
+    item.append('span').attr('class','legend-color').style('background', col);
+    item.append('span').text(conf);
+  });
+  lgd.append('div').style('margin-top','10px').style('font-size','11px').style('color','var(--color-text-muted)')
+    .text('Circle size = appearances | Concentric rings = multiple titles | Position = FIFA ranking Apr 2026'); */
+
+  updateAxes(currentYAxis);
+  updateViz(currentYAxis);
+</script>
+
+<!-- ══════════════════════════════════════════════════════
+     SCRIPT 4 — SANKEY (p5.js)
+══════════════════════════════════════════════════════ -->
+<script>
+  const SANKEY_CONFIG = {
+    confederations: { AFC:14, OFC:0, CAF:54, CONCACAF:41, CONMEBOL:10, UEFA:55 },
+    tournament2010: [
+      {stage:'Fase de Grupos', AFC:6,OFC:0,CAF:5,CONCACAF:3,CONMEBOL:5,UEFA:14},
+      {stage:'Octavos de final',AFC:1,OFC:0,CAF:0,CONCACAF:1,CONMEBOL:4,UEFA:10},
+      {stage:'Cuartos de final',AFC:0,OFC:0,CAF:0,CONCACAF:0,CONMEBOL:2,UEFA:6},
+      {stage:'Semifinal',       AFC:0,OFC:0,CAF:0,CONCACAF:0,CONMEBOL:0,UEFA:4},
+      {stage:'Final',           AFC:0,OFC:0,CAF:0,CONCACAF:0,CONMEBOL:0,UEFA:2}
+    ],
+    tournament2014: [
+      {stage:'Fase de Grupos', AFC:6,OFC:0,CAF:5,CONCACAF:3,CONMEBOL:5,UEFA:14},
+      {stage:'Octavos de final',AFC:1,OFC:0,CAF:0,CONCACAF:1,CONMEBOL:4,UEFA:10},
+      {stage:'Cuartos de final',AFC:0,OFC:0,CAF:0,CONCACAF:0,CONMEBOL:2,UEFA:6},
+      {stage:'Semifinal',       AFC:0,OFC:0,CAF:0,CONCACAF:0,CONMEBOL:0,UEFA:4},
+      {stage:'Final',           AFC:0,OFC:0,CAF:0,CONCACAF:0,CONMEBOL:0,UEFA:2}
+    ],
+    tournament2018: [
+      {stage:'Fase de Grupos', AFC:6,OFC:0,CAF:5,CONCACAF:3,CONMEBOL:5,UEFA:14},
+      {stage:'Octavos de final',AFC:1,OFC:0,CAF:0,CONCACAF:1,CONMEBOL:4,UEFA:10},
+      {stage:'Cuartos de final',AFC:0,OFC:0,CAF:0,CONCACAF:0,CONMEBOL:2,UEFA:6},
+      {stage:'Semifinal',       AFC:0,OFC:0,CAF:0,CONCACAF:0,CONMEBOL:0,UEFA:4},
+      {stage:'Final',           AFC:0,OFC:0,CAF:0,CONCACAF:0,CONMEBOL:0,UEFA:2}
+    ],
+    tournament2022: [
+      {stage:'Fase de Grupos', AFC:6,OFC:0,CAF:5,CONCACAF:4,CONMEBOL:4,UEFA:13},
+      {stage:'Octavos de final',AFC:3,OFC:0,CAF:2,CONCACAF:1,CONMEBOL:2,UEFA:8},
+      {stage:'Cuartos de final',AFC:0,OFC:0,CAF:1,CONCACAF:0,CONMEBOL:2,UEFA:5},
+      {stage:'Semifinal',       AFC:0,OFC:0,CAF:1,CONCACAF:0,CONMEBOL:1,UEFA:2},
+      {stage:'Final',           AFC:0,OFC:0,CAF:0,CONCACAF:0,CONMEBOL:1,UEFA:1}
+    ]
+  };
+
+  const SANKEY_COLORS = {
+    AFC:[255,207,107], OFC:[78,205,196], CAF:[69,183,209],
+    CONCACAF:[150,206,180], CONMEBOL:[105,214,167], UEFA:[221,90,100]
+  };
+
+  const SANKEY_VIS = {
+    w:2200, h:780,
+    margin:{top:80,right:250,bottom:90,left:200},
+    nodeW:20, minH:20, pad:10,
+    strokeMin:1, strokeMax:50,
+    opacity:{normal:30, selected:255, dimmed:10}
+  };
+
+  let s_confNodes=[], s_nodes10=[], s_nodes14=[], s_nodes18=[], s_nodes22=[];
+  let s_allNodes=[], s_links=[];
+  let s_selected=null, s_dragged=null, s_dragOff={x:0,y:0};
+
+  new p5(function(sk) {
+
+    sk.setup = function() {
+      const cnv = sk.createCanvas(SANKEY_VIS.w, SANKEY_VIS.h);
+      cnv.parent('p5-container');
+      sk.textAlign(sk.CENTER, sk.CENTER);
+      sk.textSize(11);
+      initSankeyNodes();
+      initSankeyLinks();
+      s_allNodes = [...s_confNodes,...s_nodes10,...s_nodes14,...s_nodes18,...s_nodes22];
+    };
+
+    sk.draw = function() {
+      sk.background(26);
+      updateSankeySegments(sk);
+      drawSankeyLinks(sk);
+      drawSankeyNodes(sk);
+      drawSankeyLabels(sk);
+    };
+
+    sk.mouseMoved  = function() { updateSankeyTooltip(sk); };
+    sk.mousePressed  = function() { handleSankeyClick(sk); };
+    sk.mouseDragged  = function() { handleSankeyDrag(sk); };
+    sk.mouseReleased = function() { s_dragged = null; };
+
+    function initSankeyNodes() {
+      s_confNodes=[]; 
+      s_nodes10=[]; 
+      s_nodes14=[]; 
+      s_nodes18=[]; 
+      s_nodes22=[];
+      const confs = Object.keys(SANKEY_CONFIG.confederations);
+      const total = confs.reduce((s,c)=>s+SANKEY_CONFIG.confederations[c],0);
+      const avH = SANKEY_VIS.h - SANKEY_VIS.margin.top - SANKEY_VIS.margin.bottom;
+      let yp = SANKEY_VIS.margin.top;
+      confs.forEach(conf => {
+        const m = SANKEY_CONFIG.confederations[conf];
+        const h = Math.max(SANKEY_VIS.minH, (m/total)*avH);
+        s_confNodes.push({ id:`c_${conf}`, name:conf, displayName:`${conf} (${m})`,
+          x:SANKEY_VIS.margin.left, y:yp, baseY:yp, w:SANKEY_VIS.nodeW, h:h,
+          members:m, type:'confederation', segments:null });
+        yp += h;
+      });
+      const pW = SANKEY_VIS.w - SANKEY_VIS.margin.left - SANKEY_VIS.margin.right;
+      [[SANKEY_CONFIG.tournament2010,s_nodes10,2010,0.22],
+       [SANKEY_CONFIG.tournament2014,s_nodes14,2014,0.42],
+       [SANKEY_CONFIG.tournament2018,s_nodes18,2018,0.62],
+       [SANKEY_CONFIG.tournament2022,s_nodes22,2022,0.82]].forEach(([td,arr,yr,frac])=>{
+        let yp2 = SANKEY_VIS.margin.top;
+        const xp = SANKEY_VIS.margin.left + pW * frac;
+        td.forEach((sd,i) => {
+          const tot = Object.keys(sd).filter(k=>k!=='stage').reduce((s,k)=>s+(sd[k]||0),0);
+          if (tot>0) {
+            const h = Math.max(SANKEY_VIS.minH, tot*8);
+            arr.push({ id:`s_${yr}_${i}`, name:sd.stage, year:yr,
+              displayName:`${sd.stage}`, x:xp, y:yp2, baseY:yp2,
+              w:SANKEY_VIS.nodeW, h:h, total:tot, stageData:sd,
+              type:'stage', segments:[] });
+            yp2 += h + SANKEY_VIS.pad;
+          }
+        });
+      });
+    }
+
+    function initSankeyLinks() {
+      s_links=[];
+      const confs = Object.keys(SANKEY_CONFIG.confederations);
+      [...s_nodes10,...s_nodes14,...s_nodes18,...s_nodes22].forEach(sn => {
+        confs.forEach(conf => {
+          const v = sn.stageData[conf]||0;
+          if (v>0) {
+            const src = s_confNodes.find(n=>n.name===conf);
+            if (src) s_links.push({ id:`l_${conf}_${sn.year}_${sn.name}`,
+              source:src, target:sn, value:v, confederation:conf, year:sn.year, stage:sn.name });
+          }
+        });
+      });
+    }
+
+    function updateSankeySegments(sk) {
+      const confs = Object.keys(SANKEY_CONFIG.confederations);
+      [...s_nodes10,...s_nodes14,...s_nodes18,...s_nodes22].forEach(node => {
+        node.segments=[];
+        let cy = node.y;
+        confs.forEach(conf => {
+          const t = node.stageData[conf]||0;
+          if (t>0) {
+            const sh = (t/node.total)*node.h;
+            node.segments.push({ confederation:conf, teams:t,
+              x:node.x, y:cy, w:node.w, h:sh });
+            cy += sh;
+          }
+        });
+      });
+    }
+
+    function drawSankeyLinks(sk) {
+      const maxV = Math.max(...s_links.map(l=>l.value));
+      sk.strokeCap(sk.SQUARE);
+      s_links.forEach(link => {
+        let op = SANKEY_VIS.opacity.normal;
+        if (s_selected===link) op=SANKEY_VIS.opacity.selected;
+        else if (s_selected && s_selected.type==='confederation' && s_selected.name===link.confederation) op=SANKEY_VIS.opacity.selected;
+        else if (s_selected) op=SANKEY_VIS.opacity.dimmed;
+        const [r,g,b] = SANKEY_COLORS[link.confederation];
+        const sw = SANKEY_VIS.strokeMin + (link.value/maxV)*(SANKEY_VIS.strokeMax-SANKEY_VIS.strokeMin);
+        sk.stroke(r,g,b,op); sk.strokeWeight(sw);
+        const sx = link.source.x + link.source.w;
+        const tx = link.target.x;
+        const mx = (sx+tx)/2;
+        const sy2 = calcConfY(link);
+        const ty2 = calcTargetY(link);
+        sk.noFill();
+        sk.bezier(sx,sy2,mx,sy2,mx,ty2,tx,ty2);
+        link._curve={x1:sx,y1:sy2,x2:tx,y2:ty2,mx,sw};
+      });
+      sk.strokeCap(sk.ROUND);
+    }
+
+    function calcConfY(link) {
+      const cl = s_links.filter(l=>l.source===link.source && l.target.name===link.target.name);
+      let cum=0; const idx=cl.indexOf(link);
+      for(let i=0;i<idx;i++) cum+=cl[i].value;
+      const tot=cl.reduce((s,l)=>s+l.value,0);
+      return link.source.y + ((cum+link.value/2)/tot)*link.source.h;
+    }
+
+    function calcTargetY(link) {
+      const seg = link.target.segments?.find(s=>s.confederation===link.confederation);
+      return seg ? seg.y+seg.h/2 : link.target.y+link.target.h/2;
+    }
+
+    function drawSankeyNodes(sk) {
+      s_confNodes.forEach(node => {
+        let op=SANKEY_VIS.opacity.normal;
+        if(s_selected===node) op=SANKEY_VIS.opacity.selected;
+        else if(s_selected && s_selected!==node) op=SANKEY_VIS.opacity.dimmed;
+        const [r,g,b]=SANKEY_COLORS[node.name];
+        sk.fill(r,g,b,op); sk.stroke(255); sk.strokeWeight(1);
+        sk.rect(node.x,node.y,node.w,node.h);
+        node.bounds={x:node.x,y:node.y,w:node.w,h:node.h};
+      });
+      [...s_nodes10,...s_nodes14,...s_nodes18,...s_nodes22].forEach(node=>{
+        node.segments.forEach(seg=>{
+          let op=SANKEY_VIS.opacity.normal;
+          if(s_selected && s_selected.type==='confederation' && s_selected.name===seg.confederation) op=SANKEY_VIS.opacity.selected;
+          else if(s_selected) op=SANKEY_VIS.opacity.dimmed;
+          const [r,g,b]=SANKEY_COLORS[seg.confederation];
+          sk.fill(r,g,b,op); sk.stroke(255); sk.strokeWeight(0.5);
+          sk.rect(seg.x,seg.y,seg.w,seg.h);
+        });
+        node.bounds={x:node.x,y:node.y,w:node.w,h:node.h};
+      });
+    }
+
+    function drawSankeyLabels(sk) {
+      sk.fill(220); sk.noStroke(); sk.textAlign(sk.LEFT,sk.CENTER); sk.textSize(11);
+      s_confNodes.forEach(n=>sk.text(n.displayName,n.x+n.w+8,n.y+n.h/2));
+      sk.textAlign(sk.CENTER,sk.BOTTOM); sk.textSize(9);
+      [...s_nodes10,...s_nodes14,...s_nodes18,...s_nodes22].forEach(n=>{
+        sk.text(n.displayName,n.x+n.w/2,n.y-4);
+      });
+      sk.textAlign(sk.CENTER,sk.CENTER); sk.textSize(13); sk.fill(180);
+      [[s_nodes10,2010],[s_nodes14,2014],[s_nodes18,2018],[s_nodes22,2022]].forEach(([arr,yr])=>{
+        if(arr.length){
+          const cx=arr[0].x+arr[0].w/2;
+          sk.text(yr, cx, SANKEY_VIS.margin.top-18);
+        }
+      });
+    }
+
+    function updateSankeyTooltip(sk) {
+      const tip = document.getElementById('tooltip-sankey');
+      const el = getSankeyHovered(sk);
+      if(el) {
+        let html='';
+        if(el.type==='confederation') html=`${el.name}<br/>Members: ${el.members}`;
+        else if(el.type==='segment') html=`${el.confederation}<br/>${el.stageName} ${el.year}<br/>Teams: ${el.teams}`;
+        else if(el.confederation) html=`${el.confederation} → ${el.year}<br/>${el.stage}<br/>Teams: ${el.value}`;
+        tip.innerHTML=html; tip.style.display='block';
+        tip.style.left=(sk.mouseX+14)+'px'; tip.style.top=(sk.mouseY-10)+'px';
+      } else { tip.style.display='none'; }
+    }
+
+    function handleSankeyClick(sk) {
+      const el = getSankeyHovered(sk);
+      s_selected = (el && s_selected===el) ? null : el;
+      const node = getSankeyNode(sk);
+      if(node) {
+        s_dragged=node;
+        s_dragOff.x=sk.mouseX-node.x;
+        s_dragOff.y=sk.mouseY-node.y;
+      }
+    }
+
+    function handleSankeyDrag(sk) {
+      if(s_dragged) {
+        s_dragged.x=sk.constrain(sk.mouseX-s_dragOff.x,0,SANKEY_VIS.w-s_dragged.w);
+        s_dragged.y=sk.constrain(sk.mouseY-s_dragOff.y,0,SANKEY_VIS.h-s_dragged.h);
+        s_dragged.baseY=s_dragged.y;
+        document.getElementById('tooltip-sankey').style.display='none';
+      }
+    }
+
+    function getSankeyHovered(sk) {
+      const mx=sk.mouseX, my=sk.mouseY;
+      for(const n of s_confNodes) if(n.bounds && inRect(mx,my,n.bounds)) return n;
+      for(const n of [...s_nodes10,...s_nodes14,...s_nodes18,...s_nodes22]) {
+        for(const seg of n.segments) {
+          if(inRect(mx,my,{x:seg.x,y:seg.y,w:seg.w,h:seg.h}))
+            return {type:'segment',confederation:seg.confederation,teams:seg.teams,stageName:n.name,year:n.year};
+        }
+      }
+      for(const l of s_links) {
+        if(l._curve && nearBezier(mx,my,l._curve)) return l;
+      }
+      return null;
+    }
+
+    function getSankeyNode(sk) {
+      const mx=sk.mouseX, my=sk.mouseY;
+      for(const n of s_allNodes) if(n.bounds && inRect(mx,my,n.bounds)) return n;
+      return null;
+    }
+
+    function inRect(px,py,b) {
+      return px>=b.x && px<=b.x+b.w && py>=b.y && py<=b.y+b.h;
+    }
+
+    function nearBezier(px,py,c) {
+      const d = r=>Math.sqrt((px-r.x1)**2+(py-r.y1)**2) < 12 ||
+                    Math.sqrt((px-r.x2)**2+(py-r.y2)**2) < 12 ||
+                    Math.sqrt((px-r.mx)**2+(py-(r.y1+r.y2)/2)**2) < 12;
+      return d(c);
+    }
+
+  }); // end p5
+</script>
+
+<!-- ══════════════════════════════════════════════════════
+     SCRIPT 5 — CHORD DIAGRAM
+══════════════════════════════════════════════════════ -->
+<script>
+  const TEAMS = [
+    {name:'Algeria',      group:'J', conf:'CAF',      rank:28,  best:'QF 1982',     bestYears:'1982'},
+    {name:'Argentina',    group:'J', conf:'CONMEBOL', rank:3,   best:'Champions',   bestYears:'1978, 1986, 2022'},
+    {name:'Australia',    group:'D', conf:'AFC',      rank:27,  best:'4th 2006',    bestYears:'2006'},
+    {name:'Austria',      group:'J', conf:'UEFA',     rank:24,  best:'3rd 1954',    bestYears:'1954'},
+    {name:'Belgium',      group:'G', conf:'UEFA',     rank:9,   best:'3rd 2018',    bestYears:'2018'},
+    {name:'Bosnia & Herz.',group:'B',conf:'UEFA',     rank:65,  best:'Group Stage', bestYears:'2014'},
+    {name:'Brazil',       group:'C', conf:'CONMEBOL', rank:6,   best:'Champions',   bestYears:'1958,1962,1970,1994,2002'},
+    {name:'Canada',       group:'B', conf:'CONCACAF', rank:30,  best:'Group Stage', bestYears:'1986'},
+    {name:'Cape Verde',   group:'H', conf:'CAF',      rank:69,  best:'Debut',       bestYears:'2026'},
+    {name:'Colombia',     group:'K', conf:'CONMEBOL', rank:13,  best:'QF',          bestYears:'2014'},
+    {name:'Croatia',      group:'L', conf:'UEFA',     rank:11,  best:'Runners-up',  bestYears:'2018'},
+    {name:'Czechia',      group:'A', conf:'UEFA',     rank:41,  best:'4th 1962',    bestYears:'1962'},
+    {name:'DR Congo',     group:'K', conf:'CAF',      rank:46,  best:'QF 1974',     bestYears:'1974'},
+    {name:'Ecuador',      group:'E', conf:'CONMEBOL', rank:23,  best:'R16',         bestYears:'2006'},
+    {name:'Egypt',        group:'G', conf:'CAF',      rank:34,  best:'Group Stage', bestYears:'1934, 1990'},
+    {name:'England',      group:'L', conf:'UEFA',     rank:4,   best:'Champions',   bestYears:'1966'},
+    {name:'France',       group:'I', conf:'UEFA',     rank:1,   best:'Champions',   bestYears:'1998, 2018'},
+    {name:'Germany',      group:'E', conf:'UEFA',     rank:10,  best:'Champions',   bestYears:'1954,1974,1990,2014'},
+    {name:'Ghana',        group:'L', conf:'CAF',      rank:74,  best:'QF 2010',     bestYears:'2010'},
+    {name:'Haiti',        group:'C', conf:'CONCACAF', rank:83,  best:'Group Stage', bestYears:'1974'},
+    {name:'Iran',         group:'G', conf:'AFC',      rank:20,  best:'Group Stage', bestYears:'1978+'},
+    {name:'Iraq',         group:'I', conf:'AFC',      rank:57,  best:'Group Stage', bestYears:'1986'},
+    {name:'Ivory Coast',  group:'E', conf:'CAF',      rank:34,  best:'Group Stage', bestYears:'2006-2014'},
+    {name:'Japan',        group:'F', conf:'AFC',      rank:19,  best:'QF 2022',     bestYears:'2002, 2022'},
+    {name:'Jordan',       group:'J', conf:'AFC',      rank:63,  best:'Debut',       bestYears:'2026'},
+    {name:'Curaçao',      group:'E', conf:'CONCACAF', rank:82,  best:'Debut',       bestYears:'2026'},
+    {name:'Mexico',       group:'A', conf:'CONCACAF', rank:15,  best:'QF',          bestYears:'1970, 1986'},
+    {name:'Morocco',      group:'C', conf:'CAF',      rank:8,   best:'4th 2022',    bestYears:'2022'},
+    {name:'Netherlands',  group:'F', conf:'UEFA',     rank:7,   best:'Runners-up',  bestYears:'1974, 1978, 2010'},
+    {name:'New Zealand',  group:'G', conf:'OFC',      rank:85,  best:'Group Stage', bestYears:'1982, 2010'},
+    {name:'Norway',       group:'I', conf:'UEFA',     rank:31,  best:'QF 1938',     bestYears:'1938'},
+    {name:'Panama',       group:'L', conf:'CONCACAF', rank:33,  best:'Group Stage', bestYears:'2018'},
+    {name:'Paraguay',     group:'D', conf:'CONMEBOL', rank:40,  best:'QF',          bestYears:'1954, 2010'},
+    {name:'Portugal',     group:'K', conf:'UEFA',     rank:5,   best:'3rd 1966',    bestYears:'1966'},
+    {name:'Qatar',        group:'B', conf:'AFC',      rank:55,  best:'Group Stage', bestYears:'2022'},
+    {name:'Saudi Arabia', group:'H', conf:'AFC',      rank:61,  best:'R16 1994',    bestYears:'1994'},
+    {name:'Scotland',     group:'C', conf:'UEFA',     rank:43,  best:'Group Stage', bestYears:'1974-1998'},
+    {name:'Senegal',      group:'I', conf:'CAF',      rank:12,  best:'4th 2002',    bestYears:'2002'},
+    {name:'South Africa', group:'A', conf:'CAF',      rank:60,  best:'Group Stage', bestYears:'1998-2010'},
+    {name:'South Korea',  group:'A', conf:'AFC',      rank:22,  best:'4th 2002',    bestYears:'2002'},
+    {name:'Spain',        group:'H', conf:'UEFA',     rank:2,   best:'Champions',   bestYears:'2010'},
+    {name:'Sweden',       group:'F', conf:'UEFA',     rank:38,  best:'Runners-up',  bestYears:'1958'},
+    {name:'Switzerland',  group:'B', conf:'UEFA',     rank:18,  best:'QF',          bestYears:'1934,1938,1954'},
+    {name:'Tunisia',      group:'F', conf:'CAF',      rank:44,  best:'Group Stage', bestYears:'1978+'},
+    {name:'Türkiye',      group:'D', conf:'UEFA',     rank:25,  best:'3rd 2002',    bestYears:'2002'},
+    {name:'Uruguay',      group:'H', conf:'CONMEBOL', rank:17,  best:'Champions',   bestYears:'1930, 1950'},
+    {name:'United States',group:'D', conf:'CONCACAF', rank:16,  best:'3rd 1930',    bestYears:'1930'},
+    {name:'Uzbekistan',   group:'K', conf:'AFC',      rank:50,  best:'Debut',       bestYears:'2026'}
+  ];
+
+  const MATCHES = [
+    {t1:'Mexico',       t2:'South Africa', date:'Jun 11',time:'3pm ET',  venue:'Estadio Azteca',        city:'Mexico City',     country:'Mexico'},
+    {t1:'South Korea',  t2:'Czechia',      date:'Jun 11',time:'10pm ET', venue:'Estadio Akron',         city:'Guadalajara',     country:'Mexico'},
+    {t1:'Czechia',      t2:'South Africa', date:'Jun 18',time:'12pm ET', venue:'Mercedes-Benz Stadium', city:'Atlanta',         country:'USA'},
+    {t1:'Mexico',       t2:'South Korea',  date:'Jun 18',time:'9pm ET',  venue:'Estadio Akron',         city:'Guadalajara',     country:'Mexico'},
+    {t1:'Czechia',      t2:'Mexico',       date:'Jun 24',time:'9pm ET',  venue:'Estadio Azteca',        city:'Mexico City',     country:'Mexico'},
+    {t1:'South Africa', t2:'South Korea',  date:'Jun 24',time:'9pm ET',  venue:'Estadio BBVA',          city:'Monterrey',       country:'Mexico'},
+    {t1:'Canada',       t2:'Bosnia & Herz.',date:'Jun 12',time:'3pm ET', venue:'BMO Field',             city:'Toronto',         country:'Canada'},
+    {t1:'Qatar',        t2:'Switzerland',  date:'Jun 13',time:'3pm ET',  venue:"Levi's Stadium",        city:'Santa Clara',     country:'USA'},
+    {t1:'Switzerland',  t2:'Bosnia & Herz.',date:'Jun 18',time:'3pm ET', venue:'SoFi Stadium',          city:'Inglewood',       country:'USA'},
+    {t1:'Canada',       t2:'Qatar',        date:'Jun 18',time:'6pm ET',  venue:'BC Place',              city:'Vancouver',       country:'Canada'},
+    {t1:'Switzerland',  t2:'Canada',       date:'Jun 24',time:'3pm ET',  venue:'BC Place',              city:'Vancouver',       country:'Canada'},
+    {t1:'Bosnia & Herz.',t2:'Qatar',       date:'Jun 24',time:'3pm ET',  venue:'Lumen Field',           city:'Seattle',         country:'USA'},
+    {t1:'Brazil',       t2:'Morocco',      date:'Jun 13',time:'6pm ET',  venue:'MetLife Stadium',       city:'East Rutherford', country:'USA'},
+    {t1:'Haiti',        t2:'Scotland',     date:'Jun 13',time:'9pm ET',  venue:'Gillette Stadium',      city:'Foxborough',      country:'USA'},
+    {t1:'Scotland',     t2:'Morocco',      date:'Jun 19',time:'6pm ET',  venue:'Gillette Stadium',      city:'Foxborough',      country:'USA'},
+    {t1:'Brazil',       t2:'Haiti',        date:'Jun 19',time:'8:30pm ET',venue:'Lincoln Financial Field',city:'Philadelphia',  country:'USA'},
+    {t1:'Scotland',     t2:'Brazil',       date:'Jun 24',time:'6pm ET',  venue:'Hard Rock Stadium',     city:'Miami',           country:'USA'},
+    {t1:'Morocco',      t2:'Haiti',        date:'Jun 24',time:'6pm ET',  venue:'Mercedes-Benz Stadium', city:'Atlanta',         country:'USA'},
+    {t1:'United States',t2:'Paraguay',     date:'Jun 12',time:'9pm ET',  venue:'SoFi Stadium',          city:'Inglewood',       country:'USA'},
+    {t1:'Australia',    t2:'Türkiye',      date:'Jun 13',time:'Midnight',venue:'BC Place',              city:'Vancouver',       country:'Canada'},
+    {t1:'United States',t2:'Australia',    date:'Jun 19',time:'3pm ET',  venue:'Lumen Field',           city:'Seattle',         country:'USA'},
+    {t1:'Türkiye',      t2:'Paraguay',     date:'Jun 19',time:'11pm ET', venue:"Levi's Stadium",        city:'Santa Clara',     country:'USA'},
+    {t1:'Türkiye',      t2:'United States',date:'Jun 25',time:'10pm ET', venue:'SoFi Stadium',          city:'Inglewood',       country:'USA'},
+    {t1:'Paraguay',     t2:'Australia',    date:'Jun 25',time:'10pm ET', venue:"Levi's Stadium",        city:'Santa Clara',     country:'USA'},
+    {t1:'Germany',      t2:'Curaçao',      date:'Jun 14',time:'1pm ET',  venue:'NRG Stadium',           city:'Houston',         country:'USA'},
+    {t1:'Ivory Coast',  t2:'Ecuador',      date:'Jun 14',time:'7pm ET',  venue:'Lincoln Financial Field',city:'Philadelphia',   country:'USA'},
+    {t1:'Germany',      t2:'Ivory Coast',  date:'Jun 20',time:'4pm ET',  venue:'BMO Field',             city:'Toronto',         country:'Canada'},
+    {t1:'Ecuador',      t2:'Curaçao',      date:'Jun 20',time:'8pm ET',  venue:'Arrowhead Stadium',     city:'Kansas City',     country:'USA'},
+    {t1:'Ecuador',      t2:'Germany',      date:'Jun 25',time:'4pm ET',  venue:'MetLife Stadium',       city:'East Rutherford', country:'USA'},
+    {t1:'Curaçao',      t2:'Ivory Coast',  date:'Jun 25',time:'4pm ET',  venue:'Lincoln Financial Field',city:'Philadelphia',   country:'USA'},
+    {t1:'Netherlands',  t2:'Japan',        date:'Jun 14',time:'4pm ET',  venue:'AT&T Stadium',          city:'Dallas',          country:'USA'},
+    {t1:'Sweden',       t2:'Tunisia',      date:'Jun 14',time:'10pm ET', venue:'Estadio BBVA',          city:'Monterrey',       country:'Mexico'},
+    {t1:'Netherlands',  t2:'Sweden',       date:'Jun 20',time:'1pm ET',  venue:'NRG Stadium',           city:'Houston',         country:'USA'},
+    {t1:'Tunisia',      t2:'Japan',        date:'Jun 20',time:'Midnight',venue:'Estadio BBVA',          city:'Monterrey',       country:'Mexico'},
+    {t1:'Japan',        t2:'Sweden',       date:'Jun 25',time:'n.a.',    venue:'AT&T Stadium',          city:'Dallas',          country:'USA'},
+    {t1:'Tunisia',      t2:'Netherlands',  date:'Jun 25',time:'n.a.',    venue:'AT&T Stadium',          city:'Dallas',          country:'USA'},
+    {t1:'Belgium',      t2:'Egypt',        date:'Jun 15',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'Iran',         t2:'New Zealand',  date:'Jun 15',time:'n.a.',    venue:'SoFi Stadium',          city:'Inglewood',       country:'USA'},
+    {t1:'Belgium',      t2:'Iran',         date:'Jun 21',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'Egypt',        t2:'New Zealand',  date:'Jun 21',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'Belgium',      t2:'New Zealand',  date:'Jun 26',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'Iran',         t2:'Egypt',        date:'Jun 26',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'Spain',        t2:'Cape Verde',   date:'Jun 15',time:'12pm ET', venue:'Mercedes-Benz Stadium', city:'Atlanta',         country:'USA'},
+    {t1:'Saudi Arabia', t2:'Uruguay',      date:'Jun 15',time:'n.a.',    venue:'Hard Rock Stadium',     city:'Miami',           country:'USA'},
+    {t1:'Spain',        t2:'Saudi Arabia', date:'Jun 21',time:'12pm ET', venue:'Mercedes-Benz Stadium', city:'Atlanta',         country:'USA'},
+    {t1:'Uruguay',      t2:'Cape Verde',   date:'Jun 21',time:'n.a.',    venue:'Hard Rock Stadium',     city:'Miami',           country:'USA'},
+    {t1:'Spain',        t2:'Uruguay',      date:'Jun 26',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'Saudi Arabia', t2:'Cape Verde',   date:'Jun 26',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'France',       t2:'Senegal',      date:'Jun 16',time:'3pm ET',  venue:'MetLife Stadium',       city:'East Rutherford', country:'USA'},
+    {t1:'Iraq',         t2:'Norway',       date:'Jun 16',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'France',       t2:'Iraq',         date:'Jun 22',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'Norway',       t2:'Senegal',      date:'Jun 22',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'France',       t2:'Norway',       date:'Jun 26',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'Iraq',         t2:'Senegal',      date:'Jun 26',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'Argentina',    t2:'Algeria',      date:'Jun 16',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'Austria',      t2:'Jordan',       date:'Jun 16',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'Argentina',    t2:'Austria',      date:'Jun 22',time:'n.a.',    venue:'AT&T Stadium',          city:'Dallas',          country:'USA'},
+    {t1:'Algeria',      t2:'Jordan',       date:'Jun 22',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'Argentina',    t2:'Jordan',       date:'Jun 27',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'Algeria',      t2:'Austria',      date:'Jun 27',time:'n.a.',    venue:'Arrowhead Stadium',     city:'Kansas City',     country:'USA'},
+    {t1:'Portugal',     t2:'DR Congo',     date:'Jun 17',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'Colombia',     t2:'Uzbekistan',   date:'Jun 17',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'Portugal',     t2:'Uzbekistan',   date:'Jun 23',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'Colombia',     t2:'DR Congo',     date:'Jun 23',time:'n.a.',    venue:'Arrowhead Stadium',     city:'Kansas City',     country:'USA'},
+    {t1:'Portugal',     t2:'Colombia',     date:'Jun 27',time:'n.a.',    venue:'Hard Rock Stadium',     city:'Miami',           country:'USA'},
+    {t1:'DR Congo',     t2:'Uzbekistan',   date:'Jun 27',time:'7:30pm ET',venue:'Mercedes-Benz Stadium',city:'Atlanta',        country:'USA'},
+    {t1:'England',      t2:'Croatia',      date:'Jun 17',time:'n.a.',    venue:'AT&T Stadium',          city:'Dallas',          country:'USA'},
+    {t1:'Panama',       t2:'Ghana',        date:'Jun 17',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'England',      t2:'Panama',       date:'Jun 23',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'Croatia',      t2:'Ghana',        date:'Jun 23',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'England',      t2:'Ghana',        date:'Jun 27',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'},
+    {t1:'Croatia',      t2:'Panama',       date:'Jun 27',time:'n.a.',    venue:'n.a.',                  city:'n.a.',            country:'n.a.'}
+  ];
+
+  const CONF_COLORS  = { UEFA:'#4d9de0', CONMEBOL:'#f4a261', CAF:'#2dc653', AFC:'#bc5090', CONCACAF:'#e63946', OFC:'#06b6d4' };
+  const GROUP_COLORS = { A:'#ff6b6b',B:'#ffa94d',C:'#ffe066',D:'#a9e34b',E:'#4dd0e1',F:'#4dabf7',G:'#cc5de8',H:'#f06595',I:'#ff8787',J:'#74c0fc',K:'#63e6be',L:'#e599f7' };
+
+  let sortMode='alpha', filterGroup='', selectedTeam=null, selectedChord=null, hoveredTeam=null, hoveredChord=null, panelOpen=false;
+
+  const cv  = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+
+  function resize() {
+    const area = document.getElementById('diagram-area');
+    const size = Math.min(area.clientWidth, area.clientHeight, 700);
+    cv.width = size; cv.height = size;
+    draw();
+  }
+
+  function getOrder() {
+    let arr=[...TEAMS];
+    if(sortMode==='alpha') arr.sort((a,b)=>a.name.localeCompare(b.name));
+    else {
+      const co=['UEFA','CONMEBOL','CAF','AFC','CONCACAF','OFC'];
+      arr.sort((a,b)=>{const ci=co.indexOf(a.conf)-co.indexOf(b.conf); return ci!==0?ci:a.name.localeCompare(b.name);});
+    }
+    return arr;
+  }
+
+  function buildAngles(order) {
+    const n=order.length, gap=0.006;
+    const slot=(2*Math.PI-n*gap)/n;
+    const angles={}; let a=-Math.PI/2+gap/2;
+    for(const t of order) { angles[t.name]={start:a,end:a+slot,mid:a+slot/2}; a+=slot+gap; }
+    return angles;
+  }
+
+  function pt(cx,cy,r,angle) { return [cx+Math.cos(angle)*r, cy+Math.sin(angle)*r]; }
+  function getMatch(a,b) { return MATCHES.find(m=>(m.t1===a&&m.t2===b)||(m.t1===b&&m.t2===a))||null; }
+  function hexAlpha(hex,a) {
+    const r=parseInt(hex.slice(1,3),16),g2=parseInt(hex.slice(3,5),16),b2=parseInt(hex.slice(5,7),16);
+    return `rgba(${r},${g2},${b2},${a})`;
+  }
+
+  function draw() {
+    const W=cv.width,H=cv.height,cx=W/2,cy=H/2;
+    const R=Math.min(W,H)*0.36, NR=4.5;
+    ctx.clearRect(0,0,W,H);
+    const order=getOrder(), angles=buildAngles(order);
+    const aTeam=selectedTeam||hoveredTeam, aChord=selectedChord||hoveredChord;
+
+    // chords
+    for(let i=0;i<order.length;i++) {
+      for(let j=i+1;j<order.length;j++) {
+        const a=order[i],b=order[j];
+        if(a.group!==b.group) continue;
+        const am=angles[a.name].mid, bm=angles[b.name].mid;
+        const [x1,y1]=pt(cx,cy,R-NR-2,am), [x2,y2]=pt(cx,cy,R-NR-2,bm);
+        const isThis=aChord&&((aChord.t1===a.name&&aChord.t2===b.name)||(aChord.t1===b.name&&aChord.t2===a.name));
+        const isTeam=aTeam&&(a.name===aTeam||b.name===aTeam);
+        const isGrp=filterGroup&&a.group===filterGroup;
+        let alpha;
+        if(aTeam) alpha=isTeam?(isThis?1:0.65):0.03;
+        else if(filterGroup) alpha=isGrp?(isThis?1:0.6):0.03;
+        else alpha=isThis?1:0.22;
+        const col=GROUP_COLORS[a.group];
+        ctx.beginPath(); ctx.moveTo(x1,y1);
+        ctx.bezierCurveTo(cx,cy,cx,cy,x2,y2);
+        ctx.strokeStyle=hexAlpha(col,alpha);
+        ctx.lineWidth=isThis?2.5:1; ctx.stroke();
+      }
+    }
+
+    // nodes
+    for(const t of order) {
+      const am=angles[t.name].mid;
+      const [nx,ny]=pt(cx,cy,R,am);
+      let nAlpha;
+      if(aTeam) nAlpha=t.name===aTeam?1:(TEAMS.find(x=>x.name===aTeam)?.group===t.group?0.7:0.15);
+      else if(filterGroup) nAlpha=t.group===filterGroup?1:0.12;
+      else nAlpha=t.name===hoveredTeam?1:0.8;
+      const col=CONF_COLORS[t.conf];
+      const bub=Math.max(2,(100-Math.min(t.rank,99))/100*22+3);
+      ctx.beginPath(); ctx.arc(nx,ny,bub,0,2*Math.PI);
+      ctx.fillStyle=hexAlpha(col,nAlpha*0.18); ctx.fill();
+      ctx.strokeStyle=hexAlpha(col,nAlpha*0.3); ctx.lineWidth=0.5; ctx.stroke();
+      ctx.beginPath(); ctx.arc(nx,ny,NR,0,2*Math.PI);
+      ctx.fillStyle=t.name===(aTeam||hoveredTeam)?col:`rgba(0,0,0,${nAlpha})`;
+      ctx.fill(); ctx.strokeStyle=hexAlpha(col,nAlpha); ctx.lineWidth=1.5; ctx.stroke();
+      const [lx,ly]=pt(cx,cy,R+16,am);
+      ctx.save(); ctx.translate(lx,ly);
+      let rot=am; if(rot>Math.PI/2&&rot<3*Math.PI/2) rot+=Math.PI;
+      ctx.rotate(rot);
+      ctx.font=`${nAlpha>0.5?'500':'300'} 9px IBM Plex Mono,monospace`;
+      ctx.fillStyle=`rgba(232,232,224,${nAlpha})`; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(t.name,0,0); ctx.restore();
+      if(nAlpha>0.5) {
+        ctx.save(); ctx.font='500 6px IBM Plex Mono,monospace';
+        ctx.fillStyle='rgba(232,232,224,0.6)'; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(t.group,nx,ny); ctx.restore();
+      }
+    }
+
+    // chord info box
+    if(aChord) {
+      const a=TEAMS.find(t=>t.name===aChord.t1), b=TEAMS.find(t=>t.name===aChord.t2);
+      if(a&&b) {
+        const am=angles[a.name]?.mid, bm=angles[b.name]?.mid;
+        if(am!==undefined&&bm!==undefined) {
+          const mx2=(pt(cx,cy,R-NR-2,am)[0]+pt(cx,cy,R-NR-2,bm)[0])/2;
+          const my2=(pt(cx,cy,R-NR-2,am)[1]+pt(cx,cy,R-NR-2,bm)[1])/2;
+          const mmx=cx+(mx2-cx)*0.55, mmy=cy+(my2-cy)*0.55;
+          const m=getMatch(aChord.t1,aChord.t2);
+          const lines=m?[`${m.t1} vs ${m.t2}`,`${m.date}  ${m.time}`,`${m.venue}`,`${m.city}, ${m.country}`]
+                      :[`${aChord.t1} vs ${aChord.t2}`,'n.a.','n.a.','n.a.'];
+          const bW=152,bH=62,bp=9;
+          let bx=mmx-bW/2,by=mmy-bH/2;
+          bx=Math.max(6,Math.min(bx,W-bW-6)); by=Math.max(6,Math.min(by,H-bH-6));
+          ctx.fillStyle='rgba(10,10,10,0.93)';
+          ctx.strokeStyle=GROUP_COLORS[a.group]+'aa'; ctx.lineWidth=1;
+          ctx.beginPath(); ctx.rect(bx,by,bW,bH); ctx.fill(); ctx.stroke();
+          ctx.font='500 8.5px IBM Plex Mono,monospace'; ctx.fillStyle=GROUP_COLORS[a.group];
+          ctx.textAlign='left'; ctx.textBaseline='top'; ctx.fillText(lines[0],bx+bp,by+bp);
+          ctx.font='300 7.5px IBM Plex Mono,monospace'; ctx.fillStyle='rgba(232,232,224,0.7)';
+          ctx.fillText(lines[1],bx+bp,by+bp+13); ctx.fillText(lines[2],bx+bp,by+bp+24);
+          ctx.fillText(lines[3],bx+bp,by+bp+35);
+        }
+      }
+    }
+  }
+
+  function hitNode(mx,my) {
+    const W=cv.width,H=cv.height,cx=W/2,cy=H/2;
+    const R=Math.min(W,H)*0.36;
+    const order=getOrder(), angles=buildAngles(order);
+    for(const t of order) {
+      const [nx,ny]=pt(cx,cy,R,angles[t.name].mid);
+      if((mx-nx)**2+(my-ny)**2<144) return t.name;
+    }
+    return null;
+  }
+
+  function hitChord(mx,my) {
+    const W=cv.width,H=cv.height,cx=W/2,cy=H/2;
+    const R=Math.min(W,H)*0.36, NR=4.5;
+    const order=getOrder(), angles=buildAngles(order);
+    for(let i=0;i<order.length;i++) {
+      for(let j=i+1;j<order.length;j++) {
+        const a=order[i],b=order[j];
+        if(a.group!==b.group) continue;
+        const am=angles[a.name].mid, bm=angles[b.name].mid;
+        const [x1,y1]=pt(cx,cy,R-NR-2,am), [x2,y2]=pt(cx,cy,R-NR-2,bm);
+        for(let t=0;t<=1;t+=0.04) {
+          const mt=1-t, bpx=mt**3*x1+3*mt**2*t*cx+3*mt*t**2*cx+t**3*x2;
+          const bpy=mt**3*y1+3*mt**2*t*cy+3*mt*t**2*cy+t**3*y2;
+          if(Math.abs(bpx-mx)<7&&Math.abs(bpy-my)<7) return {t1:a.name,t2:b.name};
+        }
+      }
+    }
+    return null;
+  }
+
+  function getCanvasPos(e) {
+    const r=cv.getBoundingClientRect();
+    return [(e.clientX-r.left)*cv.width/r.width, (e.clientY-r.top)*cv.height/r.height];
+  }
+
+  cv.addEventListener('mousemove', e => {
+    const [mx,my]=getCanvasPos(e);
+    const tn=hitNode(mx,my), ch=tn?null:hitChord(mx,my);
+    hoveredTeam=tn; hoveredChord=ch;
+    cv.style.cursor=(tn||ch)?'pointer':'default';
+    const ntip=document.getElementById('node-tip');
+    if(tn&&!selectedTeam) {
+      const t=TEAMS.find(x=>x.name===tn);
+      ntip.innerHTML=`<div class="nt-name">${t.name}</div><div>Group ${t.group} · Rank #${t.rank}</div><div>${t.conf}</div><div class="nt-best">Best: ${t.best}<br>${t.bestYears}</div>`;
+      ntip.style.display='block'; ntip.style.left=(e.clientX+14)+'px'; ntip.style.top=(e.clientY-10)+'px';
+    } else ntip.style.display='none';
+    const ctip=document.getElementById('chord-tip');
+    if(ch&&!selectedChord) {
+      const m=getMatch(ch.t1,ch.t2);
+      if(m) {
+        ctip.innerHTML=`<div class="ct-title">${m.t1} vs ${m.t2}</div><div>${m.date} · ${m.time}</div><div>${m.venue}</div><div>${m.city}, ${m.country}</div>`;
+        ctip.style.display='block'; ctip.style.left=(e.clientX+14)+'px'; ctip.style.top=(e.clientY-10)+'px';
+      }
+    } else ctip.style.display='none';
+    draw();
+  });
+
+  cv.addEventListener('mouseleave',()=>{
+    hoveredTeam=null; hoveredChord=null;
+    document.getElementById('node-tip').style.display='none';
+    document.getElementById('chord-tip').style.display='none';
+    cv.style.cursor='default'; draw();
+  });
+
+  cv.addEventListener('click',e=>{
+    const [mx,my]=getCanvasPos(e);
+    const tn=hitNode(mx,my), ch=tn?null:hitChord(mx,my);
+    if(tn) { selectedTeam=selectedTeam===tn?null:tn; selectedChord=null; updateSidepanelTeam(selectedTeam); }
+    else if(ch) { selectedChord=(selectedChord&&selectedChord.t1===ch.t1&&selectedChord.t2===ch.t2)?null:ch; selectedTeam=null; updateSidepanelChord(selectedChord); document.getElementById('chord-tip').style.display='none'; }
+    else { selectedTeam=null; selectedChord=null; clearSidepanel(); }
+    draw();
+  });
+
+  document.addEventListener('click',e=>{
+    if(!cv.contains(e.target)&&!e.target.closest('#sd')&&!e.target.closest('#row-2-2')) {
+      selectedTeam=null; selectedChord=null; clearSidepanel(); draw();
     }
   });
 
-  // Tooltip interaction
-  nodeGroups.on("mouseover", function(event, d) {
-    const yearLabel = yAxisType === "best" ? `Best Year: ${d.bestYear}` : `Debut Year: ${d.debutYear}`;
-    tooltip.classed("active", true)
-      .html(`<strong>${d.team}</strong><br/>
-             Stage: ${d.bestResult}<br/>
-             ${yearLabel}<br/>
-             Appearances: ${d.appearances}<br/>
-             Times Achieved: ${d.timesAchieved}<br/>
-             Ranking (Apr 2026): ${d.ranking}<br/>
-             Confederation: ${d.confederation}`)
-      .style("left", (event.pageX + 10) + "px")
-      .style("top", (event.pageY - 10) + "px");
-  })
-  .on("mousemove", function(event) {
-    tooltip.style("left", (event.pageX + 10) + "px")
-      .style("top", (event.pageY - 10) + "px");
-  })
-  .on("mouseout", function() {
-    tooltip.classed("active", false);
+  document.getElementById('sort-sel').addEventListener('change',e=>{ sortMode=e.target.value; draw(); });
+  document.getElementById('group-sel').addEventListener('change',e=>{
+    filterGroup=e.target.value; selectedTeam=null; selectedChord=null;
+    syncGroupButtons(); if(filterGroup) updateSidepanelGroup(filterGroup); else clearSidepanel(); draw();
   });
-}
-
-// Confederation filter functionality
-document.querySelectorAll(".conf-filter-btn").forEach(btn => {
-  btn.addEventListener("click", function() {
-    document.querySelectorAll(".conf-filter-btn").forEach(b => b.classList.remove("active"));
-    this.classList.add("active");
-    
-    activeConfederation = this.dataset.conf;
-    
-    // Update node visibility
-    dotsGroup.selectAll(".node-group").classed("hidden", d => {
-      return activeConfederation !== "all" && d.confederation !== activeConfederation;
-    });
+  document.getElementById('reset-btn').addEventListener('click',()=>{
+    filterGroup=''; selectedTeam=null; selectedChord=null;
+    document.getElementById('group-sel').value='';
+    syncGroupButtons(); clearSidepanel(); draw();
   });
-});
 
-// Y-axis toggle
-document.getElementById("yAxisSelect").addEventListener("change", function(e) {
-  currentYAxis = e.target.value;
-  updateAxes(currentYAxis);
-  updateVisualization(currentYAxis);
-});
+  function setGroup(g) {
+    filterGroup=filterGroup===g?'':g;
+    document.getElementById('group-sel').value=filterGroup;
+    selectedTeam=null; selectedChord=null;
+    syncGroupButtons(); if(filterGroup) updateSidepanelGroup(filterGroup); else clearSidepanel(); draw();
+  }
 
-// Initial render
-updateGridLines();
-updateStageLines();
+  function syncGroupButtons() {
+    document.querySelectorAll('.sp-group-btn').forEach(btn=>btn.classList.toggle('active',btn.textContent.trim()===filterGroup));
+  }
 
-// X-axis with clean styling
-const xAxis = d3.axisBottom(xScale)
-  .tickValues([1, 2, 3, 3.8, 4, 4.2, 4.5, 5])
-  .tickFormat(d => stageLabels[d] || "");
+  function updateSidepanelTeam(name) {
+    const el=document.getElementById('sp-selected');
+    if(!name){clearSidepanel();return;}
+    const t=TEAMS.find(x=>x.name===name);
+    const grp=TEAMS.filter(x=>x.group===t.group&&x.name!==name);
+    const matches=grp.map(opp=>{
+      const m=getMatch(name,opp.name);
+      return m?`<div class="sp-match"><div class="sp-match-teams">${m.t1} vs ${m.t2}</div>${m.date} · ${m.time}<br>${m.venue}<br>${m.city}</div>`
+              :`<div class="sp-match"><div class="sp-match-teams">${name} vs ${opp.name}</div>n.a.</div>`;
+    }).join('');
+    el.innerHTML=`<div class="sp-section-title">${t.name}</div>
+      <div class="sp-stat"><div class="sp-stat-label">Group</div><div class="sp-stat-value">${t.group}</div></div>
+      <div class="sp-stat"><div class="sp-stat-label">FIFA Rank</div><div class="sp-stat-value">#${t.rank}</div></div>
+      <div class="sp-stat"><div class="sp-stat-label">Confederation</div><div class="sp-stat-value">${t.conf}</div></div>
+      <div class="sp-stat"><div class="sp-stat-label">Best result</div><div class="sp-stat-value" style="font-size:11px">${t.best}</div></div>
+      <div class="sp-stat"><div class="sp-stat-label">Year(s)</div><div class="sp-stat-value" style="font-size:9px">${t.bestYears}</div></div>
+      <div style="margin-top:10px;font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:6px">GROUP MATCHES</div>
+      ${matches}`;
+  }
 
-g.append("g")
-  .attr("transform", `translate(0,${height})`)
-  .call(xAxis)
-  .attr("class", "axis");
+  function updateSidepanelChord(ch) {
+    const el=document.getElementById('sp-selected');
+    if(!ch){clearSidepanel();return;}
+    const m=getMatch(ch.t1,ch.t2);
+    const t1=TEAMS.find(x=>x.name===ch.t1);
+    el.innerHTML=`<div class="sp-section-title">Match</div>
+      <div class="sp-stat"><div class="sp-stat-label">Teams</div><div class="sp-stat-value" style="font-size:11px">${ch.t1}<br>vs ${ch.t2}</div></div>
+      <div class="sp-stat"><div class="sp-stat-label">Group</div><div class="sp-stat-value">${t1?.group||'n.a.'}</div></div>
+      <div class="sp-stat"><div class="sp-stat-label">Date</div><div class="sp-stat-value">${m?.date||'n.a.'}</div></div>
+      <div class="sp-stat"><div class="sp-stat-label">Time</div><div class="sp-stat-value">${m?.time||'n.a.'}</div></div>
+      <div class="sp-stat"><div class="sp-stat-label">Venue</div><div class="sp-stat-value" style="font-size:10px">${m?.venue||'n.a.'}</div></div>
+      <div class="sp-stat"><div class="sp-stat-label">City</div><div class="sp-stat-value">${m?.city||'n.a.'}, ${m?.country||'n.a.'}</div></div>`;
+  }
 
-g.append("text")
-  .attr("x", width / 2)
-  .attr("y", height + 65)
-  .attr("class", "axis-label")
-  .style("text-anchor", "middle")
-  .text("Best World Cup Stage Reached");
+  function updateSidepanelGroup(g) {
+    const el=document.getElementById('sp-selected');
+    const gt=TEAMS.filter(x=>x.group===g).sort((a,b)=>a.rank-b.rank);
+    el.innerHTML=`<div class="sp-section-title">Group ${g}</div>
+      <div class="sp-team-list">${gt.map(t=>`<div class="sp-team-row"><span class="sp-team-name">${t.name}</span><span class="sp-team-rank">#${t.rank}</span></div>`).join('')}</div>`;
+  }
 
-updateAxes(currentYAxis);
-updateVisualization(currentYAxis);
+  function clearSidepanel() {
+    document.getElementById('sp-selected').innerHTML=`<div class="sp-section-title">Selection</div><div style="font-size:9px;color:var(--text3);font-family:var(--mono)">Click a node or chord to see details here.</div>`;
+  }
 
-// Title
-// svg.append("text")
-//   .attr("x", (width + margin.left + margin.right) / 2)
-//   .attr("y", 25)
-//   .attr("text-anchor", "middle")
-//   .attr("class", "title")
-//   .text("World Cup Performance: Best Results by Stage and Year");
+  function togglePanel() {
+    panelOpen=!panelOpen;
+    document.getElementById('sp').classList.toggle('open',panelOpen);
+    document.getElementById('sd-arr').textContent=panelOpen?'▸':'◂';
+  }
 
-// Create legend
-const legendContainer = d3.select("#legend");
-const confArray = Object.keys(confColorsActual);
-
-legendContainer.append("div")
-  .style("font-weight", "500")
-  .style("margin-bottom", "0.5rem")
-  .text("Visual Structure:");
-
-const legendItems = [
-  "Gray dot = country coordinate point | Colored circle = participation count (size proportional to appearances) | Concentric rings = multiple achievements at same best stage | Position when overlapping = determined by FIFA ranking (April 2026)"
-];
-
-legendItems.forEach(item => {
-  legendContainer.append("div")
-    .attr("class", "legend-item")
-    .style("display", "block")
-    .style("margin-bottom", "0.3rem")
-    .text(item);
-});
-
-legendContainer.append("div")
-  .style("margin-top", "1rem")
-  .style("font-weight", "500")
-  .style("margin-bottom", "0.5rem")
-  .text("Confederations:");
-
-confArray.forEach(conf => {
-  const item = legendContainer.append("div")
-    .attr("class", "legend-item");
-  
-  item.append("span")
-    .attr("class", "legend-color")
-    .style("background", confColorsActual[conf]);
-  
-  item.append("span")
-    .text(conf);
-});
-
+  window.addEventListener('resize',resize);
+  resize();
 </script>
 
 </body>
