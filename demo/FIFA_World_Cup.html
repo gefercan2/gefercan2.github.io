@@ -666,7 +666,7 @@
 
 
 
-      <div class="panel-title">World Cup Performance</div>
+      <div class="panel-title">01. World Cup Performance</div>
       <div class="panel-subtitle">Best Results by Stage and Year </div>
       <div class="controls">
         <div class="control-group">
@@ -700,7 +700,7 @@
          PANEL 2 — Sankey
     ══════════════════════════════════════ -->
     <div class="stageBlock" id="stage02_Sankey">
-      <div class="panel-title">FIFA Confederations</div>
+      <div class="panel-title">02. FIFA Confederations</div>
       <div class="panel-subtitle">2010, 2014, 2018 &amp; 2022 World Cup Tournament Stages</div>
       <div id="p5-container"></div>
       <div id="tooltip-sankey"></div>
@@ -712,7 +712,7 @@
     <div class="stageBlock" id="stage03_Chord" style="padding:0; display:flex; flex-direction:column;">
 
       <div id="row-2-1">
-        <div id="div-2-1-1"><div class="logo-mark">FIFA WC<br>2026™</div></div>
+        <div id="div-2-1-1"><div class="panel-title">03. WC 2026™</div></div>
         <div id="div-2-1-2">
           <h1>Group Stage <span>Chord Diagram</span> — 48 Teams / 12 Groups</h1>
         </div>
@@ -998,7 +998,7 @@
   const svg = d3.select('#chart').append('svg')
     .attr('viewBox', [0, 0, sWidth + sMargin.left + sMargin.right, sHeight + sMargin.top + sMargin.bottom])
     .attr('preserveAspectRatio', 'xMinYMin meet')
-    .style('background', 'var(--color-bg-primary)');
+    .style('background', 'none');
 
   const g = svg.append('g').attr('transform', `translate(${sMargin.left},${sMargin.top})`);
 
@@ -1040,9 +1040,11 @@
     dotsG.selectAll('*').remove();
     const ttip = d3.select('#tooltip-scatter');
 
-    const ng = dotsG.selectAll('.node-group').data(dat).enter().append('g')
-      .attr('class', d => `node-group ${activeConfederation !== 'all' && d.confederation !== activeConfederation ? 'hidden' : ''}`)
-      .attr('transform', d => `translate(${xScale(d.x)+d.offsetX},${yScale(d.currentY)+d.offsetY})`);
+ // REPLACE WITH:
+const ng = dotsG.selectAll('.node-group').data(dat).enter().append('g')
+  .attr('class', d => `node-group ${activeConfederation !== 'all' && d.confederation !== activeConfederation ? 'hidden' : ''}`)
+  .attr('transform', d => `translate(${xScale(d.x)+d.offsetX},${yScale(d.currentY)+d.offsetY})`)
+  .style('opacity', 0.5);
 
     ng.append('circle').attr('class','base-dot').attr('r',1.5);
     ng.append('circle').attr('class','participation-circle')
@@ -1105,6 +1107,7 @@
      SCRIPT 4 — SANKEY (p5.js)
 ══════════════════════════════════════════════════════ -->
 <script>
+
   const SANKEY_CONFIG = {
     confederations: { AFC:14, OFC:0, CAF:54, CONCACAF:41, CONMEBOL:10, UEFA:55 },
     tournament2010: [
@@ -1144,13 +1147,24 @@
 
   const SANKEY_VIS = {
     w:2200, h:780,
-    margin:{top:80,right:250,bottom:90,left:200},
-    nodeW:20, minH:20, pad:10,
+    margin:{top:60,right:80,bottom:60,left:80},
+    nodeW:20, minH:20, pad:15,
     strokeMin:1, strokeMax:50,
-    opacity:{normal:30, selected:255, dimmed:10}
+    opacity:{normal:20, selected:255, dimmed:10},
+    // Layout control variables
+    confBarWidth: 20,        // width of each confederation bar column
+    confBarGap: 240,          // gap between confederation bars
+    yearGroupGap: 30,        // gap between year columns in center
+    centerOffset: 0          // shift entire center block left(-) or right(+)
   };
 
-  let s_confNodes=[], s_nodes10=[], s_nodes14=[], s_nodes18=[], s_nodes22=[];
+  // Split confederations: 3 on left, 3 on right
+  // Order matters — left side listed top to bottom, right side top to bottom
+  const CONF_LEFT  = ['UEFA','CONMEBOL','CAF'];
+  const CONF_RIGHT = ['AFC','CONCACAF','OFC'];
+
+  let s_confNodesLeft=[], s_confNodesRight=[];
+  let s_nodes10=[], s_nodes14=[], s_nodes18=[], s_nodes22=[];
   let s_allNodes=[], s_links=[];
   let s_selected=null, s_dragged=null, s_dragOff={x:0,y:0};
 
@@ -1163,234 +1177,345 @@
       sk.textSize(11);
       initSankeyNodes();
       initSankeyLinks();
-      s_allNodes = [...s_confNodes,...s_nodes10,...s_nodes14,...s_nodes18,...s_nodes22];
+      s_allNodes = [
+        ...s_confNodesLeft, ...s_confNodesRight,
+        ...s_nodes10, ...s_nodes14, ...s_nodes18, ...s_nodes22
+      ];
     };
 
     sk.draw = function() {
-      sk.background(26);
+      sk.background(10);
       updateSankeySegments(sk);
       drawSankeyLinks(sk);
       drawSankeyNodes(sk);
       drawSankeyLabels(sk);
     };
 
-    sk.mouseMoved  = function() { updateSankeyTooltip(sk); };
-    sk.mousePressed  = function() { handleSankeyClick(sk); };
-    sk.mouseDragged  = function() { handleSankeyDrag(sk); };
+    sk.mouseMoved   = function() { updateSankeyTooltip(sk); };
+    sk.mousePressed = function() { handleSankeyClick(sk); };
+    sk.mouseDragged = function() { handleSankeyDrag(sk); };
     sk.mouseReleased = function() { s_dragged = null; };
 
+    // ─── NODE FACTORY ───────────────────────────────────
     function initSankeyNodes() {
-      s_confNodes=[]; 
-      s_nodes10=[]; 
-      s_nodes14=[]; 
-      s_nodes18=[]; 
-      s_nodes22=[];
-      const confs = Object.keys(SANKEY_CONFIG.confederations);
-      const total = confs.reduce((s,c)=>s+SANKEY_CONFIG.confederations[c],0);
-      const avH = SANKEY_VIS.h - SANKEY_VIS.margin.top - SANKEY_VIS.margin.bottom;
-      let yp = SANKEY_VIS.margin.top;
-      confs.forEach(conf => {
-        const m = SANKEY_CONFIG.confederations[conf];
-        const h = Math.max(SANKEY_VIS.minH, (m/total)*avH);
-        s_confNodes.push({ id:`c_${conf}`, name:conf, displayName:`${conf} (${m})`,
-          x:SANKEY_VIS.margin.left, y:yp, baseY:yp, w:SANKEY_VIS.nodeW, h:h,
-          members:m, type:'confederation', segments:null });
-        yp += h;
+      s_confNodesLeft=[]; s_confNodesRight=[];
+      s_nodes10=[]; s_nodes14=[]; s_nodes18=[]; s_nodes22=[];
+
+      const V     = SANKEY_VIS;
+      const avH   = V.h - V.margin.top - V.margin.bottom;
+      const allC  = Object.keys(SANKEY_CONFIG.confederations);
+      const total = allC.reduce((s,c) => s + SANKEY_CONFIG.confederations[c], 20);
+
+      // ── LEFT confederation bars ──────────────────────
+      // They sit to the LEFT of center; rightmost bar is closest to center
+      // x positions (right edge closest to center):
+      //   bar 0 (innermost) x = leftEdge
+      //   We place them so their RIGHT edge approaches the left year column
+      // We'll calculate the center block first to know where to anchor.
+
+      // ── CENTER year columns ──────────────────────────
+      // 4 year columns, each nodeW wide, separated by yearGroupGap
+      const yearCols = [2010,2014,2018,2022];
+      const totalYearWidth = yearCols.length * V.nodeW + (yearCols.length-1) * V.yearGroupGap;
+      const centerX = V.w / 2 + V.centerOffset;
+      const yearStartX = centerX - totalYearWidth / 2;
+
+      // x position for each year column
+      const yearXMap = {};
+      yearCols.forEach((yr, i) => {
+        yearXMap[yr] = yearStartX + i * (V.nodeW + V.yearGroupGap);
       });
-      const pW = SANKEY_VIS.w - SANKEY_VIS.margin.left - SANKEY_VIS.margin.right;
-      [[SANKEY_CONFIG.tournament2010,s_nodes10,2010,0.22],
-       [SANKEY_CONFIG.tournament2014,s_nodes14,2014,0.42],
-       [SANKEY_CONFIG.tournament2018,s_nodes18,2018,0.62],
-       [SANKEY_CONFIG.tournament2022,s_nodes22,2022,0.82]].forEach(([td,arr,yr,frac])=>{
-        let yp2 = SANKEY_VIS.margin.top;
-        const xp = SANKEY_VIS.margin.left + pW * frac;
-        td.forEach((sd,i) => {
+
+      // ── LEFT conf bars ───────────────────────────────
+      // Rightmost bar (index 0) right edge = yearStartX - gap
+      const confGap = 40; // gap between conf block and year block
+      let leftRightEdge = yearStartX - confGap;
+
+      // Place 3 bars from right to left (innermost first)
+      CONF_LEFT.forEach((conf, i) => {
+        const members = SANKEY_CONFIG.confederations[conf];
+        const barH = Math.max(V.minH, (members / total) * avH * 0.85);
+        const barX = leftRightEdge - (i+1)*V.confBarWidth - i*V.confBarGap-300;
+        const barY = leftRightEdge - (i+5)*V.confBarWidth - i*V.confBarGap-300;
+        s_confNodesLeft.push({
+          id:`cl_${conf}`, name:conf,
+          displayName:`${conf} (${members})`,
+          x:barX, y:barY, baseY:barY,
+          w:V.confBarWidth, h:barH,
+          members, type:'confederation', segments:null,
+          side:'left'
+        });
+      });
+
+      // ── RIGHT conf bars ──────────────────────────────
+      const yearEndX = yearStartX + totalYearWidth;
+      let rightLeftEdge = yearEndX + confGap;
+
+      CONF_RIGHT.forEach((conf, i) => {
+        const members = SANKEY_CONFIG.confederations[conf];
+        const barH = Math.max(V.minH, (members / total) * avH * 0.85);
+        const barX = rightLeftEdge + i*(V.confBarWidth + V.confBarGap);
+        const barY = V.margin.top + (avH - barH)/2;
+        s_confNodesRight.push({
+          id:`cr_${conf}`, name:conf,
+          displayName:`${conf} (${members})`,
+          x:barX, y:barY, baseY:barY,
+          w:V.confBarWidth, h:barH,
+          members, type:'confederation', segments:null,
+          side:'right'
+        });
+      });
+
+      // ── YEAR stage nodes (center) ────────────────────
+      const yearArrays = {
+        2010: [SANKEY_CONFIG.tournament2010, s_nodes10],
+        2014: [SANKEY_CONFIG.tournament2014, s_nodes14],
+        2018: [SANKEY_CONFIG.tournament2018, s_nodes18],
+        2022: [SANKEY_CONFIG.tournament2022, s_nodes22]
+      };
+
+      Object.entries(yearArrays).forEach(([yr, [td, arr]]) => {
+        const year = parseInt(yr);
+        const xp   = yearXMap[year];
+        let yp     = V.margin.top;
+        td.forEach((sd, i) => {
           const tot = Object.keys(sd).filter(k=>k!=='stage').reduce((s,k)=>s+(sd[k]||0),0);
-          if (tot>0) {
-            const h = Math.max(SANKEY_VIS.minH, tot*8);
-            arr.push({ id:`s_${yr}_${i}`, name:sd.stage, year:yr,
-              displayName:`${sd.stage}`, x:xp, y:yp2, baseY:yp2,
-              w:SANKEY_VIS.nodeW, h:h, total:tot, stageData:sd,
-              type:'stage', segments:[] });
-            yp2 += h + SANKEY_VIS.pad;
+          if (tot > 0) {
+            const h = Math.max(V.minH, tot * 8);
+            arr.push({
+              id:`s_${yr}_${i}`, name:sd.stage, year,
+              displayName:sd.stage,
+              x:xp, y:yp, baseY:yp,
+              w:V.nodeW, h, total:tot,
+              stageData:sd, type:'stage', segments:[]
+            });
+            yp += h + V.pad;
           }
         });
       });
     }
 
+    // ─── LINKS ───────────────────────────────────────────
     function initSankeyLinks() {
-      s_links=[];
-      const confs = Object.keys(SANKEY_CONFIG.confederations);
-      [...s_nodes10,...s_nodes14,...s_nodes18,...s_nodes22].forEach(sn => {
-        confs.forEach(conf => {
-          const v = sn.stageData[conf]||0;
-          if (v>0) {
-            const src = s_confNodes.find(n=>n.name===conf);
-            if (src) s_links.push({ id:`l_${conf}_${sn.year}_${sn.name}`,
-              source:src, target:sn, value:v, confederation:conf, year:sn.year, stage:sn.name });
+      s_links = [];
+      const allConfNodes = [...s_confNodesLeft, ...s_confNodesRight];
+      const allStageNodes = [...s_nodes10,...s_nodes14,...s_nodes18,...s_nodes22];
+
+      allStageNodes.forEach(sn => {
+        allConfNodes.forEach(cn => {
+          const v = sn.stageData[cn.name] || 0;
+          if (v > 0) {
+            s_links.push({
+              id:`l_${cn.name}_${sn.year}_${sn.name}`,
+              source:cn, target:sn,
+              value:v, confederation:cn.name,
+              year:sn.year, stage:sn.name
+            });
           }
         });
       });
     }
 
+    // ─── SEGMENTS ────────────────────────────────────────
     function updateSankeySegments(sk) {
-      const confs = Object.keys(SANKEY_CONFIG.confederations);
+      const confs = [...CONF_LEFT, ...CONF_RIGHT];
       [...s_nodes10,...s_nodes14,...s_nodes18,...s_nodes22].forEach(node => {
-        node.segments=[];
+        node.segments = [];
         let cy = node.y;
         confs.forEach(conf => {
-          const t = node.stageData[conf]||0;
-          if (t>0) {
-            const sh = (t/node.total)*node.h;
-            node.segments.push({ confederation:conf, teams:t,
-              x:node.x, y:cy, w:node.w, h:sh });
+          const t = node.stageData[conf] || 0;
+          if (t > 0) {
+            const sh = (t / node.total) * node.h;
+            node.segments.push({ confederation:conf, teams:t, x:node.x, y:cy, w:node.w, h:sh });
             cy += sh;
           }
         });
       });
     }
 
+    // ─── DRAW LINKS ──────────────────────────────────────
     function drawSankeyLinks(sk) {
-      const maxV = Math.max(...s_links.map(l=>l.value));
+      const maxV = Math.max(...s_links.map(l => l.value));
       sk.strokeCap(sk.SQUARE);
+
       s_links.forEach(link => {
+        // opacity
         let op = SANKEY_VIS.opacity.normal;
-        if (s_selected===link) op=SANKEY_VIS.opacity.selected;
-        else if (s_selected && s_selected.type==='confederation' && s_selected.name===link.confederation) op=SANKEY_VIS.opacity.selected;
-        else if (s_selected) op=SANKEY_VIS.opacity.dimmed;
+        if (s_selected === link) op = SANKEY_VIS.opacity.selected;
+        else if (s_selected && s_selected.type==='confederation' && s_selected.name===link.confederation) op = SANKEY_VIS.opacity.selected;
+        else if (s_selected) op = SANKEY_VIS.opacity.dimmed;
+
         const [r,g,b] = SANKEY_COLORS[link.confederation];
         const sw = SANKEY_VIS.strokeMin + (link.value/maxV)*(SANKEY_VIS.strokeMax-SANKEY_VIS.strokeMin);
-        sk.stroke(r,g,b,op); sk.strokeWeight(sw);
-        const sx = link.source.x + link.source.w;
-        const tx = link.target.x;
-        const mx = (sx+tx)/2;
-        const sy2 = calcConfY(link);
-        const ty2 = calcTargetY(link);
-        sk.noFill();
-        sk.bezier(sx,sy2,mx,sy2,mx,ty2,tx,ty2);
-        link._curve={x1:sx,y1:sy2,x2:tx,y2:ty2,mx,sw};
+        sk.stroke(r,g,b,op); sk.strokeWeight(sw); sk.noFill();
+
+        const sy = calcConfY(link);
+        const ty = calcTargetY(link);
+
+        if (link.source.side === 'left') {
+          // source right edge → target left edge
+          const sx = link.source.x + link.source.w;
+          const tx = link.target.x;
+          const mx = (sx + tx) / 2;
+          sk.bezier(sx, sy, mx, sy, mx, ty, tx, ty);
+          link._curve = {x1:sx,y1:sy,x2:tx,y2:ty,mx,sw};
+        } else {
+          // source left edge ← target right edge
+          const sx = link.source.x;
+          const tx = link.target.x + link.target.w;
+          const mx = (sx + tx) / 2;
+          sk.bezier(sx, sy, mx, sy, mx, ty, tx, ty);
+          link._curve = {x1:sx,y1:sy,x2:tx,y2:ty,mx,sw};
+        }
       });
       sk.strokeCap(sk.ROUND);
     }
 
     function calcConfY(link) {
-      const cl = s_links.filter(l=>l.source===link.source && l.target.name===link.target.name);
-      let cum=0; const idx=cl.indexOf(link);
-      for(let i=0;i<idx;i++) cum+=cl[i].value;
-      const tot=cl.reduce((s,l)=>s+l.value,0);
-      return link.source.y + ((cum+link.value/2)/tot)*link.source.h;
+      // Stack links within the same confederation bar proportionally
+      const cl = s_links.filter(l => l.source === link.source);
+      let cum = 0;
+      const idx = cl.indexOf(link);
+      for (let i = 0; i < idx; i++) cum += cl[i].value;
+      const tot = cl.reduce((s,l) => s + l.value, 0);
+      return link.source.y + ((cum + link.value/2) / tot) * link.source.h;
     }
 
     function calcTargetY(link) {
-      const seg = link.target.segments?.find(s=>s.confederation===link.confederation);
-      return seg ? seg.y+seg.h/2 : link.target.y+link.target.h/2;
+      const seg = link.target.segments?.find(s => s.confederation === link.confederation);
+      return seg ? seg.y + seg.h/2 : link.target.y + link.target.h/2;
     }
 
+    // ─── DRAW NODES ──────────────────────────────────────
     function drawSankeyNodes(sk) {
-      s_confNodes.forEach(node => {
-        let op=SANKEY_VIS.opacity.normal;
-        if(s_selected===node) op=SANKEY_VIS.opacity.selected;
-        else if(s_selected && s_selected!==node) op=SANKEY_VIS.opacity.dimmed;
-        const [r,g,b]=SANKEY_COLORS[node.name];
+      const allConf = [...s_confNodesLeft, ...s_confNodesRight];
+
+      allConf.forEach(node => {
+        let op = SANKEY_VIS.opacity.normal;
+        if (s_selected === node) op = SANKEY_VIS.opacity.selected;
+        else if (s_selected && s_selected !== node) op = SANKEY_VIS.opacity.dimmed;
+        const [r,g,b] = SANKEY_COLORS[node.name];
         sk.fill(r,g,b,op); sk.stroke(255); sk.strokeWeight(1);
-        sk.rect(node.x,node.y,node.w,node.h);
-        node.bounds={x:node.x,y:node.y,w:node.w,h:node.h};
+        sk.rect(node.x, node.y, node.w, node.h);
+        node.bounds = {x:node.x, y:node.y, w:node.w, h:node.h};
       });
-      [...s_nodes10,...s_nodes14,...s_nodes18,...s_nodes22].forEach(node=>{
-        node.segments.forEach(seg=>{
-          let op=SANKEY_VIS.opacity.normal;
-          if(s_selected && s_selected.type==='confederation' && s_selected.name===seg.confederation) op=SANKEY_VIS.opacity.selected;
-          else if(s_selected) op=SANKEY_VIS.opacity.dimmed;
-          const [r,g,b]=SANKEY_COLORS[seg.confederation];
+
+      [...s_nodes10,...s_nodes14,...s_nodes18,...s_nodes22].forEach(node => {
+        node.segments.forEach(seg => {
+          let op = SANKEY_VIS.opacity.normal;
+          if (s_selected && s_selected.type==='confederation' && s_selected.name===seg.confederation) op = SANKEY_VIS.opacity.selected;
+          else if (s_selected) op = SANKEY_VIS.opacity.dimmed;
+          const [r,g,b] = SANKEY_COLORS[seg.confederation];
           sk.fill(r,g,b,op); sk.stroke(255); sk.strokeWeight(0.5);
-          sk.rect(seg.x,seg.y,seg.w,seg.h);
+          sk.rect(seg.x, seg.y, seg.w, seg.h);
         });
-        node.bounds={x:node.x,y:node.y,w:node.w,h:node.h};
+        node.bounds = {x:node.x, y:node.y, w:node.w, h:node.h};
       });
     }
 
+    // ─── LABELS ──────────────────────────────────────────
     function drawSankeyLabels(sk) {
-      sk.fill(220); sk.noStroke(); sk.textAlign(sk.LEFT,sk.CENTER); sk.textSize(11);
-      s_confNodes.forEach(n=>sk.text(n.displayName,n.x+n.w+8,n.y+n.h/2));
-      sk.textAlign(sk.CENTER,sk.BOTTOM); sk.textSize(9);
-      [...s_nodes10,...s_nodes14,...s_nodes18,...s_nodes22].forEach(n=>{
-        sk.text(n.displayName,n.x+n.w/2,n.y-4);
+      sk.noStroke(); sk.textSize(11);
+
+      // LEFT conf labels — text to the LEFT of bar
+      s_confNodesLeft.forEach(n => {
+        sk.fill(220); sk.textAlign(sk.RIGHT, sk.CENTER);
+        sk.text(n.displayName, n.x - 8, n.y + n.h/2);
       });
-      sk.textAlign(sk.CENTER,sk.CENTER); sk.textSize(13); sk.fill(180);
-      [[s_nodes10,2010],[s_nodes14,2014],[s_nodes18,2018],[s_nodes22,2022]].forEach(([arr,yr])=>{
-        if(arr.length){
-          const cx=arr[0].x+arr[0].w/2;
-          sk.text(yr, cx, SANKEY_VIS.margin.top-18);
+
+      // RIGHT conf labels — text to the RIGHT of bar
+      s_confNodesRight.forEach(n => {
+        sk.fill(220); sk.textAlign(sk.LEFT, sk.CENTER);
+        sk.text(n.displayName, n.x + n.w + 8, n.y + n.h/2);
+      });
+
+      // Year column labels above
+      sk.fill(160); sk.textSize(13); sk.textAlign(sk.CENTER, sk.BOTTOM);
+      [[s_nodes10,2010],[s_nodes14,2014],[s_nodes18,2018],[s_nodes22,2022]].forEach(([arr,yr]) => {
+        if (arr.length) {
+          const cx = arr[0].x + arr[0].w/2;
+          sk.text(yr, cx, SANKEY_VIS.margin.top - 10);
         }
       });
+
+      // Stage name labels below each node
+      sk.fill(140); sk.textSize(9); sk.textAlign(sk.CENTER, sk.TOP);
+      [...s_nodes10,...s_nodes14,...s_nodes18,...s_nodes22].forEach(n => {
+        sk.text(n.displayName, n.x + n.w/2, n.y + n.h + 4);
+      });
     }
 
+    // ─── TOOLTIP ─────────────────────────────────────────
     function updateSankeyTooltip(sk) {
       const tip = document.getElementById('tooltip-sankey');
-      const el = getSankeyHovered(sk);
-      if(el) {
-        let html='';
-        if(el.type==='confederation') html=`${el.name}<br/>Members: ${el.members}`;
-        else if(el.type==='segment') html=`${el.confederation}<br/>${el.stageName} ${el.year}<br/>Teams: ${el.teams}`;
-        else if(el.confederation) html=`${el.confederation} → ${el.year}<br/>${el.stage}<br/>Teams: ${el.value}`;
-        tip.innerHTML=html; tip.style.display='block';
+      const el  = getSankeyHovered(sk);
+      if (el) {
+        let html = '';
+        if (el.type==='confederation') html=`${el.name}<br/>Members: ${el.members}`;
+        else if (el.type==='segment')  html=`${el.confederation}<br/>${el.stageName} ${el.year}<br/>Teams: ${el.teams}`;
+        else if (el.confederation)     html=`${el.confederation} → ${el.year}<br/>${el.stage}<br/>Teams: ${el.value}`;
+        tip.innerHTML = html; tip.style.display='block';
         tip.style.left=(sk.mouseX+14)+'px'; tip.style.top=(sk.mouseY-10)+'px';
-      } else { tip.style.display='none'; }
+      } else tip.style.display='none';
     }
 
+    // ─── CLICK / DRAG ────────────────────────────────────
     function handleSankeyClick(sk) {
-      const el = getSankeyHovered(sk);
+      const el   = getSankeyHovered(sk);
       s_selected = (el && s_selected===el) ? null : el;
       const node = getSankeyNode(sk);
-      if(node) {
-        s_dragged=node;
-        s_dragOff.x=sk.mouseX-node.x;
-        s_dragOff.y=sk.mouseY-node.y;
+      if (node) {
+        s_dragged     = node;
+        s_dragOff.x   = sk.mouseX - node.x;
+        s_dragOff.y   = sk.mouseY - node.y;
       }
     }
 
     function handleSankeyDrag(sk) {
-      if(s_dragged) {
-        s_dragged.x=sk.constrain(sk.mouseX-s_dragOff.x,0,SANKEY_VIS.w-s_dragged.w);
-        s_dragged.y=sk.constrain(sk.mouseY-s_dragOff.y,0,SANKEY_VIS.h-s_dragged.h);
-        s_dragged.baseY=s_dragged.y;
+      if (s_dragged) {
+        s_dragged.x     = sk.constrain(sk.mouseX - s_dragOff.x, 0, SANKEY_VIS.w - s_dragged.w);
+        s_dragged.y     = sk.constrain(sk.mouseY - s_dragOff.y, 0, SANKEY_VIS.h - s_dragged.h);
+        s_dragged.baseY = s_dragged.y;
         document.getElementById('tooltip-sankey').style.display='none';
       }
     }
 
+    // ─── HIT TESTING ─────────────────────────────────────
     function getSankeyHovered(sk) {
       const mx=sk.mouseX, my=sk.mouseY;
-      for(const n of s_confNodes) if(n.bounds && inRect(mx,my,n.bounds)) return n;
-      for(const n of [...s_nodes10,...s_nodes14,...s_nodes18,...s_nodes22]) {
-        for(const seg of n.segments) {
-          if(inRect(mx,my,{x:seg.x,y:seg.y,w:seg.w,h:seg.h}))
+      for (const n of [...s_confNodesLeft,...s_confNodesRight]) {
+        if (n.bounds && inR(mx,my,n.bounds)) return n;
+      }
+      for (const n of [...s_nodes10,...s_nodes14,...s_nodes18,...s_nodes22]) {
+        for (const seg of n.segments) {
+          if (inR(mx,my,{x:seg.x,y:seg.y,w:seg.w,h:seg.h}))
             return {type:'segment',confederation:seg.confederation,teams:seg.teams,stageName:n.name,year:n.year};
         }
       }
-      for(const l of s_links) {
-        if(l._curve && nearBezier(mx,my,l._curve)) return l;
+      for (const l of s_links) {
+        if (l._curve && nearB(mx,my,l._curve)) return l;
       }
       return null;
     }
 
     function getSankeyNode(sk) {
       const mx=sk.mouseX, my=sk.mouseY;
-      for(const n of s_allNodes) if(n.bounds && inRect(mx,my,n.bounds)) return n;
+      for (const n of s_allNodes) if (n.bounds && inR(mx,my,n.bounds)) return n;
       return null;
     }
 
-    function inRect(px,py,b) {
+    function inR(px,py,b) {
       return px>=b.x && px<=b.x+b.w && py>=b.y && py<=b.y+b.h;
     }
 
-    function nearBezier(px,py,c) {
-      const d = r=>Math.sqrt((px-r.x1)**2+(py-r.y1)**2) < 12 ||
-                    Math.sqrt((px-r.x2)**2+(py-r.y2)**2) < 12 ||
-                    Math.sqrt((px-r.mx)**2+(py-(r.y1+r.y2)/2)**2) < 12;
-      return d(c);
+    function nearB(px,py,c) {
+      return Math.hypot(px-c.x1,py-c.y1)<14 ||
+             Math.hypot(px-c.x2,py-c.y2)<14 ||
+             Math.hypot(px-c.mx,py-(c.y1+c.y2)/2)<14;
     }
 
   }); // end p5
+
 </script>
 
 <!-- ══════════════════════════════════════════════════════
