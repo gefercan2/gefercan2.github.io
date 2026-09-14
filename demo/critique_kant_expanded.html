@@ -13,7 +13,7 @@
                 margin: 0;
                 padding: 0;
                 font-family:'Times New Roman', Times, serif;
-                background: #ecbfd4;
+                background: linear-gradient(180deg,#f7d0bc 40%,#4c9dac 100%);
             }
 
             #tree-container {
@@ -167,7 +167,7 @@
                 overflow-y: auto;
                 padding: 3% 4%;
                 box-sizing: border-box;
-                background: #ecb5c4;
+                background: none;
                 border-left: 1px solid #ccc;
             }
 
@@ -179,12 +179,13 @@
                 left: 0;
                 width: 400px;
                 height: 100%;
-                background:rgba(240, 227, 206, 0.05);
+                /* background:rgba(240, 227, 206, 0.05); */
+                background:none;
                 backdrop-filter: blur(2px);
 /*                 border-right: 1px solid #ccc;
                 box-shadow: 2px 0 10px rgba(0,0,0,0.15); */
                 z-index: 500;
-                padding: 5% 3%;
+                padding: 5% 3% 0% 3%;
                 box-sizing: border-box;
                 overflow-y: auto;
                 transform: translateX(-100%);
@@ -274,7 +275,7 @@
                 top: 0;
                 right: 0;
                 width: 30%;
-                background:rgba(240, 227, 206, 0.05);
+                background:none;
                 backdrop-filter: blur(2px);
                 border-top: 1px solid #ccc;
                 border-radius:25px;
@@ -390,17 +391,19 @@
         <!-- <img id="portrait_kant" src="https://raw.githubusercontent.com/gefercan2/gefercan2.github.io/main/demo/KantPortraitSmall.png" alt="Portrait of Kant"> -->
 
         <div id="sidebar-diagram"> 
-            <h3>Understanding Critique</h3>
-            <p class="sidebar-subtitle">This graphic shows the chapter structure of German philosopher Inmanuel Kant's (1724-1804) Critique of Pure Reason (1781). </p>
+            <h3>Understanding the Critique</h3>
+            <p class="sidebar-subtitle">This diagram shows the chapter structure of the book Critique of Pure Reason, written in 1781 by German philosopher Inmanuel Kant's (1724-1804). </p>
             <br>
             <hr>
-            <p>Each one of the circles is a chapter or section of the book.<br> 
-               Click in the names of the chapters and they will expand/collapse.<br> 
-               You can zoom in/out and pan the graphic.<br>
-               The size of each circle shows the numbers of words of each chapter.<br>
+            <p>Each one of the circles is a chapter or section of the book.  
+               <b>Click in the names of the chapters and they will expand/collapse.</b> if they have subdivisions.
+               You can zoom in/out and pan around the graphic.<br>
+               Each circle is connected to its subchapters(sections).
+               The size of each circle shows the numbers of words of each chapter. 
                If you roll over, you can see the details of each chapter in the info panel to the right. <br> 
                There, if you click "see more" you can will see the complete text of the selected chapter.<br> 
-               The diagram aims to work as a visual index to the text.</p>
+               The diagram aims to work as a visual index to the text.
+            </p>
         </div>
 
         <div id="diagram">
@@ -11517,9 +11520,9 @@ const links = [
 
         const svg = d3.select("#tree-container")
             .append("svg")
-            .attr("width", "100%")
-            .attr("height", "100%")
-            .attr("viewBox", `0 0 ${width} ${height}`);
+            .attr("width", "150%")
+            .attr("height", "150%")
+            .attr("viewBox", `400 120 ${width} ${height}`);
 
 const g = svg.append("g");
 // Declared early so nothing later in the script can crash before these exist
@@ -11535,8 +11538,8 @@ const WORD_VOLUME_CONFIG = {
     minRadius: 0,         // radius (px) when word count is 0 or unavailable
     fillColor: '#324299',
     fillOpacity: 0.18,
-    blurWhenIdle: 16,       // gaussian blur amount when the node is NOT selected/hovered
-    blurWhenActive: 1.5    // gaussian blur amount when the node IS selected/hovered (sharper)
+    blurWhenIdle: 10,       // gaussian blur amount when the node is NOT selected/hovered
+    blurWhenActive: 5    // gaussian blur amount when the node IS selected/hovered (sharper)
 };
 
 // Maps word count -> circle radius; domain gets rescaled once real data is known
@@ -12323,6 +12326,8 @@ g.selectAll('.node').on('click.hideSidebar', hideSidebarOnce);
                 const rawText = el.textContent || el.innerText || '';
                 sectionAnalysisCache[divId] = analyzeText(rawText);
             });
+
+            
 
             console.log('Step A complete:', sectionAnalysisCache);
 
