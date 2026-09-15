@@ -10,9 +10,9 @@
 
 <style>
 :root{
-  --bg:#08080e;--s1:#0f0f18;--b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.11);--b3:rgba(255,255,255,.18);
+     background-image: linear-gradient(to bottom, rgb(12, 56, 84), rgb(15, 5, 21));;--s1:#0f0f18;--b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.11);--b3:rgba(255,255,255,.18);
   --t1:#eae8e2;--t2:#8c8a84;--t3:#4e4c48;--t4:#2e2c2a;
-  --gold:#c8a96e;--gold2:#e2c48a;--teal:#7eb8c9;--violet:#9b7fc7;--rose:#c97e7e;--sage:#7ec99b;
+  --gold:#ceb27e;--gold2:#e2c48a;--teal:#7eb8c9;--violet:#9b7fc7;--rose:#c97e7e;--sage:#7ec99b;
   --r:9px;--pw:290px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -31,9 +31,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 
 /* ── STAGE NEXT BUTTONS ── */
 .stage-next{
-  position:fixed;bottom:18px;right:18px;z-index:50;padding:9px 18px;
+  position:fixed;top:18px;right:18px;z-index:50;padding:9px 18px;
   background:rgba(126,184,201,.14);border:0.5px solid rgba(126,184,201,.4);border-radius:7px;
-  font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  font-family:'DM Mono',monospace;font-size:0.7em;letter-spacing:.1em;text-transform:uppercase;
   color:var(--teal);cursor:pointer;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
   transition:all .15s;
 }
@@ -50,19 +50,19 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 ════════════════════ */
 .panel{
   position:absolute;
-  background:rgba(15,15,24,.88);
+  background:rgba(18,18,16,.55);
   border:0.5px solid var(--b2);
   border-radius:var(--r);
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
   user-select:none;
   transition:box-shadow .2s,background .2s,backdrop-filter .2s;
 }
 /* Extra blur when hovering over chart area */
 .panel.over-chart{
-  background:rgba(8,8,16,.95);
-  backdrop-filter:blur(36px);
-  -webkit-backdrop-filter:blur(36px);
+  background:rgba(18,18,16,.55);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
   box-shadow:0 8px 48px rgba(0,0,0,.75);
 }
 .drag-handle{
@@ -74,7 +74,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .drag-handle.hopen{border-color:var(--b1)}
 .tog{display:flex;align-items:center;gap:7px;cursor:pointer;flex:1;min-width:0}
 .panel-title{font-size:0.8em;letter-spacing:.13em;text-transform:uppercase;font-weight:500}
-.cg{font-size:9px;color:var(--t3);transition:transform .3s;display:inline-block;flex-shrink:0}
+.cg{font-size:0.8em;color:var(--t3);transition:transform .3s;display:inline-block;flex-shrink:0}
 .cg.open{transform:rotate(180deg)}
 .panel-body{overflow:hidden;transition:max-height .4s cubic-bezier(.4,0,.2,1),opacity .3s}
 .panel-body.open{opacity:1}
@@ -89,10 +89,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 #upload-panel{top:18px;left:18px;width:var(--pw)}
 #drop-zone{border:0.5px dashed rgba(200,169,110,.35);border-radius:7px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(200,169,110,.05)}
 #drop-zone:hover,#drop-zone.dz-over{background:rgba(200,169,110,.12);border-color:rgba(200,169,110,.65)}
-.dz-icon{font-size:18px;opacity:.4;margin-bottom:4px}.dz-label{font-size:10px;color:var(--gold);letter-spacing:.06em}.dz-sub{font-size:9px;color:var(--t3);margin-top:2px}
+.dz-icon{font-size:18px;opacity:.4;margin-bottom:4px}
+.dz-label{font-size:10px;color:var(--gold);letter-spacing:.06em}
+.dz-sub{font-size:9px;color:var(--t3);margin-top:2px}
 #file-input{display:none}
 .prog-wrap{display:none;flex-direction:column;gap:5px}
-.prog-label{font-size:9px;color:var(--t2)}.prog-track{height:2px;background:var(--b2);border-radius:1px;overflow:hidden}
+.prog-label{font-size:9px;color:var(--t2)}
+.prog-track{height:2px;background:var(--b2);border-radius:1px;overflow:hidden}
 .prog-fill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--teal));transition:width .08s linear}
 #files-list{display:flex;flex-direction:column;gap:4px}
 .fi{display:flex;align-items:center;gap:7px;font-size:9px;color:var(--t2);padding:5px 8px;background:var(--b1);border-radius:5px;transition:background .15s}
@@ -135,9 +138,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 #next-to-config:hover{background:rgba(126,184,201,.2);border-color:rgba(126,184,201,.6)}
 
 
-.analyse-meta{font-size:9px;color:var(--t2);line-height:1.7}
+.analyse-meta{font-size:9px;color:var(--t2);line-height:1.7; display:none;}
 .analyse-meta .hi{color:var(--teal);font-style:italic}
-.run-btn{width:100%;padding:9px;background:rgba(3, 125, 239, 0.52);border:0.5px solid rgba(233, 238, 243, 0.35);border-radius:9px;color:var(--teal);font-family:'DM Mono',monospace;font-size:0.6em;cursor:pointer;letter-spacing:.1em;text-transform:uppercase;transition:all .2s}
+.run-btn{width:100%;padding:9px;background:rgba(3, 125, 239, 0.52);border:0.5px solid rgba(233, 238, 243, 0.35);border-radius:9px;color:var(--teal);font-family:'DM Mono',monospace;font-size:0.8em;cursor:pointer;letter-spacing:.1em;text-transform:uppercase;transition:all .2s}
 .run-btn:hover:not(:disabled){background:rgba(126,184,201,.52);border-color:rgba(1, 188, 245, 0.6)}
 .run-btn:disabled{opacity:.75;cursor:not-allowed}
 
@@ -148,12 +151,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .opt-row input[type=checkbox]{accent-color:var(--gold);width:11px;height:11px}
 
 /* ── STATS ── */
-#stats-panel{bottom:18px;left:18px;width:200px;display:none}
-.sp-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:0.5px solid var(--b1);font-size:9px}
-.sp-row:last-child{border:none}.sp-k{color:var(--t2)}.sp-v{color:var(--t1)}
+#stats-panel{bottom:18px;left:18px;width:300px;display:none}
+.sp-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:0.5px solid var(--b1);font-size:0.8em}
+.sp-row:last-child{border:none}
+.sp-k{color:var(--t2)}.sp-v{color:var(--t1)}
 
 /* ── ZOOM ── */
-#zoom-panel{top:18px;right:18px;display:flex;flex-direction:column;overflow:hidden;width:36px}
+#zoom-panel{bottom:18px;right:18px;display:flex;flex-direction:column;overflow:hidden;width:36px}
 .zb{width:36px;height:34px;background:transparent;border:none;color:var(--t2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Mono',monospace}
 .zb:hover{background:var(--b1);color:var(--gold)}
 .zs{height:0.5px;background:var(--b2)}
@@ -168,11 +172,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .lg-ring{width:8px;height:8px;border-radius:50%;flex-shrink:0;border-width:1.5px;border-style:solid}
 
 /* ── WORD PANEL ── */
-#word-panel{right:18px;width:210px;display:none}
-.wp-word{font-family:'Fraunces',serif;font-size:17px;color:var(--gold2)}
-.wp-freq{font-size:9px;color:var(--t2)}
-.wp-sec{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-top:5px;margin-bottom:2px}
-.wp-tag{display:inline-block;padding:2px 6px;border-radius:3px;font-size:9px;background:var(--b2);color:var(--t2);margin:2px 2px 0 0;cursor:pointer;transition:background .15s}
+#word-panel{right:18px;width:400px;display:none}
+.wp-word{font-family:'Fraunces',serif;font-size:1em;color:var(--gold2)}
+.wp-freq{font-size:0.8em;color:var(--t2)}
+.wp-sec{font-size:0.8em;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-top:5px;margin-bottom:2px}
+.wp-tag{display:inline-block;padding:2px 6px;border-radius:3px;font-size:0.8em;background:var(--b2);color:var(--t2);margin:2px 2px 0 0;cursor:pointer;transition:background .15s}
 .wp-tag:hover{background:var(--b3)}
 
 /* ── CONTEXT READER ──────────────────────────────────────────────────
@@ -211,7 +215,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .ctx-text em{font-style:normal;color:var(--gold2);background:rgba(200,169,110,.13);border-radius:2px;padding:0 2px}
 /* Bottom nav row */
 .ctx-nav{display:flex;gap:6px;margin-top:8px;align-items:center}
-.ctx-nb{padding:4px 10px;background:var(--b1);border:0.5px solid var(--b2);border-radius:5px;color:var(--t2);font-family:'DM Mono',monospace;font-size:9px;cursor:pointer;transition:all .15s}
+.ctx-nb{padding:4px 10px;background:var(--b1);border:0.5px solid var(--b2);border-radius:5px;color:var(--t2);font-family:'DM Mono',monospace;font-size:0.8em;cursor:pointer;transition:all .15s}
 .ctx-nb:hover{background:var(--b2);color:var(--t1)}
 /* Expand/collapse toggle button — lives at far right of nav row */
 #ctx-expand{
@@ -314,7 +318,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
   display:flex;   /* always visible — panel layout stays constant */
   flex-direction:column;gap:5px;
 }
-.mode-label{font-size:8px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase}
+.mode-label{font-size:0.7em;color:var(--t3);letter-spacing:.08em;text-transform:uppercase; padding:15px 0px;}
 #mode-toggle{display:flex;gap:0;border-radius:6px;overflow:hidden;border:0.5px solid var(--b2)}
 .mode-btn{
   flex:1;padding:6px 4px;background:transparent;border:none;
@@ -326,7 +330,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .mode-btn.active{background:rgba(126,184,201,.15);color:var(--teal)}
 .mode-btn:hover:not(.active){background:var(--b1);color:var(--t1)}
 /* Small description below the toggle */
-#mode-desc{font-size:8px;color:var(--t3);line-height:1.5}
+#mode-desc{font-size:0.8em;color:var(--t3);line-height:1.5; padding:10px 0%;}
 
 
 /* ── CHART TEXT COUNTER-ROTATION ──────────────────────────────────────
@@ -357,9 +361,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 
 /* back buttons (stage 2 & 3) */
 #back_button_2,#back_button_3{
-  position:fixed;top:18px;left:18px;z-index:50;padding:8px 16px;
+  position:fixed;top:18px;left:18px;z-index:50;padding:9px 25px;
   background:rgba(15,15,24,.88);border:0.5px solid var(--b2);border-radius:7px;
-  font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);
+  font-size:0.7em;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);
   cursor:pointer;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
   transition:all .15s;
 }
@@ -370,13 +374,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 #main_column{max-width:720px;margin:0 auto;padding:80px 40px 160px;
   font-family:'Fraunces',serif;font-size:15px;line-height:1.9;color:var(--t1)}
 .ft-para{margin-bottom:22px}
-.ft-title{font-size:22px;color:var(--gold2);font-style:italic}
-.ft-section{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--teal)}
+.ft-title{font-size:2.5em;color:var(--gold2);font-style:italic}
+.ft-section{font-size:1em;letter-spacing:.08em;text-transform:uppercase;color:var(--teal)}
 .ft-para em{font-style:normal;color:var(--gold2);background:rgba(200,169,110,.15);border-radius:2px;padding:0 2px}
-#text_sidebar{width:240px;flex-shrink:0;height:100%;overflow-y:auto;
+#text_sidebar{width:300px;flex-shrink:0;height:100%;overflow-y:auto;
   background:var(--s1);border-left:0.5px solid var(--b2);padding:80px 18px 40px}
-.ts-title{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:14px}
-.ts-row{display:flex;justify-content:space-between;font-size:10px;color:var(--t2);
+.ts-title{font-size:0.8em;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:14px}
+.ts-row{display:flex;justify-content:space-between;font-size:0.8em;color:var(--t2);
   padding:6px 0;border-bottom:0.5px solid var(--b1)}
 .ts-row span:last-child{color:var(--t1)}
 
@@ -384,10 +388,71 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .ts-export-row{display:flex;gap:6px;margin-top:8px}
 .ts-export-btn{
   flex:1;padding:7px 6px;background:var(--b1);border:0.5px solid var(--b2);border-radius:6px;
-  color:var(--t2);font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.04em;
+  color:var(--t2);font-family:'DM Mono',monospace;font-size:0.7em;letter-spacing:.04em;
   cursor:pointer;transition:all .15s;text-align:center;
 }
 .ts-export-btn:hover{background:var(--b2);color:var(--gold2);border-color:var(--gold)}
+
+/* ── ANNOTATION HIGHLIGHT (in main text) ── */
+.ft-para mark.ann-mark{
+  background:rgba(126,201,155,.18);color:inherit;font-style:normal;
+  border-bottom:1px solid var(--sage);border-radius:2px;padding:0 1px;
+  cursor:pointer;transition:background .15s;
+}
+.ft-para mark.ann-mark:hover{background:rgba(126,201,155,.32)}
+.ft-para mark.ann-mark.ann-active{background:rgba(126,201,155,.45)}
+
+/* ── FLOATING "ANNOTATE" BUTTON ── */
+#ann-btn{
+  position:fixed;z-index:200;display:none;padding:6px 12px;
+  background:rgba(15,15,24,.95);border:0.5px solid var(--sage);border-radius:6px;
+  color:var(--sage);font-family:'DM Mono',monospace;font-size:0.8em;letter-spacing:.06em;
+  text-transform:uppercase;cursor:pointer;backdrop-filter:blur(12px);
+  box-shadow:0 6px 24px rgba(0,0,0,.5);
+}
+#ann-btn:hover{background:rgba(126,201,155,.15)}
+
+/* ── ANNOTATION POPUP FORM ── */
+#ann-popup{
+  position:fixed;z-index:201;display:none;width:260px;
+  background:rgba(15,15,24,.97);border:0.5px solid var(--b3);border-radius:8px;
+  padding:12px;backdrop-filter:blur(18px);box-shadow:0 12px 40px rgba(0,0,0,.6);
+}
+#ann-popup .ann-quote{
+  font-family:'Fraunces',serif;font-style:italic;font-size:0.8em;color:var(--gold2);
+  line-height:1.5;max-height:60px;overflow-y:auto;margin-bottom:8px;
+  padding:6px 8px;background:var(--b1);border-radius:5px;border-left:2px solid var(--sage);
+}
+#ann-popup textarea{
+  width:100%;min-height:60px;background:var(--b1);border:0.5px solid var(--b2);
+  border-radius:5px;color:var(--t1);font-family:'DM Mono',monospace;font-size:0.8em;
+  padding:8px;resize:vertical;outline:none;
+}
+#ann-popup textarea:focus{border-color:var(--sage)}
+.ann-popup-row{display:flex;gap:6px;margin-top:8px}
+.ann-popup-row button{
+  flex:1;padding:6px;border-radius:5px;font-family:'DM Mono',monospace;font-size:0.7em;
+  letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;
+}
+#ann-save{background:rgba(126,201,155,.14);border:0.5px solid rgba(126,201,155,.4);color:var(--sage)}
+#ann-save:hover{background:rgba(126,201,155,.26)}
+#ann-cancel{background:var(--b1);border:0.5px solid var(--b2);color:var(--t2)}
+#ann-cancel:hover{background:var(--b2);color:var(--t1)}
+
+/* ── SIDEBAR ANNOTATIONS LIST ── */
+.ann-item{
+  background:var(--b1);border:0.5px solid var(--b2);border-left:2px solid var(--sage);
+  border-radius:5px;padding:8px 9px;margin-bottom:7px;font-size:0.8em;
+}
+.ann-item-quote{font-family:'Fraunces',serif;font-style:italic;color:var(--gold2);
+  line-height:1.4;margin-bottom:4px;cursor:pointer}
+.ann-item-quote:hover{text-decoration:underline}
+.ann-item-note{color:var(--t1);line-height:1.5;margin-bottom:4px}
+.ann-item-meta{display:flex;justify-content:space-between;align-items:center;
+  font-size:0.7em;color:var(--t3);letter-spacing:.03em}
+.ann-item-del{color:var(--t4);cursor:pointer;font-size:0.8em;transition:color .15s}
+.ann-item-del:hover{color:var(--rose)}
+.ann-empty{font-size:0.7em;color:var(--t3);font-style:italic}
 </style>
 </head>
 
@@ -428,12 +493,23 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
     </div>
 
     <div class="stage" id="stage_03">
-        <div id="original_text">
-            <div id="back_button_3" onclick="goToStage(2)"> back </div>
-            <div id="ft-tabs"></div>
-            <div id="main_column"></div>
+      <div id="original_text">
+        <div id="back_button_3" onclick="goToStage(2)"> back </div>
+        <div id="ft-tabs"></div>
+        <div id="main_column"></div>
+      </div>
+      <div id="text_sidebar"></div>
+
+      <!-- floating annotate trigger + popup form -->
+      <div id="ann-btn" onclick="openAnnPopup()">✎ annotate</div>
+      <div id="ann-popup">
+        <div class="ann-quote" id="ann-popup-quote"></div>
+        <textarea id="ann-popup-text" placeholder="write your annotation…"></textarea>
+        <div class="ann-popup-row">
+          <button id="ann-save" onclick="saveAnnotation()">save</button>
+          <button id="ann-cancel" onclick="closeAnnPopup()">cancel</button>
         </div>
-        <div id="text_sidebar">
+      </div>
 
       </div>
     </div>
@@ -595,7 +671,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
       <span class="c-t3" style="font-size:8px;letter-spacing:.08em">view</span>
     </div>
     <button class="zb" onclick="zoomBy(.2)">+</button>
-    <div class="zs"></div><div id="zlabel">100%</div><div class="zs"></div>
+    <div class="zs"></div>
+    <div id="zlabel">100%</div><div class="zs"></div>
     <button class="zb" onclick="zoomBy(-.2)">−</button>
     <div class="zs"></div>
     <button class="zb" style="font-size:11px" onclick="zoomReset()">⟳</button>
@@ -628,17 +705,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
         <span class="cg open" id="cg-ctx">▾</span>
         <span class="panel-title c-teal">context reader</span>
       </div>
-      <span style="font-size:14px;color:var(--t3);cursor:pointer" onclick="closeCtxPanel()">×</span>
+      <span style="font-size:15px;color:var(--t3);cursor:pointer" onclick="closeCtxPanel()">×</span>
     </div>
     <div class="panel-body open" id="ctx-body" style="max-height:260px;opacity:1">
       <div class="panel-inner">
         <div class="ctx-meta" id="ctx-meta"></div>
         <div class="ctx-text" id="ctx-text"></div>
         <div class="ctx-nav">
-          <button class="ctx-nb" onclick="ctxNav(-1)">← prev</button>
-          <button class="ctx-nb" onclick="ctxNav(1)">next →</button>
+          <button class="ctx-nb" onclick="ctxNav(-1)"> << prev</button>
+          <button class="ctx-nb" onclick="ctxNav(1)"> >>  next </button>
           <button class="ctx-nb" onclick="showFullText()">see text complete</button>
-          <button class="ctx-nb" onclick="closeCtxPanel()" style="margin-left:auto">close</button>
+          <!-- <button class="ctx-nb" onclick="closeCtxPanel()" style="margin-left:auto">close</button> -->
         </div>
       </div>
     </div>
@@ -663,6 +740,9 @@ let selectedFileIds=new Set();
 let currentStage=1;
 let ctxFileIdx=0;
 let ftActiveFileIdx=0;
+let ANNOTATIONS=[];
+let annIdCounter=0;
+let pendingSelection=null; /* {source, paraIdx, quote} awaiting save */
 
 /* ═════════════════════════════════════
    STAGE NAVIGATION
@@ -674,6 +754,11 @@ function goToStage(n){
   document.getElementById('stage_03').style.display = n===3 ? 'flex'  : 'none';
   document.getElementById('layer-ui-1').style.display = n===1 ? 'block' : 'none';
   document.getElementById('layer-ui-2').style.display = n===2 ? 'block' : 'none';
+  if(n!==3){
+    document.getElementById('ann-btn').style.display='none';
+    document.getElementById('ann-popup').style.display='none';
+    pendingSelection=null;
+  }
   if(n===1) renderNetworkGraph();
 }
 
@@ -797,6 +882,9 @@ function renderFullTextTabs(){
 function switchFtTab(i){
   ftActiveFileIdx=i;
   renderFullTextTabs();
+  document.getElementById('ann-btn').style.display='none';
+  document.getElementById('ann-popup').style.display='none';
+  pendingSelection=null;
   /* only apply the original highlight/scroll-focus on the tab it came from */
   const focus = (i===ctxFileIdx) ? ctxParaIdx : 0;
   const hl    = (i===ctxFileIdx) ? ctxHighlight : null;
@@ -805,6 +893,7 @@ function switchFtTab(i){
 
 function renderFullText(fileIdx, highlightWord, focusParaIdx){
   const src = (CORPUS.perFile && CORPUS.perFile[fileIdx]) ? CORPUS.perFile[fileIdx].data : CORPUS;
+  const srcName = (CORPUS.perFile && CORPUS.perFile[fileIdx]) ? CORPUS.perFile[fileIdx].name : 'corpus';
   const main=document.getElementById('main_column');
   const sidebar=document.getElementById('text_sidebar');
   main.innerHTML='';
@@ -817,9 +906,19 @@ function renderFullText(fileIdx, highlightWord, focusParaIdx){
       const re=new RegExp('\\b('+highlightWord.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')\\b','gi');
       txt=txt.replace(re,'<em>$1</em>');
     }
+    /* wrap any saved annotation quotes for this source+paragraph in <mark> */
+    ANNOTATIONS.filter(a=>a.source===srcName && a.paraIdx===i).forEach(a=>{
+      const esc=a.quote.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const safe=esc.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+      const re=new RegExp('('+safe+')');
+      if(re.test(txt) && !txt.includes('data-ann-id="'+a.id+'"')){
+        txt=txt.replace(re, `<mark class="ann-mark" data-ann-id="${a.id}" onclick="jumpToAnnotation('${a.id}')">$1</mark>`);
+      }
+    });
     div.innerHTML=txt;
     main.appendChild(div);
   });
+
   const m=src.meta;
   sidebar.innerHTML=`
     <div class="ts-title">document specs</div>
@@ -831,6 +930,9 @@ function renderFullText(fileIdx, highlightWord, focusParaIdx){
     <div class="ts-row"><span>readability</span><span>${m.readability} (${m.flesch})</span></div>
     <div class="ts-row"><span>citations</span><span>${m.citationCount}</span></div>
 
+    <div class="ts-title" style="margin-top:20px">annotations — ${srcName}</div>
+    <div id="ts-annotations-wrap"></div>
+
     <div class="ts-title" style="margin-top:20px">export analysis</div>
     <div class="ts-export-row">
       <button class="ts-export-btn" onclick="saveSpecFile('csv')">↓ specs .csv</button>
@@ -839,7 +941,11 @@ function renderFullText(fileIdx, highlightWord, focusParaIdx){
     <div class="ts-export-row">
       <button class="ts-export-btn" onclick="saveChartSVG()">↓ chart .svg</button>
     </div>
+    <div class="ts-export-row">
+      <button class="ts-export-btn" onclick="saveAnnotationsTxt()">↓ annotations .txt</button>
+    </div>
   `;
+  renderAnnotationsList(fileIdx);
   if(focusParaIdx!==null && focusParaIdx!==undefined){
     setTimeout(()=>{
       const t=document.getElementById('ft-p'+focusParaIdx);
@@ -847,6 +953,240 @@ function renderFullText(fileIdx, highlightWord, focusParaIdx){
     },50);
   }
 }
+
+/* ═════════════════════════════════════
+   TEXT ANNOTATIONS
+═════════════════════════════════════ */
+document.addEventListener('mouseup', e=>{
+  if(currentStage!==3)return;
+  if(e.target.closest('#ann-popup')||e.target.closest('#ann-btn'))return;
+
+  const sel=window.getSelection();
+  const btn=document.getElementById('ann-btn');
+  if(!sel || sel.isCollapsed || sel.rangeCount===0){ btn.style.display='none'; return; }
+
+  const text=sel.toString().trim();
+  if(text.length<2){ btn.style.display='none'; return; }
+
+  const range=sel.getRangeAt(0);
+  const paraEl=range.commonAncestorContainer.nodeType===1
+    ? range.commonAncestorContainer.closest('.ft-para')
+    : range.commonAncestorContainer.parentElement.closest('.ft-para');
+  if(!paraEl){ btn.style.display='none'; return; }
+
+  const paraIdx=parseInt(paraEl.id.replace('ft-p',''),10);
+  const srcName = (CORPUS.perFile && CORPUS.perFile[ftActiveFileIdx])
+    ? CORPUS.perFile[ftActiveFileIdx].name : 'corpus';
+
+  pendingSelection={source:srcName, paraIdx, quote:text};
+
+  const rect=range.getBoundingClientRect();
+  btn.style.left=Math.round(rect.left+rect.width/2-40)+'px';
+  btn.style.top=Math.round(rect.top-36+window.scrollY)+'px';
+  btn.style.display='block';
+});
+
+function openAnnPopup(){
+  if(!pendingSelection)return;
+  document.getElementById('ann-btn').style.display='none';
+  const popup=document.getElementById('ann-popup');
+  document.getElementById('ann-popup-quote').textContent='"'+pendingSelection.quote+'"';
+  document.getElementById('ann-popup-text').value='';
+  const btn=document.getElementById('ann-btn');
+  let left=parseInt(btn.style.left,10)||40;
+  let top=(parseInt(btn.style.top,10)||40)+34;
+  left=Math.min(left, window.innerWidth-280);
+  top=Math.min(top, window.innerHeight-220);
+  popup.style.left=Math.max(10,left)+'px';
+  popup.style.top=Math.max(10,top)+'px';
+  popup.style.display='block';
+  document.getElementById('ann-popup-text').focus();
+}
+
+function closeAnnPopup(){
+  document.getElementById('ann-popup').style.display='none';
+  pendingSelection=null;
+  window.getSelection().removeAllRanges();
+}
+
+function saveAnnotation(){
+  if(!pendingSelection)return;
+  const note=document.getElementById('ann-popup-text').value.trim();
+  ANNOTATIONS.push({
+    id:'a'+(annIdCounter++),
+    source:pendingSelection.source,
+    paraIdx:pendingSelection.paraIdx,
+    quote:pendingSelection.quote,
+    note: note || '(no note)',
+    createdAt: new Date().toISOString(),
+  });
+  closeAnnPopup();
+  /* re-render current tab so the new <mark> shows up */
+  renderFullText(ftActiveFileIdx, ctxHighlight, null);
+}
+
+function deleteAnnotation(id){
+  ANNOTATIONS=ANNOTATIONS.filter(a=>a.id!==id);
+  renderFullText(ftActiveFileIdx, ctxHighlight, null);
+}
+
+function jumpToAnnotation(id){
+  const a=ANNOTATIONS.find(x=>x.id===id); if(!a)return;
+  document.querySelectorAll('.ann-mark').forEach(m=>m.classList.remove('ann-active'));
+  const mark=document.querySelector(`.ann-mark[data-ann-id="${id}"]`);
+  if(mark){ mark.classList.add('ann-active'); mark.scrollIntoView({block:'center'}); }
+}
+
+function renderAnnotationsList(fileIdx){
+  const wrap=document.getElementById('ts-annotations-wrap');
+  if(!wrap)return;
+  const srcName = (CORPUS.perFile && CORPUS.perFile[fileIdx]) ? CORPUS.perFile[fileIdx].name : 'corpus';
+  const list=ANNOTATIONS.filter(a=>a.source===srcName);
+  if(!list.length){ wrap.innerHTML='<div class="ann-empty">no annotations yet — select text to add one</div>'; return; }
+  wrap.innerHTML=list.map(a=>{
+    const dt=new Date(a.createdAt);
+    const stamp=dt.toLocaleDateString()+' '+dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    return `
+      <div class="ann-item">
+        <div class="ann-item-quote" onclick="jumpToAnnotation('${a.id}')">"${a.quote}"</div>
+        <div class="ann-item-note">${a.note}</div>
+        <div class="ann-item-meta">
+          <span>¶${a.paraIdx+1} · ${stamp}</span>
+          <span class="ann-item-del" onclick="deleteAnnotation('${a.id}')">×</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function saveAnnotationsTxt(){
+  if(!ANNOTATIONS.length){ alert('No annotations to save yet.'); return; }
+  const bySource={};
+  ANNOTATIONS.forEach(a=>{ (bySource[a.source]=bySource[a.source]||[]).push(a); });
+
+  let out='LEXIA — TEXT ANNOTATIONS\n'+('='.repeat(40))+'\n\n';
+  Object.keys(bySource).forEach(src=>{
+    out+='SOURCE: '+src+'\n'+('-'.repeat(40))+'\n\n';
+    bySource[src]
+      .sort((a,b)=>a.paraIdx-b.paraIdx)
+      .forEach(a=>{
+        const dt=new Date(a.createdAt);
+        const stamp=dt.toLocaleDateString()+' '+dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        out+=`[${stamp}] ¶${a.paraIdx+1}\n`;
+        out+=`"${a.quote}"\n`;
+        out+=`Note: ${a.note}\n\n`;
+      });
+    out+='\n';
+  });
+  saveTextFile('lexia_annotations.txt', out, 'text/plain');
+}
+
+
+
+
+/* ═════════════════════════════════════
+   EXPORT — SPECS (csv/txt) & CHART (svg)
+═════════════════════════════════════ */
+
+/* Saves text content to disk. Uses the native save dialog (File System
+   Access API) when available; falls back to a normal browser download
+   (which still shows a "save as" dialog in most browser settings). */
+async function saveTextFile(filename, content, mimeType){
+  if(window.showSaveFilePicker){
+    try{
+      const ext='.'+filename.split('.').pop();
+      const handle=await window.showSaveFilePicker({
+        suggestedName:filename,
+        types:[{description:'File', accept:{[mimeType]:[ext]}}]
+      });
+      const writable=await handle.createWritable();
+      await writable.write(content);
+      await writable.close();
+      return;
+    }catch(err){
+      if(err.name==='AbortError')return; /* user cancelled the dialog */
+      /* otherwise fall through to the download fallback below */
+    }
+  }
+  const blob=new Blob([content],{type:mimeType});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* Export the currently viewed file's analysis specs as csv or txt */
+function saveSpecFile(format){
+  if(!CORPUS)return;
+  const hasPerFile=CORPUS.perFile && CORPUS.perFile[ftActiveFileIdx];
+  const src = hasPerFile ? CORPUS.perFile[ftActiveFileIdx].data : CORPUS;
+  const name = hasPerFile ? CORPUS.perFile[ftActiveFileIdx].name : 'corpus';
+  const m=src.meta;
+
+  const rows=[
+    ['metric','value'],
+    ['file', name],
+    ['words', m.totalWords],
+    ['unique types', m.uniqueTypes],
+    ['vocab density %', m.vocabDensity],
+    ['sentences', m.sentences],
+    ['avg sentence length', m.avgSentenceLen],
+    ['paragraphs', m.paragraphCount],
+    ['readability', m.readability],
+    ['flesch score', m.flesch],
+    ['citations', m.citationCount],
+  ];
+
+  const base=(name.replace(/\.[^.]+$/,'').replace(/[^\w\-]+/g,'_')||'analysis');
+
+  if(format==='csv'){
+    const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    saveTextFile(base+'_specs.csv', csv, 'text/csv');
+  }else{
+    const txt=rows.map(r=>r[0]+': '+r[1]).join('\n');
+    saveTextFile(base+'_specs.txt', txt, 'text/plain');
+  }
+}
+
+/* Export the concentric chart as a standalone SVG file */
+function saveChartSVG(){
+  const svgEl=document.getElementById('chart-svg');
+  if(!svgEl)return;
+
+  const clone=svgEl.cloneNode(true);
+  clone.setAttribute('xmlns','http://www.w3.org/2000/svg');
+  clone.setAttribute('xmlns:xlink','http://www.w3.org/1999/xlink');
+
+  /* Inline the CSS custom properties used by the chart so colours still
+     resolve when the file is opened outside this page. */
+  const rootStyles=getComputedStyle(document.documentElement);
+  const varNames=['--bg','--s1','--b1','--b2','--b3','--t1','--t2','--t3','--t4',
+                   '--gold','--gold2','--teal','--violet','--rose','--sage'];
+  let varCss=':root{';
+  varNames.forEach(v=>{ varCss+=`${v}:${rootStyles.getPropertyValue(v).trim()};`; });
+  varCss+='}';
+  const styleTag=document.createElementNS('http://www.w3.org/2000/svg','style');
+  styleTag.textContent=varCss;
+  clone.insertBefore(styleTag, clone.firstChild);
+
+  /* Solid background rect so the export isn't transparent */
+  const bgRect=document.createElementNS('http://www.w3.org/2000/svg','rect');
+  bgRect.setAttribute('x','0'); bgRect.setAttribute('y','0');
+  bgRect.setAttribute('width', clone.getAttribute('width')||window.innerWidth);
+  bgRect.setAttribute('height', clone.getAttribute('height')||window.innerHeight);
+  bgRect.setAttribute('fill','var(--bg)');
+  clone.insertBefore(bgRect, styleTag.nextSibling);
+
+  const serializer=new XMLSerializer();
+  let src=serializer.serializeToString(clone);
+  if(!/^<\?xml/.test(src)) src='<?xml version="1.0" standalone="no"?>\r\n'+src;
+  saveTextFile('lexia_chart.svg', src, 'image/svg+xml');
+}
+
+
+
+
+
 
 /* ═════════════════════════════════════
    PANEL BODY TOGGLE
@@ -1041,6 +1381,7 @@ function removeFile(idx){
 function resetCorpus(){
   FILES=[]; CORPUS=null; selectedTopic=null; ctxParaIdx=null;
   selectedFileIds=new Set();
+  ANNOTATIONS=[];
   renderNetworkGraph();
   document.getElementById('files-list').innerHTML='';
   document.getElementById('paste-area').value='';
@@ -1370,7 +1711,7 @@ function applyWordHighlight(word){
   /* C3 dots: dim non-matching, enlarge matching */
   d3.selectAll('.word-dot')
     .transition().duration(200)
-    .attr('opacity', d => d.word===word ? 1 : .06)
+    .attr('opacity', d => d.word===word ? 1 : .16)
     .attr('r', d => d.word===word
       ? (d.paraIsTitle ? 7 : 5.5)    /* selected: clearly enlarged */
       : (d.paraIsTitle ? 2.5 : 2));  /* others: shrunk so selection stands out */
@@ -1379,13 +1720,13 @@ function applyWordHighlight(word){
   d3.selectAll('.cloud-word')
     .transition().duration(200)
     .style('fill-opacity', function(){
-      return this.getAttribute('data-word')===word ? 1 : .12;
+      return this.getAttribute('data-word')===word ? 1 : .42;
     })
     .style('font-size', function(){
       /* Keep the existing font-size but add 3px to the matching word */
       const cur = parseFloat(this.getAttribute('data-base-fs')||
                              this.style.fontSize||'9');
-      return (this.getAttribute('data-word')===word ? cur-3 : cur)+'px';
+      return (this.getAttribute('data-word')===word ? cur+5 : cur)+'px';
     });
 
   /* C1 topic bubbles: brighten if they relate to this word */
@@ -1438,7 +1779,7 @@ function clearHighlights(){
     .transition().duration(200)
     .style('fill-opacity', .68)
     .style('font-size', function(){
-      return (this.getAttribute('data-base-fs')||'9')+'px';
+      return (this.getAttribute('data-base-fs')||'19')+'px';
     });
 
   d3.selectAll('.topic-bubble')
@@ -1720,7 +2061,7 @@ function renderC1(g,data,forceR,cloudRi,cloudRo){
   const cloudBelt=g.append('g').attr('class','cloud-belt');
   const cloudWords=data.cloudWords.slice(0,28);
   const maxC=cloudWords[0]?.count||1;
-  const fScale=d3.scaleSqrt().domain([1,maxC]).range([6.5,14.5]);
+  const fScale=d3.scaleSqrt().domain([1,maxC]).range([7.5,14.5]);
   const cloudPal=['#c8a96e','#e2c48a','#7eb8c9','#9b7fc7','#7ec99b','#c97e7e','#d4a860','#a0c8d4','#b8a0d4','#a0d4b8','#d4c8a0','#a0b8d4'];
   const beltW=cloudRo-cloudRi;
 
@@ -2176,7 +2517,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     if(b!==null)el.style.bottom=b+'px'; if(l!==null)el.style.left=l+'px';
     if(r!==null)el.style.left='auto'; if(b!==null)el.style.top='auto';
   };
-  pos('zoom-panel',18,18,null,null);
+  pos('zoom-panel',null,18,18,null);
   pos('legend-panel',null,18,18,null);
   pos('stats-panel',null,null,18,18);
   pos('word-panel',Math.round(window.innerHeight/2-120),18,null,null);
