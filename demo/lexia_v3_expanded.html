@@ -267,7 +267,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .e-sub{font-size:9px;color:rgba(255,255,255,.06);letter-spacing:.14em;text-transform:uppercase;z-index:1}
 
 /* ── TOOLTIP ── */
-#tip{position:fixed;pointer-events:none;background:rgba(10,10,18,.97);border:0.5px solid var(--b3);border-radius:8px;padding:10px 13px;font-size:10px;color:var(--t1);max-width:270px;line-height:1.6;z-index:9999;display:none;box-shadow:0 12px 40px rgba(0,0,0,.65)}
+#tip{position:fixed;z-index:9999;pointer-events:none;background:rgba(10,10,18,.97);border:0.5px solid var(--b3);border-radius:8px;padding:10px 13px;font-size:10px;color:var(--t1);max-width:270px;line-height:1.6;z-index:9999;display:none;box-shadow:0 12px 40px rgba(0,0,0,.65)}
 .tt-lbl{font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
 .tt-val{color:var(--t1);font-size:11px;font-weight:500}
 .tt-sub{color:var(--t2);font-size:9px;margin-top:2px;line-height:1.5}
@@ -2003,7 +2003,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
   <svg id="chart-svg"></svg>
     
       </div>
-      <div id="tip"></div>
+      <!-- <div id="tip"></div> -->
     </div>
 
     <div class="stage" id="stage_03">
@@ -2181,7 +2181,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 </div>
 
 
-
+<div id="tip"></div> 
 
 
 
@@ -2221,6 +2221,7 @@ let GRID_INNER_R=null;       /* innermost radius used by the measure grid (ticks
    STAGE NAVIGATION
 ═════════════════════════════════════ */
 function goToStage(n){
+  hideTip();
   currentStage = n;
   document.getElementById('stage_01').classList.toggle('open', n===1);
   document.getElementById('stage_03').classList.toggle('open', n===3);
@@ -2317,6 +2318,12 @@ function renderNetworkGraph(){
     else selectedFileIds.add(d.id);
     svg.selectAll('.fnode-ring').attr('opacity',dd=>selectedFileIds.has(dd.id)?1:0);
   });
+
+  node.on('mousemove',(e,d)=>tip(`<div class="tt-lbl">text</div>
+    <div class="tt-val">${d.name}</div>
+    <div class="tt-sub">${fmtNum(d.wc)} words · ${fmtNum(d.size)} chars</div>
+    <div class="tt-sub">${selectedFileIds.has(d.id)?'✓ selected · click to remove':'click to include'}</div>`,e))
+  .on('mouseleave',hideTip);
 
   sim.on('tick',()=>{
     link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y)
