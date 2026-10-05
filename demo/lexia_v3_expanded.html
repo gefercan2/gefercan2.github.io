@@ -176,7 +176,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .lg-ring{width:8px;height:8px;border-radius:50%;flex-shrink:0;border-width:1.5px;border-style:solid}
 
 /* ── WORD PANEL ── */
-#word-panel{right:18px;width:400px;display:none}
+#word-panel{ width:400px;display:none}
 .wp-word{font-family:'Fraunces',serif;font-size:1em;color:var(--gold2)}
 .wp-freq{font-size:0.8em;color:var(--t2)}
 .wp-sec{font-size:0.8em;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-top:5px;margin-bottom:2px}
@@ -355,9 +355,21 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 
 /* ── GENERAL LAYOUT ── */
 #container{width:100%;height:100%;position:relative}
-.stage{position:fixed;inset:0;width:100%;height:100%;display:none;overflow:hidden}
-#stage_01{display:block}
-#stage_03{flex-direction:row}
+.stage{position:fixed;inset:0;width:100%;height:100%;overflow:hidden}
+#stage_02{display:block}
+/* sliding panels */
+#stage_01,#stage_03{
+  z-index:60;
+  background:radial-gradient(circle,rgb(1,65,87),rgb(15,5,21));
+  transition:transform .5s cubic-bezier(.4,0,.2,1),visibility 0s linear .5s;
+  visibility:hidden;
+}
+#stage_01{display:block;transform:translateX(-100%)}
+#stage_03{display:flex;flex-direction:row;transform:translateX(100%)}
+#stage_01.open,#stage_03.open{
+  transform:none;visibility:visible;
+  transition:transform .5s cubic-bezier(.4,0,.2,1),visibility 0s;
+}
 
 /* network graph layer */
 #network_place{position:absolute;right:10%;inset:1;width:100%;height:100%;display:block;}
@@ -511,6 +523,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 #s1-ingest{padding:18px;overflow-y:auto;border-right:.5px solid var(--b1)}
 #s1-ingest #upload-panel{position:relative;top:auto;left:auto;width:100%}
 #s1-ingest #upload-panel .drag-handle{cursor:default}
+
+
 @media (max-width:1200px){
   #s1-ingest .corpus-cols{flex-direction:column !important}
   #s1-ingest .col-divider{width:auto;height:.5px}
@@ -521,6 +535,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 #s1-network.net-hidden{opacity:0;pointer-events:none}
 .s1-net-hint{position:absolute;left:18px;bottom:18px;font-size:.62em;letter-spacing:.12em;
   text-transform:uppercase;color:var(--t3);pointer-events:none}
+
+
+
   /* ── CONTEXT READER: max half the screen, text scrolls ── */
 #ctx-panel{max-height:50vh;flex-direction:column}
 #ctx-panel .drag-handle{flex-shrink:0}
@@ -545,11 +562,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 
 
 
+
+
 <body>
 
   <div id="container">
     
-    <div class="stage" id="stage_01">
+    <div class="stage open" id="stage_01">
       <div id="s1-grid">
 
         <!-- ── COLUMN 1 · 20 % ── -->
@@ -825,12 +844,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 
   <!-- ══ WORD DETAIL ══ -->
   <div class="panel" id="word-panel" style="display:none">
-    <div class="drag-handle hopen" id="hdr-word" data-panel="word-panel">
+    <div class="drag-handle hopen" id="hdr-word" data-panel="word-panel"> ::
       <div class="tog" onclick="toggleBody('word-body','cg-word','hdr-word')">
-        <span class="cg open" id="cg-word">▾</span>
-        <span class="panel-title c-violet">word detail</span>
+        <span class="cg open" id="cg-word"  >▾</span>
+        <span class="panel-title c-teal">word detail</span>
+        
       </div>
-      <span style="font-size:14px;color:var(--t3);cursor:pointer" onclick="closeWordPanel()">×</span>
+      <span style="font-size:14px;color:var(--t3);cursor:pointer" onclick="closeWordPanel()"></span>
     </div>
     <div class="panel-body open" id="word-body" style="max-height:400px;opacity:1">
       <div class="panel-inner">
@@ -852,7 +872,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
         <span class="cg open" id="cg-ctx">▾</span>
         <span class="panel-title c-teal">context reader</span>
       </div>
-      <span style="font-size:15px;color:var(--t3);cursor:pointer" onclick="closeCtxPanel()">×</span>
+      <span style="font-size:15px;color:var(--t3);cursor:pointer" onclick="closeCtxPanel()"></span>
     </div>
     <div class="panel-body open" id="ctx-body" style="max-height:260px;opacity:1">
       <div class="panel-inner">
@@ -910,10 +930,9 @@ let GRID_INNER_R=null;       /* innermost radius used by the measure grid (ticks
    STAGE NAVIGATION
 ═════════════════════════════════════ */
 function goToStage(n){
-  currentStage=n;
-  document.getElementById('stage_01').style.display = n===1 ? 'block' : 'none';
-  document.getElementById('stage_02').style.display = n===2 ? 'block' : 'none';
-  document.getElementById('stage_03').style.display = n===3 ? 'flex'  : 'none';
+  currentStage = n;
+  document.getElementById('stage_01').classList.toggle('open', n===1);
+  document.getElementById('stage_03').classList.toggle('open', n===3);
   document.getElementById('layer-ui-1').style.display = n===1 ? 'block' : 'none';
   document.getElementById('layer-ui-2').style.display = n===2 ? 'block' : 'none';
   if(n!==3){
@@ -2006,7 +2025,7 @@ function showParaWordDetail(paraIdx, fileIdx){
 }
 
 function showWordPanel(word, data){
-  document.getElementById('word-panel').style.display='flex';
+  document.getElementById('word-panel').style.display='block';
   document.getElementById('wp-word').textContent=word;
   document.getElementById('wp-freq').textContent='×'+(data.freq[word]||0)+' occurrences';
   document.getElementById('wp-tfidf').textContent=(data.tfidf[word]||0).toFixed(3);
@@ -3439,17 +3458,49 @@ setTimeout(()=>{
   },300);
 });
 
-const DEMO=`The Architecture of Memory
+const DEMO=`UNESCO Courier ; Sept, 1987 ; Article; Print friendly
 
-In the late nineteenth century, scholars began to question the nature of consciousness and its relationship to language. The mind, they argued, was not a passive receiver of experience but an active constructor of meaning (James, 1890).
-
-When we consider how memories are formed, we must first acknowledge the role of attention. Without directed focus, experience passes through us like water through open hands. The stream of consciousness that William James famously described was not a metaphor but a phenomenological observation of great depth and complexity.
-
-Chapter One: Language and Encoding
-
-Language shapes memory in profound ways. The words we have available to describe an experience determine, in part, how that experience is encoded and later retrieved. This linguistic relativity extends beyond simple vocabulary into the deep structures of grammar (Whorf, 1956).
+# The angel with the arquebus 
+Baroque art in Latin America
+Miguel Rojas Mix
 
 
+
+
+
+ONE of the most typical figures of Latin American baroque art is that of a dandified angel with swan's wings and a broad-brimmed hat with a feather in it. He is richly clad in a garment with lace ruffles and a greatcoat with a gold and silver lining, and he holds a heavy arquebus.
+
+Although found only in Andean painting, the "Angel with the Arquebus' is a supremely representative feature of the baroque art of Latin America, which is at once a magnificent and theatrical form of art, and also a style whose purpose was to induce the Indian to accept the power of God and the king and, through religion and force of arms, to make him part of colonial society. One of its most common themes was the system of mestizaje, or ethnic intermixture, in which people were placed in castes according to their origin and the colour of their skin.
+
+Baroque art in Latin America has left an indelible mark on the individual and on the course of history. Even today, many writers consider themselves to be baroque writers. In fact, baroque art is the art of the New World. The mixture of Iberian (in which there was already an Arab element) with Indian and Black elements produced a distinctive style which some have called Indo-Hispanic, some creole (criollo), or mestizo. In accordance with its regional characteristics, it has also been called "Andean Baroque' and "Poblano Baroque' (after the Mexican town of Puebla).
+
+A proselytizing art, Baroque was the "Bible of the poor', the gospel conveyed to the Indian's mind by images. While the Protestants preached simplicity and modesty, used no images and made no attempt at evangelization, the Council of Trent (1545-1563) took a stand against pagan images, extolled the Eucharist, the Virgin and the Pope, advocated evangelization and the cult of the saints, and laid down rules to the effect that the saints should be portrayed in a setting suggestive of martyrdom and ecstasy. As late as 1782, instructions were still being issued for artists which repeated the Council's resolutions concerning iconography and set forth detailed rules on the degree of nudity that was permissible for each saint, the age at which he should be depicted and the attitude in which he should be shown.
+
+The baroque style was a perfect way of conveying to the Indians the idea that they should accept their new destiny. Classical art in an art of moderation and balance, an art that is concerned with general principles, and seeks what is universal. Its characters are rhetorical figures. Baroque art is the opposite; it expresses what order and moderation cannot express--emotion, grief, ecstasy and faith. Its representation of mystical feelings is close to everyday life, and its examples are taken from actuality. Its Christs are sacred actors in a human tragedy. Carved in wood painted the colour of flesh, with real hair, eyelashes and eyelids, with glass eyes and real clothing, they are more like characters in a waxworks exhibition than scared images. In the "Christ of Sorrows', the subject most frequently treated in Latin America, sorrow is dramatized in a paroxysm of grief. The figure is covered with blood (made of scarlet cochineal and pitch) so that the viewer almost feels the pain of the wounds, and the face and body are distorted by deep suffering. The convincing realism of the pain, which is in no sense symbolic, was intended to show the Indians that their trials were as nothing compared to the sufferings of Christ.
+
+In its early period, Latin American baroque art was thoroughly European in character. Most of the sixteen- and seventeenth-century paintings are by European artists who worked for the New World, or copies of engravings brought from Europe. Yet even then there was a certain intermixture of styles. The plans of the cathedrals were of Roman or Spanish origin, but they were considerably modified in the course of execution. And of course the "plateresque' or Spanish Renaissance style was a product of the intermixture of the mudejar style and late Gothic.
+
+The second period of Latin American Baroque began when local artists emerged. Although ideas and works of art continued to be imported, certain changes and the emphasis placed on certain themes reveal a growing independence. Because of the prevailing taste for pictures that told a story, a touching story, with an element of fantasy, art of this period is often called "primitive' art. The wood carvings known in the Nahuatl language as tequitqui reveal the sensibility of the Indian. The combination of realism and abstraction in these carvings shows the persistence of pre-Columbian ideas.
+
+Iconography was also modified by the Black sensibility. Baroque art (and especially recoco art) used the Black as a decorative feature. In Europe he was a figure holding a lamp, or, in tapestries, a counterpoint to the white horse whose reins he held. In Latin America Blacks were at first depicted as sumptuously liveried servants or as figures wearing motley. In both cases they added a picturesque note. As sensibility is a form of narcissism, an African element was bound to appear in Latin America to lend dignity to the popular image. Its failure to do so would have been an act of self-abnegation by the artists themselves, who were mestizos, mulattoes or Blacks. Thus African gods slipped surreptitiously into the cult of the saints, and in many cases a darker complexion, rendered by the mixture of wax and paint used to depict the flesh of the Virgin or the angels, was enough to make them recognizable as Blacks from Brazil, Colombia or other regions with a large African population.
+
+The Latin American element in baroque art did not, however, simply consist of modification or stylistic exaggeration. The ultrabaroque or churrigueresque style nowhere reached such a pitch of ostentation as it did in Latin America, especially Mexico, but many of the motifs that artists in the New World began to use were quite different in spirit: decorative forms such as masks with Aymara or Quechua faces, known as indatides, or the delicately gilded frames with carvings of macaws, capybaras, monkeys and other creatures, in settings of papayas, pineapples and banana trees. Such motifs were depicted with a "flat' technique, as if the artists refused to accept the illusion of volume and space known to Western art.
+
+Other highlights of Latin American Baroque are the screens that are distinctive features of churches in the New World, but whose filigreed carving recalls mudejar taste; other creole saints as well as the Angel with the Arquebus; Matamoros images, in which Indians are portrayed instead of Moors, and which should really be called Mataindios in Latin America; depictions of the Magi in which colonial artists include not only a Black king, but sometimes a mestizo and an Indian, so that the subject becomes a metaphor of race; the guitar-playing sirens beside the doors of San Lorenzo de Potosi, in Bolivia, and in the choir of San Miguel de Pomata, in Peru; the creole Virgins--the morenas (Black women) or mamacitas (little mothers) as the Indians call them. In the church of San Juan on the shores of Lake Titicaca, the child Jesus is shown wearing a poncho and a cap like those the Aymara children in the district wear, and to avoid any possible confusion is labelled with the inscription "I am Jesus'. Innumerable painted panels show Incas in gala dress, while others show impoverished Indians. And of course there are many specifically colonial characters and themes, such as Santa Rosa de Lima (1586-1617), a saint much portrayed by eighteenth-century painters, and the "Christ of the Earthquakes', who is venerated in the cathedral of Cuzco and in many other Andean churches, a Christian way of exorcizing the fears of a people that has always felt threatened by the gods of Nature.
+
+Baroque art in Latin America is not a mere transposition of Spanish or Portuguese art. It is a hybrid art. And it embraces more than two cultures, for along with the Spanish tradition it received the Arab heritage in the form of the mudejar style. It is said that the Indian contribution is shown in a preference for a range of pure colours and in the use of abstraction in the portrayal of figures. But the Black influence can also be seen, both in the dark complexion of angels and Virgins and in the syncretism of African gods with the traditional Christian saints. A marvellously enriched style emerged from all these influences, the style of an art that was fundamental to a new world. Such is the art we know as "Latin American Baroque'.
+
+Photo: Left, portal of the church of San Francisco, La Paz, Bolivia, an outstanding example of Andean Baroque. Construction began in 1743. The decoration with anthropomorphic and animal motifs is typical of Latin American "churrigueresque' architecture. Above, facade of the Jesuit church, known as La Compan ia, in Quito, Ecuador. Completed in 1765, the church incorporates twisted columns and other Spanish and Italian features. The interior is decorated with magnificent gilded wood carvings in local style and other Spanish and Italian features. The interior is decorated with magnificent gilded wood carvings in local style.
+
+Photo: The work of Andean sculptors in Peru, Ecuador and Bolivia ranges from imitations of Spanish religious sculpture to depictions of local themes. Above, detail of a crucifix by Gaspar de Sangurima in the monastery of the Immaculate Conception, Cuenca, Ecuador. Christ is portrayed in the realistic style typical of Spanish sculptors, with a stream of blood flowing from His side. Right, Peruvian statue of the baby Jesus dressed as an Indian, with cap and poncho.
+
+
+
+
+COPYRIGHT 1987 UNESCO COPYRIGHT 2004 Gale Group
+
+
+#arthistory #latam #baroque #art  #peru 
 Trauma disrupts normal memory processes in distinctive ways. Intrusive memories, flashbacks, and dissociation represent failures of normal integration. The body, Bessel van der Kolk has argued, keeps the score of these unprocessed experiences (van der Kolk, 2014). The treatment of traumatic memory requires understanding both the psychological and neurobiological dimensions of the disorder.
 
 Social memory extends beyond the individual. Communities construct shared narratives that bind members together and define collective identity. These narratives are transmitted across generations through ritual, story, and material culture. The study of collective memory reveals how the past is always shaped by present concerns and power relations (Halbwachs, 1925).
