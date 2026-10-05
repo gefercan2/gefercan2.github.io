@@ -144,9 +144,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 
 .analyse-meta{font-size:9px;color:var(--t2);line-height:1.7; display:none;}
 .analyse-meta .hi{color:var(--teal);font-style:italic}
-.run-btn{width:100%;padding:9px;background:rgba(3, 125, 239, 0.52);border:0.5px solid rgba(233, 238, 243, 0.35);border-radius:9px;color:var(--teal);font-family:'DM Mono',monospace;font-size:0.8em;cursor:pointer;letter-spacing:.1em;text-transform:uppercase;transition:all .2s}
+.run-btn{width:100%;margin:50px 0px 20px 0px;padding:9px;background:rgba(3, 125, 239, 0.52);border:0.5px solid rgba(233, 238, 243, 0.35);border-radius:9px;color:var(--teal);font-family:'DM Mono',monospace;font-size:0.8em;cursor:pointer;letter-spacing:.1em;text-transform:uppercase;transition:all .2s}
 .run-btn:hover:not(:disabled){background:rgba(126,184,201,.52);border-color:rgba(1, 188, 245, 0.6)}
-.run-btn:disabled{opacity:.75;cursor:not-allowed}
+.run-btn:disabled{opacity:.75;cursor:not-allowed; }
 
 .opt-row{display:flex;align-items:center;justify-content:space-between;font-size:9px;color:var(--t2)}
 .opt-row input[type=range]{width:85px;accent-color:var(--violet)}
@@ -285,7 +285,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
   border-radius:7px;
   background:rgba(200,169,110,.04);
   transition:background .2s,border-color .2s;
-  min-height:72px;
+  min-height:72px; margin: 20px 0px;
 }
 #ingest-zone.dz-over,#ingest-zone:focus-within{
   background:rgba(200,169,110,.10);
@@ -320,7 +320,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 ──────────────────────────────────────────────────────────────────────*/
 #mode-row{
   display:flex;   /* always visible — panel layout stays constant */
-  flex-direction:column;gap:5px;
+  flex-direction:column;gap:5px;margin:20px 0px 30px 0px;
 }
 .mode-label{font-size:0.7em;color:var(--t3);letter-spacing:.08em;text-transform:uppercase; padding:15px 0px;}
 #mode-toggle{display:flex;gap:0;border-radius:6px;overflow:hidden;border:0.5px solid var(--b2)}
@@ -512,9 +512,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 #s1-title{justify-content:baseline;}
 .s1-name{font-family:'Fraunces',serif;font-weight:200;font-size:clamp(28px,3vw,30px);
   color:var(--t3);letter-spacing:.02em;line-height:1}
-.s1-tag{font-size:3em;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);margin-top:12px}
+.s1-tag{font-size:3em; font-weight:lighter;letter-spacing:.16em;text-transform:uppercase;color:#525151;margin-top:12px}
 #s1-text{justify-content:baseline;font-family:'Fraunces',serif;font-size:0.9em;
-  line-height:1.75;color:var(--t2);scrollbar-width:thin;scrollbar-color:var(--b2) transparent}
+  line-height:1.5;color:#797777; scrollbar-width:thin;scrollbar-color:var(--b2) transparent}
 #s1-text p+p{margin-top:10px}
 #s1-graphic{align-items:center;justify-content:center}
 #s1-graphic svg{width:100%;height:100%}
@@ -579,15 +579,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
             <div class="s1-tag">concentric/text/analysis</div>
           </div>
           <div class="s1-band" id="s1-text">
-            <p>Create a graphic of your text. In the centre, topics divide the space; around them, a dial of key words turns to meet whatever paragraph you select.</p>
-            <p>Paragraphs run clockwise from the top, word occurrences trail outside them, and citations sit on the outer edge. Load several texts to compare them as parallel rings.</p>
+            <p>Create a graphic of your text and see it in a new light. In the centre, topics divide the space; around them, a dial of key words turns to meet whatever paragraph you select. Paragraphs run clockwise from the top, word occurrences trail outside them, and citations sit on the outer edge. Load several texts to compare them as parallel rings.</p>
           </div>
           <div class="s1-band" id="s1-graphic">
              <?xml version="1.0" encoding="UTF-8"?>
             <svg id="chart-svg2" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 600 516.26">
-  <!-- Generator: Adobe Illustrator 30.8.2, SVG Export Plug-In . SVG Version: 2.1.4 Build 7)  -->
-  <defs>
-    <style>
+          <!-- Generator: Adobe Illustrator 30.8.2, SVG Export Plug-In . SVG Version: 2.1.4 Build 7)  -->
+          <defs>
+            <style>
       .st0, .st1 {
         font-size: 12.7px;
       }
@@ -597,7 +596,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
       }
 
       .st0, .st2, .st4, .st6, .st8, .st7 {
-        fill: #d3d5d6;
+        fill: #797777;
       }
 
       .st0, .st2, .st6, .st7 {
@@ -607,7 +606,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 
       .st1, .st9, .st10, .st11, .st12, .st13, .st14 {
         fill: none;
-        stroke: #fff;
+        stroke: #797777;
       }
 
       .st1, .st9, .st10, .st12, .st14 {
@@ -631,11 +630,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
       }
 
       .st15, .st16 {
-        fill: #fff;
+        fill: #797777;
       }
 
       .st17 {
-        fill: #606060;
+        fill: #797777;
       }
 
       .st11 {
@@ -643,7 +642,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
       }
 
       .st3 {
-        fill: #c7c8ca;
+        fill: #797777;
         font-size: 16.7px;
       }
 
@@ -1890,25 +1889,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
   <line class="st14" x1="93.78" y1="377.26" x2="188.47" y2="353.86"/>
   <line class="st14" x1="139.37" y1="486.66" x2="79.52" y2="386.39"/>
             </svg>
-            <!--<svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-              <defs><clipPath id="s1-c1clip"><circle cx="100" cy="100" r="34"/></clipPath></defs>
-              //C4 citations  
-              <circle cx="100" cy="100" r="90" fill="none" stroke="var(--rose)" stroke-opacity=".5" stroke-width=".6" stroke-dasharray="2 7"/>
-              //C3 occurrence trail  
-              <circle cx="100" cy="100" r="76" fill="none" stroke="var(--violet)" stroke-opacity=".7" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="0 7"/>
-              // C2 paragraphs  
-              <circle cx="100" cy="100" r="59" fill="none" stroke="var(--teal)" stroke-opacity=".45" stroke-width="9" stroke-dasharray="22 2 9 2 30 2 13 2 17 2"/>
-              // measure grid 
-              <circle cx="100" cy="100" r="47" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width=".4"/>
-              <circle cx="100" cy="100" r="45" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="3" stroke-dasharray=".4 4.3"/>
-              //C1 voronoi 
-              <circle cx="100" cy="100" r="34" fill="rgba(200,169,110,.08)" stroke="var(--gold)" stroke-opacity=".5" stroke-width=".5"/>
-              <g clip-path="url(#s1-c1clip)" fill="none" stroke="var(--gold)" stroke-opacity=".6" stroke-width=".5">
-                <path d="M98 62 L95 91 L64 103 M95 91 L119 99 L140 90 M119 99 L113 140 M95 91 L88 112 L113 140 M88 112 L60 126"/>
-              </g>
-              //start marker  
-              <line x1="100" y1="6" x2="100" y2="26" stroke="#fff" stroke-opacity=".65" stroke-width=".8" stroke-linecap="round"/>
-            </svg> -->
           </div>
         </section>
 
@@ -1984,7 +1964,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
           <div class="opt-row">
             <label><input type="checkbox" id="opt-stops" checked> stopwords</label>
             <label><input type="checkbox" id="opt-cites" checked> citations</label>
+            
+            <br>
           </div>
+          
           <button class="run-btn" id="run-btn" onclick="runAnalysis()"> CREATE CHART </button>
         </div>
 
